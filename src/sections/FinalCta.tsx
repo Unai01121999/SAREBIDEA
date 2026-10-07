@@ -1,6 +1,8 @@
 import { AnimatePresence, motion } from 'motion/react'
 import { useState, type FormEvent } from 'react'
-import { createLead, validateLead, type LeadFormErrors } from '../lib/leads'
+import { submitPublicLead, validateLead, type LeadFormErrors } from '../lib/leads'
+import { supabase, turnstileSiteKey } from '../lib/supabase'
+import { Turnstile } from '../components/ui/Turnstile'
 import { brand, businessTypes } from '../data/site'
 import { easeOut } from '../lib/motion'
 import { Icon } from '../components/ui/Icon'
@@ -15,6 +17,8 @@ export function FinalCta() {
   const [errors, setErrors] = useState<LeadFormErrors>({})
   const [failed, setFailed] = useState('')
   const [loading, setLoading] = useState(false)
+  const [token, setToken] = useState('')
+  const [resets, setResets] = useState(0)
 
   const onSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault()
@@ -35,15 +39,21 @@ export function FinalCta() {
       ;(form.elements.namedItem(first) as HTMLElement | null)?.focus()
       return
     }
+    if (supabase && !token) {
+      setFailed('Completa la comprobación de seguridad antes de enviar.')
+      return
+    }
     setLoading(true)
     try {
-      await createLead({ ...v, name: v.name.trim(), email: v.email.trim(), description: v.description.trim(), source: 'web' })
+      await submitPublicLead({ ...v, name: v.name.trim(), email: v.email.trim(), description: v.description.trim() }, token, String(d.get('company') ?? ''))
       setSent(true)
     } catch (e) {
       if ((e as { code?: string })?.code === 'invalid_argument') {
         setFailed('Esta vista previa solo guarda solicitudes enviadas por el equipo de SAREBIDEA. En la web publicada, el formulario funcionará para cualquier visitante.')
         return
       }
+      setToken('')
+      setResets((n) => n + 1)
       setFailed(`No hemos podido enviar tu solicitud. Inténtalo de nuevo o escríbenos a ${brand.email}.`)
     } finally {
       setLoading(false)
@@ -175,6 +185,16 @@ export function FinalCta() {
                     />
                     {err('description')}
                   </div>
+                  {/* Honeypot anti-bot: las personas no lo ven; los bots suelen rellenarlo. */}
+                  <div aria-hidden="true" className="absolute -left-[9999px] h-0 w-0 overflow-hidden">
+                    <label htmlFor="company">Empresa (no rellenar)</label>
+                    <input id="company" name="company" tabIndex={-1} autoComplete="off" />
+                  </div>
+                  {supabase && turnstileSiteKey && (
+                    <div className="sm:col-span-2">
+                      <Turnstile siteKey={turnstileSiteKey} onToken={setToken} resetKey={resets} />
+                    </div>
+                  )}
                   {failed && (
                     <p role="alert" className="text-sm text-[#ffb4b4] sm:col-span-2">
                       {failed}

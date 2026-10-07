@@ -1,6 +1,9 @@
-// Almacén de clientes (leads). Dos modos, por orden de prioridad:
-// 1. Vista previa de claude.ai: base de datos compartida del artifact (`db`).
-// 2. Desarrollo local: localStorage, solo para poder probar.
+// Almacén de clientes (leads). Tres modos, por orden de prioridad:
+// 1. Producción: Supabase (si hay VITE_SUPABASE_URL y VITE_SUPABASE_PUBLISHABLE_KEY). El ID SB-0001 lo pone la base de datos.
+//    El formulario público NO escribe en la tabla: llama a la Edge Function `submit-lead` (anti-bot + correo).
+// 2. Vista previa de claude.ai: base de datos compartida del artifact (`db`).
+// 3. Desarrollo local: localStorage, solo para poder probar.
+import { supabase } from './supabase'
 
 export type LeadSource = 'web' | 'telefono' | 'presencial' | 'email' | 'otro'
 export type LeadStatus = 'nuevo' | 'contactado' | 'cliente' | 'descartado'
@@ -90,6 +93,29 @@ type Db = {
 type UserCap = { canEdit(): Promise<boolean> }
 type ClaudeWin = { claude?: { use(name: string): Promise<unknown> } }
 
+// --- Supabase: columnas en snake_case ---
+const columns: Record<string, string> = {
+  businessType: 'business_type',
+  createdAt: 'created_at',
+  domainExpiry: 'domain_expiry',
+  webExpiry: 'web_expiry',
+  paymentStatus: 'payment_status',
+}
+const toRow = (o: Record<string, unknown>) =>
+  Object.fromEntries(
+    Object.entries(o)
+      .filter(([k, v]) => v !== undefined && k !== 'id')
+      // Fechas vacías: null (la columna es de tipo date)
+      .map(([k, v]) => [columns[k] ?? k, (k === 'domainExpiry' || k === 'webExpiry') && v === '' ? null : v]),
+  )
+const fromRow = (r: Record<string, unknown>): Lead => {
+  const o: Record<string, unknown> = {}
+  const back = Object.fromEntries(Object.entries(columns).map(([a, b]) => [b, a]))
+  for (const [k, v] of Object.entries(r)) o[back[k] ?? k] = v === null && k !== 'amount' ? undefined : v
+  if (typeof o.amount === 'string') o.amount = Number(o.amount)
+  return o as Lead
+}
+
 let dbPromise: Promise<Db | null> | null = null
 /** Base de datos del artifact, o null si no estamos dentro de claude.ai. */
 export function getDb(): Promise<Db | null> {
@@ -101,13 +127,14 @@ export function getDb(): Promise<Db | null> {
 
 /** ¿Puede este visitante ver el Área Privada? En claude.ai: solo editores/propietario. En local: sí (demo). */
 export async function canSeePrivate(): Promise<boolean> {
+  if (supabase) return true // en producción decide AuthGate (contraseña + segundo factor)
   const c = (window as unknown as ClaudeWin).claude
   if (!c?.use) return true
   const user = (await c.use('user').catch(() => null)) as UserCap | null
   return user ? user.canEdit() : false
 }
 
-export const isHosted = () => !!(window as unknown as ClaudeWin).claude?.use
+export const isHosted = () => !!supabase || !!(window as unknown as ClaudeWin).claude?.use
 
 const readLocal = (): Lead[] => {
   try {
@@ -131,7 +158,24 @@ const uid = () => `${Date.now().toString(36)}-${Math.random().toString(36).slice
 /** Última lista recibida por watchLeads: sirve para calcular el siguiente ID. */
 let latest: Lead[] = []
 
+/** Formulario público de la web: pasa por la Edge Function (Turnstile + validación + aviso por correo). */
+export async function submitPublicLead(
+  input: { name: string; phone: string; email: string; businessType: string; description: string },
+  turnstileToken: string,
+  company: string,
+): Promise<void> {
+  if (!supabase) return createLead({ ...input, source: 'web' })
+  const { error } = await supabase.functions.invoke('submit-lead', { body: { ...input, turnstileToken, company } })
+  if (error) throw error
+}
+
+/** Alta manual desde el Área privada (requiere sesión de administrador con segundo factor). */
 export async function createLead(input: LeadInput): Promise<void> {
+  if (supabase) {
+    const { error } = await supabase.from('leads').insert(toRow({ ...input, status: input.status ?? 'nuevo' }))
+    if (error) throw error
+    return
+  }
   const lead: Omit<Lead, 'id'> = { ...input, status: input.status ?? 'nuevo', createdAt: new Date().toISOString() }
   // El formulario público no puede leer la lista; esos clientes reciben su ID al abrir el Área privada.
   if (!lead.code && latest.length) lead.code = nextCode(latest)
@@ -147,12 +191,22 @@ export async function createLead(input: LeadInput): Promise<void> {
 
 export async function updateLead(id: string, patch: Partial<Omit<Lead, 'id'>>): Promise<void> {
   patch = Object.fromEntries(Object.entries(patch).filter(([, v]) => v !== undefined))
+  if (supabase) {
+    const { error } = await supabase.from('leads').update(toRow(patch)).eq('id', id)
+    if (error) throw error
+    return
+  }
   const db = await getDb()
   if (db) return db.collection(COLLECTION).doc(id).update(patch)
   writeLocal(readLocal().map((l) => (l.id === id ? { ...l, ...patch } : l)))
 }
 
 export async function deleteLead(id: string): Promise<void> {
+  if (supabase) {
+    const { error } = await supabase.from('leads').delete().eq('id', id)
+    if (error) throw error
+    return
+  }
   const db = await getDb()
   if (db) return db.collection(COLLECTION).doc(id).delete()
   writeLocal(readLocal().filter((l) => l.id !== id))
@@ -165,6 +219,22 @@ export function watchLeads(onLeads: (leads: Lead[]) => void, onError: (code: str
     latest = leads
     onLeads(leads)
     assignMissingCodes(leads)
+  }
+  if (supabase) {
+    const sb = supabase
+    const load = async () => {
+      const { data, error } = await sb.from('leads').select('*').order('created_at', { ascending: false })
+      if (error) onError(error.code ?? 'error')
+      else onLeads(data.map(fromRow))
+    }
+    load()
+    const channel = sb
+      .channel('leads-admin')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'leads' }, load)
+      .subscribe()
+    return () => {
+      sb.removeChannel(channel)
+    }
   }
   let cancelled = false
   getDb().then((db) => {
