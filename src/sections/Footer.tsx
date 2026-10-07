@@ -1,5 +1,6 @@
 import { brand } from '../data/site'
 import { Icon } from '../components/ui/Icon'
+import { openPreferences } from '../lib/consent'
 import { Logo } from '../components/ui/Logo'
 
 const cols = [
@@ -15,9 +16,9 @@ const cols = [
   {
     title: 'Legal',
     links: [
-      ['Aviso legal', '#'],
-      ['Privacidad', '#'],
-      ['Cookies', '#'],
+      ['Aviso legal', '#aviso-legal'],
+      ['Política de privacidad', '#politica-de-privacidad'],
+      ['Política de cookies', '#politica-de-cookies'],
     ],
   },
 ]
@@ -42,6 +43,13 @@ export function Footer() {
                     </a>
                   </li>
                 ))}
+                {c.title === 'Legal' && (
+                  <li>
+                    <button type="button" onClick={openPreferences} className="text-white/80 transition-colors hover:text-white">
+                      Configurar cookies
+                    </button>
+                  </li>
+                )}
               </ul>
             </nav>
           ))}

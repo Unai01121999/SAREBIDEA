@@ -7,6 +7,21 @@ export const brand = {
   phone: '680 530 886',
 }
 
+/**
+ * Datos del titular que exige el art. 10 de la LSSI y el art. 13 del RGPD.
+ * COMPLETA los campos "PENDIENTE" antes de publicar: aparecen tal cual en el Aviso legal y la Política de privacidad.
+ */
+export const legal = {
+  owner: 'PENDIENTE: nombre y apellidos o razón social',
+  taxId: 'PENDIENTE: NIF / CIF',
+  address: 'PENDIENTE: domicilio completo (calle, código postal, localidad, provincia)',
+  /** Si eres sociedad inscrita; si eres autónomo, déjalo vacío ('') y no se muestra. */
+  registry: '',
+  domain: 'sarebidea.com',
+  url: 'https://sarebidea.com',
+  updated: '7 de octubre de 2026',
+}
+
 export const nav = [
   { label: 'Servicios', href: '#servicios' },
   { label: 'Cómo funciona', href: '#como-funciona' },

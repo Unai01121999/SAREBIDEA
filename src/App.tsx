@@ -1,6 +1,9 @@
 import { AnimatePresence, MotionConfig } from 'motion/react'
 import { usePrivateRoute } from './hooks/usePrivateRoute'
 import { PrivateArea } from './private/PrivateArea'
+import { useLegalRoute } from './hooks/useLegalRoute'
+import { LegalPage } from './components/legal/LegalPage'
+import { CookieBanner } from './components/legal/CookieBanner'
 import { useLenis } from './hooks/useLenis'
 import { useReducedMotionPref } from './hooks/useMediaQuery'
 import { Navbar } from './sections/Navbar'
@@ -17,6 +20,7 @@ export default function App() {
   const reduced = useReducedMotionPref()
   useLenis(!reduced)
   const privateRoute = usePrivateRoute()
+  const legalRoute = useLegalRoute()
 
   return (
     <MotionConfig reducedMotion="user">
@@ -38,6 +42,8 @@ export default function App() {
       </main>
       <Footer />
       <AnimatePresence>{privateRoute.open && <PrivateArea onClose={privateRoute.hide} />}</AnimatePresence>
+      <AnimatePresence>{legalRoute.page && <LegalPage key={legalRoute.page} page={legalRoute.page} onClose={legalRoute.hide} />}</AnimatePresence>
+      <CookieBanner />
     </MotionConfig>
   )
 }
