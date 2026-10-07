@@ -16,8 +16,6 @@ import {
 } from '../lib/leads'
 import { Icon, type IconName } from '../components/ui/Icon'
 import { Logo } from '../components/ui/Logo'
-import { supabase } from '../lib/supabase'
-import { AuthGate } from './AuthGate'
 import { lock, PreviewLock } from './PreviewLock'
 import { ExpiryBadge, LeadDrawer, PaymentBadge, StatusBadge, withProtocol } from './LeadDrawer'
 
@@ -107,7 +105,6 @@ export function PrivateArea({ onClose }: { onClose: () => void }) {
   }, [])
 
   useEffect(() => {
-    if (supabase) return // en producción da paso AuthGate
     let alive = true
     canSeePrivate().then((ok) => alive && setAccess(ok ? 'locked' : 'denied'))
     return () => {
@@ -197,16 +194,11 @@ export function PrivateArea({ onClose }: { onClose: () => void }) {
           {access === 'allowed' && (
             <button
               type="button"
-              onClick={async () => {
+              onClick={() => {
                 setDrawer(null)
                 setLeads(null)
-                if (supabase) {
-                  await supabase.auth.signOut()
-                  setAccess('checking')
-                } else {
-                  lock()
-                  setAccess('locked')
-                }
+                lock()
+                setAccess('locked')
               }}
               className="inline-flex h-10 items-center rounded-full px-3.5 text-[0.94rem] text-ink-2 ring-1 ring-line transition-colors hover:bg-ink/[0.05] hover:text-ink sm:px-4"
             >
@@ -223,9 +215,8 @@ export function PrivateArea({ onClose }: { onClose: () => void }) {
       </header>
 
       <main className="container-x pt-8 pb-24 sm:pt-12">
-        {access === 'checking' && supabase && <AuthGate onReady={grant} />}
         {access === 'locked' && <PreviewLock onReady={grant} />}
-        {access === 'checking' && !supabase && <p className="py-20 text-center text-mute">Comprobando acceso…</p>}
+        {access === 'checking' && <p className="py-20 text-center text-mute">Comprobando acceso…</p>}
 
         {access === 'denied' && (
           <div className="mx-auto max-w-md py-24 text-center">

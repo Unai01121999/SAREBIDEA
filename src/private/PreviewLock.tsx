@@ -5,7 +5,7 @@ import { otpauthUri, randomSecret, verifyTotp } from '../lib/totp'
 import { brand } from '../data/site'
 import { Icon } from '../components/ui/Icon'
 
-// Segundo factor de la vista previa (sin Supabase): además de la cuenta de claude.ai, se pide el
+// Segundo factor de la vista previa: además de la cuenta de claude.ai, se pide el
 // código de 6 cifras de una app de autenticación. La clave vive en la base de datos del artifact
 // (solo la lee el propietario); en desarrollo local, en localStorage.
 // La sesión dura 8 horas o hasta pulsar "Cerrar sesión".

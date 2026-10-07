@@ -6,8 +6,7 @@ const subscribe = (cb: () => void) => {
   return () => window.removeEventListener('hashchange', cb)
 }
 
-// ?acceso=privada: vuelta del inicio de sesión con Google (ver AuthGate)
-const isOpen = () => window.location.hash === HASH || new URLSearchParams(window.location.search).has('acceso')
+const isOpen = () => window.location.hash === HASH
 
 /** El Área Privada vive en #area-privada: enlazable y el botón "atrás" la cierra. */
 export function usePrivateRoute() {
@@ -18,11 +17,7 @@ export function usePrivateRoute() {
   const hide = useCallback(() => {
     if (!isOpen()) return
     // Quita el hash sin saltar al inicio de la página
-    const params = new URLSearchParams(window.location.search)
-    params.delete('acceso')
-    params.delete('code')
-    const q = params.toString()
-    history.replaceState(null, '', window.location.pathname + (q ? `?${q}` : ''))
+    history.replaceState(null, '', window.location.pathname + window.location.search)
     window.dispatchEvent(new HashChangeEvent('hashchange'))
   }, [])
   return { open, show, hide }
