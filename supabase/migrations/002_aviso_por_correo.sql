@@ -9,7 +9,7 @@ language plpgsql security definer set search_path = public as $$
 begin
   if new.source = 'web' then
     perform net.http_post(
-      url     := 'https://TU_PROYECTO.supabase.co/functions/v1/notify-new-lead',
+      url     := 'https://klvdmrkwscmzpzyuquih.supabase.co/functions/v1/notify-new-lead',
       headers := jsonb_build_object('Content-Type', 'application/json', 'x-webhook-secret', 'TU_SECRETO'),
       body    := jsonb_build_object('type', 'INSERT', 'table', 'leads', 'record', to_jsonb(new))
     );
