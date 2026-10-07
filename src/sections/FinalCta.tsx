@@ -1,7 +1,7 @@
 import { AnimatePresence, motion } from 'motion/react'
 import { useState, type FormEvent } from 'react'
 import { createLead, validateLead, type LeadFormErrors } from '../lib/leads'
-import { brand, businessTypes, legal } from '../data/site'
+import { brand, businessTypes } from '../data/site'
 import { easeOut } from '../lib/motion'
 import { Icon } from '../components/ui/Icon'
 import { Reveal } from '../components/ui/Reveal'
@@ -194,15 +194,6 @@ export function FinalCta() {
                       </>
                     )}
                   </button>
-                  {/* Información básica de protección de datos (primera capa, art. 11 LOPDGDD) */}
-                  <p className="text-[12.5px] leading-relaxed text-white/50 sm:col-span-2">
-                    <strong className="font-medium text-white/70">Responsable:</strong> {legal.owner}. <strong className="font-medium text-white/70">Finalidad:</strong> atender tu solicitud y preparar tu propuesta.{' '}
-                    <strong className="font-medium text-white/70">Base jurídica:</strong> medidas precontractuales a petición tuya. <strong className="font-medium text-white/70">Destinatarios:</strong> proveedores de alojamiento y correo, sin cesiones a terceros. <strong className="font-medium text-white/70">Derechos:</strong> acceso, rectificación, supresión y otros, escribiendo a {brand.email}. Más información en la{' '}
-                    <a href="#politica-de-privacidad" className="underline underline-offset-2 hover:text-white">
-                      política de privacidad
-                    </a>
-                    .
-                  </p>
                   <div className="flex flex-col items-center gap-3 pt-1 sm:col-span-2">
                     <p className="text-[13px] text-white/45">¿Prefieres hablar?</p>
                     <a
