@@ -6,7 +6,7 @@ const subscribe = (cb: () => void) => {
   return () => window.removeEventListener('hashchange', cb)
 }
 
-// ?acceso: se mantiene por compatibilidad con enlaces antiguos
+// ?acceso=privada: se mantiene por compatibilidad con enlaces antiguos
 const isOpen = () => window.location.hash === HASH || new URLSearchParams(window.location.search).has('acceso')
 
 /** El Área Privada vive en #area-privada: enlazable y el botón "atrás" la cierra. */
