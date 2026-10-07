@@ -203,9 +203,16 @@ export function FinalCta() {
                     </a>
                     .
                   </p>
-                  <p className="pt-1 text-center text-[13px] text-white/45 sm:col-span-2">
-                    ¿Prefieres hablar? Llámanos al <span className="text-white/80 select-all">{brand.phone}</span>
-                  </p>
+                  <div className="flex flex-col items-center gap-3 pt-1 sm:col-span-2">
+                    <p className="text-[13px] text-white/45">¿Prefieres hablar?</p>
+                    <a
+                      href={`tel:+34${brand.phone.replace(/\s/g, '')}`}
+                      className="inline-flex h-12 w-full items-center justify-center gap-2.5 rounded-full text-[1rem] font-medium text-paper ring-1 ring-white/25 transition-[background-color,scale] duration-200 ease-[var(--ease-out-strong)] hover:bg-white/10 active:scale-[0.98]"
+                    >
+                      <Icon name="phone" size={18} />
+                      Llamar al {brand.phone}
+                    </a>
+                  </div>
                 </motion.form>
               )}
             </AnimatePresence>

@@ -14,7 +14,7 @@ export const brand = {
 export const legal = {
   owner: 'Unai Padura Larrea',
   taxId: '79078063S',
-  address: 'Gallarraga 20A',
+  address: 'Gueñes',
   /** Si eres sociedad inscrita; si eres autónomo, déjalo vacío ('') y no se muestra. */
   registry: '',
   domain: 'sarebidea.com',
