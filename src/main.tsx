@@ -13,7 +13,10 @@ import '@fontsource/instrument-serif/latin-400-italic.css'
 import '@fontsource/montserrat/latin-500.css'
 import '@fontsource/montserrat/latin-800.css'
 import './index.css'
+import { initAnalytics } from './lib/analytics'
 import App from './App.tsx'
+
+initAnalytics() // Google Analytics: solo se carga si se acepta la analítica
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>

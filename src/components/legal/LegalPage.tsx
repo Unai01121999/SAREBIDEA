@@ -176,6 +176,7 @@ function Privacidad() {
             'Supabase: base de datos donde se guardan las solicitudes (servidores en la Unión Europea).',
             'Resend: envío del aviso interno por correo electrónico cuando recibimos una solicitud (proveedor con sede en EE. UU.).',
             'Hostinger: alojamiento web y servicios de correo asociados al dominio.',
+            'Google (Google Analytics): solo si aceptas las cookies de analítica; mide el uso de la web de forma agregada (ver Política de cookies).',
           ]}
         />
         <p>
@@ -206,6 +207,10 @@ function Privacidad() {
 function Cookies() {
   const th = 'px-3 py-2.5 text-left text-[0.8rem] font-medium text-mute'
   const td = 'px-3 py-3 align-top text-[0.9rem]'
+  const optional: [string, string, string, string][] = [
+    ['_ga', 'Distinguir visitantes y medir el uso de la web. Google Analytics (Google Ireland Ltd. / Google LLC), cookie de terceros.', '13 meses', 'Analítica'],
+    ['_ga_9VQM7EP390', 'Mantener el estado de la sesión de visita. Google Analytics, cookie de terceros.', '13 meses', 'Analítica'],
+  ]
   const rows: [string, string, string, string][] = [
     ['sarebidea-consent', 'Recordar tu elección sobre cookies. Propia, localStorage.', '12 meses', 'Técnica'],
     ['sarebidea-private-tab', 'Recordar la pestaña abierta en el Área privada (solo la usa la persona administradora). Propia, localStorage.', 'Hasta que se borre', 'Técnica'],
@@ -219,7 +224,7 @@ function Cookies() {
 
       <Section title="1. Qué usamos hoy">
         <p>
-          Esta web <strong className="font-semibold">no utiliza cookies de analítica ni de publicidad</strong>, y no carga servicios de terceros al abrirse (las tipografías se sirven desde nuestro propio sitio, sin contactar con otros servidores). Solo usamos almacenamiento técnico imprescindible, que no requiere consentimiento:
+          Al abrirse, esta web <strong className="font-semibold">no carga servicios de terceros ni crea cookies de analítica o publicidad</strong> (las tipografías se sirven desde nuestro propio sitio, sin contactar con otros servidores). Solo usa almacenamiento técnico imprescindible, que no requiere consentimiento:
         </p>
         <div className="overflow-x-auto rounded-2xl bg-white ring-1 ring-line">
           <table className="w-full min-w-[34rem] border-collapse">
@@ -245,9 +250,34 @@ function Cookies() {
         </div>
       </Section>
 
-      <Section title="2. Cookies opcionales">
+      <Section title="2. Cookies opcionales (solo si las aceptas)">
         <p>
-          Si en el futuro añadimos analítica o marketing, estarán <strong className="font-semibold">desactivadas por defecto</strong> y no se cargará nada hasta que las aceptes. Rechazar es tan fácil como aceptar: el banner ofrece los botones «Rechazar todo» y «Aceptar todo» al mismo nivel. Si cambiamos las categorías, te volveremos a preguntar.
+          Usamos <strong className="font-semibold">Google Analytics</strong> para conocer, de forma agregada, cómo se usa la web. Está <strong className="font-semibold">desactivado por defecto</strong>: no se carga nada de Google ni se crea ninguna cookie hasta que aceptas la categoría «Analítica». Si la rechazas, o la retiras después, se detiene y se borran sus cookies. Rechazar es tan fácil como aceptar: el banner ofrece los botones «Rechazar todo» y «Aceptar todo» al mismo nivel. No usamos cookies de marketing.
+        </p>
+        <div className="overflow-x-auto rounded-2xl bg-white ring-1 ring-line">
+          <table className="w-full min-w-[34rem] border-collapse">
+            <thead className="border-b border-line">
+              <tr>
+                <th className={th}>Nombre</th>
+                <th className={th}>Finalidad y titular</th>
+                <th className={th}>Duración</th>
+                <th className={th}>Tipo</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-line">
+              {optional.map(([n, f, d, t]) => (
+                <tr key={n}>
+                  <td className={`${td} font-mono text-[0.82rem]`}>{n}</td>
+                  <td className={td}>{f}</td>
+                  <td className={td}>{d}</td>
+                  <td className={td}>{t}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+        <p>
+          Al aceptar, Google puede tratar datos como tu dirección IP y datos de uso, y transferirlos fuera del Espacio Económico Europeo con las garantías que ofrece (cláusulas contractuales tipo y Marco de Privacidad de Datos UE-EE. UU.). Más información en la <a href="https://policies.google.com/technologies/partner-sites?hl=es" target="_blank" rel="noopener noreferrer" className={A}>política de Google sobre el uso de datos</a>. Si cambiamos las categorías, te volveremos a preguntar.
         </p>
       </Section>
 

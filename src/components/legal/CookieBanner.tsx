@@ -11,7 +11,7 @@ const categories: { key: Category; title: string; body: string }[] = [
   {
     key: 'analytics',
     title: 'Analítica',
-    body: 'Nos ayudan a entender cómo se usa la web (páginas visitadas, tiempos) para mejorarla. Hoy no hay ninguna activa.',
+    body: 'Google Analytics: nos ayuda a entender cómo se usa la web (páginas visitadas, tiempos) para mejorarla. Solo se carga si la aceptas.',
   },
   {
     key: 'marketing',
