@@ -12,9 +12,9 @@ export const brand = {
  * COMPLETA los campos "PENDIENTE" antes de publicar: aparecen tal cual en el Aviso legal y la Política de privacidad.
  */
 export const legal = {
-  owner: 'PENDIENTE: nombre y apellidos o razón social',
-  taxId: 'PENDIENTE: NIF / CIF',
-  address: 'PENDIENTE: domicilio completo (calle, código postal, localidad, provincia)',
+  owner: 'Unai Padura Larrea',
+  taxId: '79078063S',
+  address: 'Gallarraga 20A',
   /** Si eres sociedad inscrita; si eres autónomo, déjalo vacío ('') y no se muestra. */
   registry: '',
   domain: 'sarebidea.com',
