@@ -61,11 +61,6 @@ export function Footer() {
                   {brand.email}
                 </a>
               </li>
-              <li>
-                <a href={`tel:+34${brand.phone.replace(/\s/g, '')}`} className="hover:text-white">
-                  {brand.phone}
-                </a>
-              </li>
             </ul>
             <div className="mt-5 flex gap-2">
               {(['instagram', 'linkedin'] as const).map((n) => (

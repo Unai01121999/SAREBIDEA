@@ -53,7 +53,6 @@ function AvisoLegal() {
             ['NIF / CIF', legal.taxId],
             ['Domicilio', legal.address],
             ['Correo electrónico', mail],
-            ['Teléfono', brand.phone],
             ['Sitio web', legal.url],
             ...(legal.registry ? ([['Registro Mercantil', legal.registry]] as [string, ReactNode][]) : []),
           ]}

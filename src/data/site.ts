@@ -4,7 +4,6 @@
 export const brand = {
   name: 'SAREBIDEA',
   email: 'sarebidea@sarebidea.com',
-  phone: '680 530 886',
 }
 
 /**
