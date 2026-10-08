@@ -1,0 +1,334 @@
+// Esquema de base de datos del panel SAREBIDEA (PostgreSQL).
+// Diseñado para crecer: IDs de texto (cuid), índices en todas las claves de búsqueda y de listados habituales,
+// dinero en Decimal (nunca Float) y borrado en cascada solo donde tiene sentido.
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// ─── Enumeraciones ──────────────────────────────────────────────────────────────
+
+enum UserRole {
+  OWNER
+  ADMIN
+  EDITOR
+  VIEWER
+}
+
+enum ClientStatus {
+  ACTIVE
+  PENDING
+  INACTIVE
+}
+
+enum ServiceType {
+  WEB_DESIGN
+  HOSTING
+  DOMAIN
+  MAINTENANCE
+  SEO
+  ECOMMERCE
+}
+
+enum WebsiteStatus {
+  DEVELOPMENT
+  PRODUCTION
+  PAUSED
+  ARCHIVED
+}
+
+enum Technology {
+  WORDPRESS
+  NEXTJS
+  REACT
+  SHOPIFY
+  PRESTASHOP
+  WEBFLOW
+  OTHER
+}
+
+enum InvoiceStatus {
+  PAID
+  PENDING
+  OVERDUE
+  CANCELLED
+}
+
+enum InvoiceConcept {
+  WEB_DEVELOPMENT
+  HOSTING
+  DOMAIN
+  MAINTENANCE
+  SEO
+  ECOMMERCE
+}
+
+enum TaskStatus {
+  TODO
+  IN_PROGRESS
+  REVIEW
+  DONE
+}
+
+enum TaskPriority {
+  LOW
+  MEDIUM
+  HIGH
+  URGENT
+}
+
+enum ActivityEntity {
+  CLIENT
+  WEBSITE
+  DOMAIN
+  HOSTING
+  INVOICE
+  TASK
+}
+
+// ─── Usuarios ───────────────────────────────────────────────────────────────────
+
+model User {
+  id         String   @id @default(cuid())
+  name       String
+  email      String   @unique
+  role       UserRole @default(EDITOR)
+  active     Boolean  @default(true)
+  /// ID del usuario en el proveedor de autenticación (p. ej. Supabase Auth). Nunca se guardan contraseñas aquí.
+  authUserId String?  @unique
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  assignedTasks Task[]         @relation("TaskAssignee")
+  comments      TaskComment[]
+  activity      ActivityLog[]
+
+  @@index([role, active])
+}
+
+// ─── Clientes ───────────────────────────────────────────────────────────────────
+
+model Client {
+  id          String       @id @default(cuid())
+  company     String
+  contactName String
+  email       String
+  phone       String       @default("")
+  address     String       @default("")
+  postalCode  String       @default("")
+  province    String       @default("")
+  country     String       @default("España")
+  /// CIF/NIF. No es único: un mismo titular puede tener varias fichas (p. ej. tienda y restaurante).
+  taxId       String       @default("")
+  status      ClientStatus @default(PENDING)
+  services    ServiceType[]
+  notes       String       @default("")
+  /// Archivado lógico: el cliente sigue existiendo pero se oculta de los listados.
+  archivedAt  DateTime?
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+
+  websites Website[]
+  domains  Domain[]
+  hostings Hosting[]
+  invoices Invoice[]
+  tasks    Task[]
+
+  @@index([status, archivedAt])
+  @@index([company])
+  @@index([email])
+  @@index([taxId])
+  @@index([createdAt(sort: Desc)])
+}
+
+// ─── Webs ───────────────────────────────────────────────────────────────────────
+
+model Website {
+  id              String        @id @default(cuid())
+  clientId        String
+  name            String
+  status          WebsiteStatus @default(DEVELOPMENT)
+  technology      Technology    @default(WORDPRESS)
+  description     String        @default("")
+  domainName      String        @default("")
+  productionUrl   String        @default("")
+  stagingUrl      String        @default("")
+  repoUrl         String        @default("")
+  mainBranch      String        @default("main")
+  hostingProvider String        @default("")
+  startDate       DateTime
+  publishDate     DateTime?
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+
+  client   Client    @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  domains  Domain[]
+  hostings Hosting[]
+  tasks    Task[]
+
+  @@index([clientId])
+  @@index([status, updatedAt(sort: Desc)])
+  @@index([technology])
+}
+
+// ─── Dominios ───────────────────────────────────────────────────────────────────
+
+model Domain {
+  id           String   @id @default(cuid())
+  clientId     String
+  websiteId    String?
+  name         String   @unique
+  registrar    String
+  registeredAt DateTime
+  /// Clave de las alertas (30 / 15 / 7 días y caducado): se consulta por rango de fechas.
+  renewsAt     DateTime
+  annualCost   Decimal  @db.Decimal(10, 2)
+  autoRenew    Boolean  @default(false)
+  dns          String   @default("")
+  nameservers  String[]
+  notes        String   @default("")
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  client  Client   @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  website Website? @relation(fields: [websiteId], references: [id], onDelete: SetNull)
+
+  @@index([renewsAt])
+  @@index([clientId])
+  @@index([websiteId])
+  @@index([registrar])
+}
+
+// ─── Hosting ────────────────────────────────────────────────────────────────────
+
+model Hosting {
+  id           String   @id @default(cuid())
+  clientId     String
+  websiteId    String?
+  provider     String
+  plan         String
+  annualCost   Decimal  @db.Decimal(10, 2)
+  contractedAt DateTime
+  renewsAt     DateTime
+  active       Boolean  @default(true)
+  notes        String   @default("")
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  client  Client   @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  website Website? @relation(fields: [websiteId], references: [id], onDelete: SetNull)
+
+  @@index([active, renewsAt])
+  @@index([clientId])
+  @@index([websiteId])
+  @@index([provider])
+}
+
+// ─── Facturación ────────────────────────────────────────────────────────────────
+
+model Invoice {
+  id          String         @id @default(cuid())
+  /// Numeración correlativa por año: F-2026-001. Única en toda la base de datos.
+  number      String         @unique
+  clientId    String
+  concept     InvoiceConcept
+  description String
+  issuedAt    DateTime
+  dueAt       DateTime
+  /// Base imponible.
+  subtotal    Decimal        @db.Decimal(10, 2)
+  /// IVA en porcentaje (21.00).
+  taxRate     Decimal        @db.Decimal(5, 2)
+  status      InvoiceStatus  @default(PENDING)
+  /// Ingreso recurrente (hosting, mantenimiento, renovaciones).
+  recurring   Boolean        @default(false)
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
+
+  /// Las facturas son documentos legales: si un cliente tiene facturas, no se puede borrar (hay que archivarlo).
+  client Client @relation(fields: [clientId], references: [id], onDelete: Restrict)
+
+  @@index([clientId, issuedAt(sort: Desc)])
+  @@index([status, dueAt])
+  @@index([issuedAt])
+  @@index([concept, issuedAt])
+}
+
+// ─── Tareas ─────────────────────────────────────────────────────────────────────
+
+model Task {
+  id          String       @id @default(cuid())
+  title       String
+  description String       @default("")
+  clientId    String?
+  websiteId   String?
+  assigneeId  String?
+  priority    TaskPriority @default(MEDIUM)
+  status      TaskStatus   @default(TODO)
+  labels      String[]
+  /// Posición dentro de su columna del Kanban.
+  position    Int          @default(0)
+  dueAt       DateTime?
+  completedAt DateTime?
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+
+  client   Client?       @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  website  Website?      @relation(fields: [websiteId], references: [id], onDelete: SetNull)
+  assignee User?         @relation("TaskAssignee", fields: [assigneeId], references: [id], onDelete: SetNull)
+  comments TaskComment[]
+
+  @@index([status, position])
+  @@index([clientId])
+  @@index([websiteId])
+  @@index([assigneeId])
+  @@index([dueAt])
+}
+
+model TaskComment {
+  id         String   @id @default(cuid())
+  taskId     String
+  authorId   String?
+  /// Nombre en el momento del comentario (se conserva aunque se borre el usuario).
+  authorName String
+  text       String
+  createdAt  DateTime @default(now())
+
+  task   Task  @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  author User? @relation(fields: [authorId], references: [id], onDelete: SetNull)
+
+  @@index([taskId, createdAt])
+}
+
+// ─── Historial y ajustes ────────────────────────────────────────────────────────
+
+/// Registro de acciones (historial de la ficha de cliente y actividad reciente del dashboard).
+model ActivityLog {
+  id        String         @id @default(cuid())
+  entity    ActivityEntity
+  entityId  String
+  /// Sin clave foránea a propósito: el historial debe sobrevivir al borrado del cliente.
+  clientId  String?
+  message   String
+  actorId   String?
+  actorName String         @default("Sistema")
+  createdAt DateTime       @default(now())
+
+  actor User? @relation(fields: [actorId], references: [id], onDelete: SetNull)
+
+  @@index([createdAt(sort: Desc)])
+  @@index([clientId, createdAt(sort: Desc)])
+  @@index([entity, entityId])
+}
+
+/// Ajustes de la aplicación como pares clave/valor (empresa, impuestos, moneda, proveedores…).
+model Setting {
+  key       String   @id
+  value     Json
+  updatedAt DateTime @updatedAt
+}
