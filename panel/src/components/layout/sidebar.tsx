@@ -22,7 +22,7 @@ export function SidebarNav({ collapsed = false, onNavigate }: { collapsed?: bool
       ))}
       {/* Solicitudes reales del formulario de la web: viven en el área privada anterior (Supabase) hasta migrarlas aquí. */}
       <a
-        href="/#area-privada"
+        href="/#solicitudes-web"
         className={cn('group mt-3 flex h-9 items-center gap-3 rounded-lg border border-dashed px-2.5 text-[13.5px] font-medium text-muted-foreground transition-colors hover:bg-accent/70 hover:text-foreground', collapsed && 'justify-center px-0')}
         title="Solicitudes del formulario de la web"
       >

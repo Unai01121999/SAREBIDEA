@@ -1,6 +1,7 @@
 import { useCallback, useSyncExternalStore } from 'react'
 
-const HASH = '#area-privada'
+// Visor de solicitudes del formulario (Supabase). El «Área privada» principal es ahora el panel (/panel/).
+const HASH = '#solicitudes-web'
 const subscribe = (cb: () => void) => {
   window.addEventListener('hashchange', cb)
   return () => window.removeEventListener('hashchange', cb)
@@ -9,7 +10,7 @@ const subscribe = (cb: () => void) => {
 // ?acceso=privada: se mantiene por compatibilidad con enlaces antiguos
 const isOpen = () => window.location.hash === HASH || new URLSearchParams(window.location.search).has('acceso')
 
-/** El Área Privada vive en #area-privada: enlazable y el botón "atrás" la cierra. */
+/** El visor de solicitudes vive en #solicitudes-web: enlazable y el botón "atrás" lo cierra. */
 export function usePrivateRoute() {
   const open = useSyncExternalStore(subscribe, isOpen, () => false)
   const show = useCallback(() => {

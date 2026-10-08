@@ -21,6 +21,9 @@ const goToPanel = () => {
   window.location.assign('/panel/')
 }
 
+// Enlaces antiguos a #area-privada también llevan al panel.
+if (typeof window !== 'undefined' && window.location.hash === '#area-privada') window.location.replace('/panel/')
+
 export default function App() {
   const reduced = useReducedMotionPref()
   useLenis(!reduced)

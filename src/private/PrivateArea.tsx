@@ -302,6 +302,9 @@ export function PrivateArea({ onClose }: { onClose: () => void }) {
           </nav>
           <div className="space-y-1 border-t border-slate-900/[0.07] p-3">
             {!isHosted() && <p className="px-3 pb-2 text-[12px] leading-snug text-slate-400">Modo local: los datos se guardan solo en este navegador.</p>}
+            <a href="/panel/" className="flex h-10 w-full items-center gap-3 rounded-xl bg-sky-50 px-3 text-[0.9rem] font-medium text-sky-700 transition-colors hover:bg-sky-100">
+              <Icon name="grid" size={17} /> Abrir el panel completo
+            </a>
             <button type="button" onClick={onClose} className="flex h-10 w-full items-center gap-3 rounded-xl px-3 text-[0.9rem] text-slate-600 transition-colors hover:bg-slate-50 hover:text-slate-900">
               <Icon name="arrow" size={17} className="rotate-180 text-slate-400" /> Volver a la web
             </button>
