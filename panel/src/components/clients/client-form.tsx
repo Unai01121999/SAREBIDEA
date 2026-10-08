@@ -43,7 +43,7 @@ export function useClientForm(client: Client | undefined, onDone: (saved?: Clien
       const saved = await update.mutateAsync({ id: client.id, patch: v })
       onDone(saved)
     } else {
-      const saved = await create.mutateAsync({ ...v, archived: false })
+      const saved = await create.mutateAsync({ ...v, archived: false, origin: 'MANUAL', sourceId: null, formData: null })
       onDone(saved)
     }
   })

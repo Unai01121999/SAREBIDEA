@@ -1,6 +1,5 @@
 import { AnimatePresence, MotionConfig } from 'motion/react'
-import { usePrivateRoute } from './hooks/usePrivateRoute'
-import { PrivateArea } from './private/PrivateArea'
+import { useEffect } from 'react'
 import { useLegalRoute } from './hooks/useLegalRoute'
 import { LegalPage } from './components/legal/LegalPage'
 import { CookieBanner } from './components/legal/CookieBanner'
@@ -21,13 +20,19 @@ const goToPanel = () => {
   window.location.assign('/panel/')
 }
 
-// Enlaces antiguos a #area-privada también llevan al panel.
-if (typeof window !== 'undefined' && window.location.hash === '#area-privada') window.location.replace('/panel/')
+// Enlaces antiguos a #area-privada también llevan al panel (al cargar y si cambia solo el hash).
+const redirectLegacy = () => {
+  if (window.location.hash === '#area-privada') window.location.replace('/panel/')
+}
+if (typeof window !== 'undefined') redirectLegacy()
 
 export default function App() {
   const reduced = useReducedMotionPref()
   useLenis(!reduced)
-  const privateRoute = usePrivateRoute()
+  useEffect(() => {
+    window.addEventListener('hashchange', redirectLegacy)
+    return () => window.removeEventListener('hashchange', redirectLegacy)
+  }, [])
   const legalRoute = useLegalRoute()
 
   return (
@@ -49,7 +54,6 @@ export default function App() {
         <FinalCta />
       </main>
       <Footer />
-      <AnimatePresence>{privateRoute.open && <PrivateArea onClose={privateRoute.hide} />}</AnimatePresence>
       <AnimatePresence>{legalRoute.page && <LegalPage key={legalRoute.page} page={legalRoute.page} onClose={legalRoute.hide} />}</AnimatePresence>
       <CookieBanner />
     </MotionConfig>

@@ -1,4 +1,4 @@
-import { getDb, persistDb, resetDb } from '@/lib/mock-db'
+import { clearDb, getDb, persistDb, resetDb } from '@/lib/mock-db'
 import { sleep, uid } from '@/lib/utils'
 import type { ActivityEntry, EntityMap, EntityName } from '@/types/domain'
 import type { DataSource, Repository } from './repository'
@@ -127,5 +127,9 @@ export const mockSource: DataSource = {
   async reset() {
     await sleep(LATENCY)
     resetDb()
+  },
+  async clear() {
+    await sleep(LATENCY)
+    clearDb()
   },
 }

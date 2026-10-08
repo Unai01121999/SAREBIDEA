@@ -27,7 +27,7 @@ export function FinalCta() {
       businessType: String(d.get('businessType') ?? ''),
       description: String(d.get('description') ?? ''),
     }
-    const errs = validateLead(v, { requireAll: true })
+    const errs = validateLead(v)
     setErrors(errs)
     setFailed('')
     const first = Object.keys(errs)[0]

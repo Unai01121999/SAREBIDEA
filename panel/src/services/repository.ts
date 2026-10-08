@@ -14,4 +14,5 @@ export interface DataSource {
   activity: { list(): Promise<ActivityEntry[]> }
   settings: { get(): Promise<AppSettings>; update(patch: Partial<AppSettings>): Promise<AppSettings> }
   reset?(): Promise<void>
+  clear?(): Promise<void>
 }

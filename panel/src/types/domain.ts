@@ -6,6 +6,9 @@ export type ISODate = string
 export const CLIENT_STATUSES = ['ACTIVE', 'PENDING', 'INACTIVE'] as const
 export type ClientStatus = (typeof CLIENT_STATUSES)[number]
 
+export const CLIENT_ORIGINS = ['MANUAL', 'FORM'] as const
+export type ClientOrigin = (typeof CLIENT_ORIGINS)[number]
+
 export const SERVICE_TYPES = ['WEB_DESIGN', 'HOSTING', 'DOMAIN', 'MAINTENANCE', 'SEO', 'ECOMMERCE'] as const
 export type ServiceType = (typeof SERVICE_TYPES)[number]
 
@@ -45,8 +48,21 @@ export interface Client {
   services: ServiceType[]
   notes: string
   archived: boolean
+  /** Cómo llegó: dado de alta a mano en el panel o a través del formulario de la web. */
+  origin: ClientOrigin
+  /** Si vino del formulario: ID de la solicitud en la tabla `leads` de Supabase (evita importarla dos veces). */
+  sourceId: string | null
+  /** Lo que escribió la persona en el formulario (solo origen FORM). */
+  formData: ClientFormData | null
   createdAt: ISODate
   updatedAt: ISODate
+}
+
+export interface ClientFormData {
+  code: string
+  businessType: string
+  description: string
+  submittedAt: ISODate
 }
 
 export interface Website {

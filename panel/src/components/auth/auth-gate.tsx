@@ -34,6 +34,16 @@ export function AuthGate({ children }: { children: React.ReactNode }) {
     let alive = true
 
     const resolve = async (session: Session | null) => {
+      try {
+        await check(session)
+      } catch {
+        // Sesión dañada o ilegible: se descarta y se pide entrar de nuevo (nunca se queda en «Comprobando…»).
+        await sb.auth.signOut({ scope: 'local' }).catch(() => undefined)
+        if (alive) setStep({ kind: 'signin' })
+      }
+    }
+
+    const check = async (session: Session | null) => {
       if (!alive) return
       if (!session) return setStep({ kind: 'signin' })
       const email = session.user.email?.toLowerCase() ?? ''
@@ -53,7 +63,10 @@ export function AuthGate({ children }: { children: React.ReactNode }) {
       if (alive) setStep({ kind: 'enroll', factorId: data.id, qr: data.totp.qr_code, secret: data.totp.secret })
     }
 
-    sb.auth.getSession().then(({ data }) => resolve(data.session))
+    sb.auth
+      .getSession()
+      .then(({ data }) => resolve(data.session))
+      .catch(() => resolve(null))
     const { data: sub } = sb.auth.onAuthStateChange((event, session) => {
       if (event === 'SIGNED_IN' || event === 'SIGNED_OUT') resolve(session)
     })

@@ -1,10 +1,13 @@
 // Etiquetas en español y colores semánticos de cada enumeración del dominio.
-import type { ClientStatus, InvoiceConcept, InvoiceStatus, ServiceType, TaskPriority, TaskStatus, Technology, UserRole, WebsiteStatus } from '@/types/domain'
+import type { ClientOrigin, ClientStatus, InvoiceConcept, InvoiceStatus, ServiceType, TaskPriority, TaskStatus, Technology, UserRole, WebsiteStatus } from '@/types/domain'
 
 export type Tone = 'neutral' | 'success' | 'warning' | 'danger' | 'info' | 'brand'
 
 export const clientStatusLabel: Record<ClientStatus, string> = { ACTIVE: 'Activo', PENDING: 'Pendiente', INACTIVE: 'Inactivo' }
 export const clientStatusTone: Record<ClientStatus, Tone> = { ACTIVE: 'success', PENDING: 'warning', INACTIVE: 'neutral' }
+
+export const originLabel: Record<ClientOrigin, string> = { MANUAL: 'Alta manual', FORM: 'Formulario web' }
+export const originTone: Record<ClientOrigin, Tone> = { MANUAL: 'neutral', FORM: 'info' }
 
 export const serviceLabel: Record<ServiceType, string> = {
   WEB_DESIGN: 'Diseño web',

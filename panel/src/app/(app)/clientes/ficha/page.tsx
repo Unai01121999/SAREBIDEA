@@ -1,6 +1,6 @@
 'use client'
 
-import { Archive, ArchiveRestore, ExternalLink, Mail, MapPin, Pencil, Phone, Plus, Trash2 } from 'lucide-react'
+import { Archive, ArchiveRestore, ExternalLink, FileText, Mail, MapPin, Pencil, PenLine, Phone, Plus, Trash2 } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { useMemo, useState } from 'react'
@@ -19,9 +19,10 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { WebsiteFormDialog } from '@/components/websites/website-form'
 import { clientsApi, domainsApi, hostingsApi, invoicesApi, useActivity, websitesApi } from '@/hooks/use-entities'
-import { formatCurrency, formatDate, timeAgo } from '@/lib/format'
-import { conceptLabel } from '@/lib/labels'
+import { formatCurrency, formatDate, formatDateTime, timeAgo } from '@/lib/format'
+import { conceptLabel, originLabel, originTone } from '@/lib/labels'
 import { effectiveStatus, invoiceTotal } from '@/lib/metrics'
+import type { Client } from '@/types/domain'
 import { routes } from '@/lib/routes'
 
 export default function ClientDetailPage() {
@@ -71,6 +72,9 @@ export default function ClientDetailPage() {
         description={
           <span className="flex flex-wrap items-center gap-2">
             <ClientStatusBadge status={client.status} />
+            <Badge tone={originTone[client.origin ?? 'MANUAL']} dot={false}>
+              {originLabel[client.origin ?? 'MANUAL']}
+            </Badge>
             {client.archived && <Badge tone="neutral">Archivado</Badge>}
             <span>Cliente desde {formatDate(client.createdAt)}</span>
           </span>
@@ -110,6 +114,7 @@ export default function ClientDetailPage() {
           <TabsTrigger value="webs">Webs ({cWebs.length})</TabsTrigger>
           <TabsTrigger value="dominios">Dominios ({cDomains.length})</TabsTrigger>
           <TabsTrigger value="facturacion">Facturación ({cInvoices.length})</TabsTrigger>
+          <TabsTrigger value="origen">Origen</TabsTrigger>
           <TabsTrigger value="historial">Historial</TabsTrigger>
         </TabsList>
 
@@ -262,6 +267,10 @@ export default function ClientDetailPage() {
           </Card>
         </TabsContent>
 
+        <TabsContent value="origen">
+          <OriginPanel client={client} />
+        </TabsContent>
+
         <TabsContent value="historial">
           <Card>
             <CardContent>
@@ -335,5 +344,62 @@ function EmptyRow({ cols, text }: { cols: number; text: string }) {
         {text}
       </TableCell>
     </TableRow>
+  )
+}
+
+/** Cómo llegó este cliente: formulario de la web o alta manual, con lo que se escribió en el formulario. */
+function OriginPanel({ client }: { client: Client }) {
+  const fromForm = (client.origin ?? 'MANUAL') === 'FORM'
+  return (
+    <div className="grid gap-4 lg:grid-cols-3">
+      <Card className="lg:col-span-2">
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            {fromForm ? <FileText className="size-4 text-info" /> : <PenLine className="size-4 text-muted-foreground" />}
+            {fromForm ? 'Llegó a través del formulario de la web' : 'Dado de alta manualmente'}
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <p className="mb-5 text-sm text-muted-foreground">
+            {fromForm ? 'La propia persona rellenó el formulario de contacto de sarebidea.com y la solicitud se importó al panel automáticamente.' : 'Lo añadiste tú desde el panel (por ejemplo tras una llamada, un correo o una visita).'}
+          </p>
+          <dl className="grid gap-x-6 gap-y-4 sm:grid-cols-2">
+            <div>
+              <dt className="text-xs text-muted-foreground">Origen</dt>
+              <dd className="mt-1">
+                <Badge tone={originTone[client.origin ?? 'MANUAL']}>{originLabel[client.origin ?? 'MANUAL']}</Badge>
+              </dd>
+            </div>
+            <div>
+              <dt className="text-xs text-muted-foreground">{fromForm ? 'Solicitud recibida' : 'Fecha de alta'}</dt>
+              <dd className="mt-1 text-sm font-medium">{formatDateTime(fromForm ? (client.formData?.submittedAt ?? client.createdAt) : client.createdAt)}</dd>
+            </div>
+            {fromForm ? (
+              <>
+                {client.formData?.code && (
+                  <div>
+                    <dt className="text-xs text-muted-foreground">Referencia de la solicitud</dt>
+                    <dd className="mt-1 text-sm font-medium tabular">{client.formData.code}</dd>
+                  </div>
+                )}
+                <div>
+                  <dt className="text-xs text-muted-foreground">Tipo de negocio indicado</dt>
+                  <dd className="mt-1 text-sm font-medium">{client.formData?.businessType || '—'}</dd>
+                </div>
+                <div className="sm:col-span-2">
+                  <dt className="text-xs text-muted-foreground">Lo que escribió en el formulario</dt>
+                  <dd className="mt-1 rounded-lg bg-muted/60 p-3 text-sm whitespace-pre-wrap">{client.formData?.description || '—'}</dd>
+                </div>
+              </>
+            ) : (
+              <div>
+                <dt className="text-xs text-muted-foreground">Dado de alta por</dt>
+                <dd className="mt-1 text-sm font-medium">Unai Padura Larrea</dd>
+              </div>
+            )}
+          </dl>
+        </CardContent>
+      </Card>
+    </div>
   )
 }

@@ -10,14 +10,15 @@ import { PageHeader } from '@/components/layout/page-header'
 import { ClientStatusBadge } from '@/components/shared/badges'
 import { RowActions } from '@/components/shared/row-actions'
 import { Avatar } from '@/components/ui/avatar'
+import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { ConfirmDialog } from '@/components/ui/confirm-dialog'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { clientsApi, websitesApi } from '@/hooks/use-entities'
 import { downloadCsv } from '@/lib/csv'
 import { formatDate } from '@/lib/format'
-import { clientStatusLabel } from '@/lib/labels'
-import { CLIENT_STATUSES, type Client } from '@/types/domain'
+import { clientStatusLabel, originLabel, originTone } from '@/lib/labels'
+import { CLIENT_ORIGINS, CLIENT_STATUSES, type Client } from '@/types/domain'
 import { routes } from '@/lib/routes'
 
 export default function ClientsPage() {
@@ -27,6 +28,7 @@ export default function ClientsPage() {
   const update = clientsApi.useUpdate()
   const remove = clientsApi.useRemove()
   const [status, setStatus] = useState<'ALL' | Client['status']>('ALL')
+  const [origin, setOrigin] = useState<'ALL' | Client['origin']>('ALL')
   const [scope, setScope] = useState<'active' | 'archived' | 'all'>('active')
   const [editing, setEditing] = useState<Client | undefined>()
   const [toDelete, setToDelete] = useState<Client | undefined>()
@@ -38,8 +40,8 @@ export default function ClientsPage() {
   }, [websites])
 
   const rows = useMemo(
-    () => (clients ?? []).filter((c) => (status === 'ALL' || c.status === status) && (scope === 'all' || (scope === 'archived') === c.archived)),
-    [clients, status, scope],
+    () => (clients ?? []).filter((c) => (status === 'ALL' || c.status === status) && (origin === 'ALL' || (c.origin ?? 'MANUAL') === origin) && (scope === 'all' || (scope === 'archived') === c.archived)),
+    [clients, status, origin, scope],
   )
 
   const columns: Col<Client>[] = [
@@ -57,10 +59,11 @@ export default function ClientsPage() {
         </div>
       ),
     },
-    { id: 'contact', header: 'Contacto', accessorFn: (c) => c.contactName, cell: ({ row }) => <span className="block max-w-[170px] truncate" title={row.original.contactName}>{row.original.contactName}</span> },
-    { id: 'email', header: 'Email', accessorFn: (c) => c.email, cell: ({ row }) => <span className="block max-w-[210px] truncate text-muted-foreground" title={row.original.email}>{row.original.email}</span> },
+    { id: 'contact', header: 'Contacto', accessorFn: (c) => c.contactName, cell: ({ row }) => <span className="block max-w-[130px] truncate" title={row.original.contactName}>{row.original.contactName}</span> },
+    { id: 'email', header: 'Email', accessorFn: (c) => c.email, cell: ({ row }) => <span className="block max-w-[160px] truncate text-muted-foreground" title={row.original.email}>{row.original.email}</span> },
     { id: 'phone', header: 'Teléfono', accessorFn: (c) => c.phone, cell: ({ row }) => <span className="whitespace-nowrap tabular">{row.original.phone || '—'}</span> },
     { id: 'status', header: 'Estado', accessorFn: (c) => c.status, cell: ({ row }) => <ClientStatusBadge status={row.original.status} /> },
+    { id: 'origin', header: 'Origen', accessorFn: (c) => c.origin ?? 'MANUAL', cell: ({ row }) => <Badge tone={originTone[row.original.origin ?? 'MANUAL']}>{originLabel[row.original.origin ?? 'MANUAL']}</Badge> },
     { id: 'webs', header: 'Webs', accessorFn: (c) => webCount.get(c.id) ?? 0, cell: ({ row }) => <span className="tabular">{webCount.get(row.original.id) ?? 0}</span> },
     { id: 'createdAt', header: 'Alta', accessorFn: (c) => c.createdAt, cell: ({ row }) => <span className="whitespace-nowrap text-muted-foreground">{formatDate(row.original.createdAt)}</span> },
     {
@@ -110,7 +113,7 @@ export default function ClientsPage() {
         onExport={(list) =>
           downloadCsv(
             'clientes.csv',
-            list.map((c) => ({ Empresa: c.company, Contacto: c.contactName, Email: c.email, Telefono: c.phone, CIF: c.taxId, Direccion: c.address, CP: c.postalCode, Provincia: c.province, Pais: c.country, Estado: clientStatusLabel[c.status], Webs: webCount.get(c.id) ?? 0, Alta: formatDate(c.createdAt) })),
+            list.map((c) => ({ Empresa: c.company, Contacto: c.contactName, Email: c.email, Telefono: c.phone, CIF: c.taxId, Direccion: c.address, CP: c.postalCode, Provincia: c.province, Pais: c.country, Estado: clientStatusLabel[c.status], Origen: originLabel[c.origin ?? 'MANUAL'], Webs: webCount.get(c.id) ?? 0, Alta: formatDate(c.createdAt) })),
           )
         }
         toolbar={
@@ -124,6 +127,19 @@ export default function ClientsPage() {
                 {CLIENT_STATUSES.map((s) => (
                   <SelectItem key={s} value={s}>
                     {clientStatusLabel[s]}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            <Select value={origin} onValueChange={(v) => setOrigin(v as typeof origin)}>
+              <SelectTrigger className="h-8 w-48" aria-label="Filtrar por origen">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="ALL">Todos los orígenes</SelectItem>
+                {CLIENT_ORIGINS.map((o) => (
+                  <SelectItem key={o} value={o}>
+                    {originLabel[o]}
                   </SelectItem>
                 ))}
               </SelectContent>

@@ -1,6 +1,6 @@
 'use client'
 
-import { Database, RotateCcw } from 'lucide-react'
+import { Database, RotateCcw, Trash2 } from 'lucide-react'
 import { useState } from 'react'
 import { PageHeader } from '@/components/layout/page-header'
 import { CompanyForm, TaxForm } from '@/components/settings/company-tax-forms'
@@ -10,11 +10,13 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { ConfirmDialog } from '@/components/ui/confirm-dialog'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { useResetData } from '@/hooks/use-entities'
+import { useClearData, useResetData } from '@/hooks/use-entities'
 
 export default function SettingsPage() {
   const reset = useResetData()
+  const clear = useClearData()
   const [confirm, setConfirm] = useState(false)
+  const [confirmClear, setConfirmClear] = useState(false)
   return (
     <div className="animate-fade-up">
       <PageHeader title="Configuración" description="Empresa, impuestos, usuarios, roles y proveedores." crumbs={[{ label: 'Configuración' }]} />
@@ -47,13 +49,20 @@ export default function SettingsPage() {
               <CardDescription>Ahora mismo el panel funciona con datos ficticios guardados en este navegador. Al conectar PostgreSQL con Prisma, esta sección desaparece.</CardDescription>
             </CardHeader>
             <CardContent>
-              <Button variant="outline" onClick={() => setConfirm(true)}>
-                <RotateCcw /> Restablecer datos de ejemplo
-              </Button>
+              <div className="flex flex-wrap gap-2">
+                <Button variant="outline" onClick={() => setConfirm(true)}>
+                  <RotateCcw /> Restablecer datos de ejemplo
+                </Button>
+                <Button variant="outline" className="text-destructive hover:text-destructive" onClick={() => setConfirmClear(true)}>
+                  <Trash2 /> Borrar todos los datos
+                </Button>
+              </div>
+              <p className="mt-3 text-xs text-muted-foreground">«Borrar todos los datos» deja el panel vacío para empezar con clientes reales. Las solicitudes del formulario de la web se vuelven a importar solas.</p>
             </CardContent>
           </Card>
         </TabsContent>
       </Tabs>
+      <ConfirmDialog open={confirmClear} onOpenChange={setConfirmClear} title="Borrar todos los datos" description="Se borrarán todos los clientes, webs, dominios, hosting, facturas y tareas guardados en este navegador. Las solicitudes del formulario se importarán de nuevo." confirmLabel="Borrar todo" loading={clear.isPending} onConfirm={() => clear.mutate(undefined, { onSuccess: () => setConfirmClear(false) })} />
       <ConfirmDialog open={confirm} onOpenChange={setConfirm} title="Restablecer datos de ejemplo" description="Se borrarán los cambios que hayas hecho y se generarán de nuevo los datos ficticios." confirmLabel="Restablecer" loading={reset.isPending} onConfirm={() => reset.mutate(undefined, { onSuccess: () => setConfirm(false) })} />
     </div>
   )

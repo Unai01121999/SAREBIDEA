@@ -141,6 +141,22 @@ export const DEFAULT_SETTINGS: AppSettings = {
 
 // --- generador ------------------------------------------------------------------------------
 
+/** Conjunto vacío (solo la persona propietaria y los ajustes): punto de partida para trabajar con datos reales. */
+export function emptyDataset(now: Date = new Date()): Dataset {
+  const t = now.toISOString()
+  return {
+    clients: [],
+    websites: [],
+    domains: [],
+    hostings: [],
+    invoices: [],
+    tasks: [],
+    users: [{ id: 'usr_001', name: 'Unai Padura Larrea', email: 'sarebidea@sarebidea.com', role: 'OWNER', active: true, createdAt: t, updatedAt: t }],
+    activity: [],
+    settings: DEFAULT_SETTINGS,
+  }
+}
+
 export function generateDataset(now: Date = new Date(), seed = 20260707): Dataset {
   const rand = rng(seed)
   const int = (min: number, max: number) => Math.floor(rand() * (max - min + 1)) + min
@@ -190,12 +206,29 @@ export function generateDataset(now: Date = new Date(), seed = 20260707): Datase
       services: [],
       notes: chance(0.3) ? pick(['Prefiere contacto por WhatsApp.', 'Factura a nombre de la sociedad.', 'Pide siempre presupuesto cerrado.', 'Cliente recomendado por otro cliente.', 'Pagos por transferencia a 30 días.']) : '',
       archived: i === 5 || i === 31,
+      origin: 'MANUAL',
+      sourceId: null,
+      formData: null,
       createdAt,
       updatedAt: createdAt,
     })
   }
   clients.sort((a, b) => a.createdAt.localeCompare(b.createdAt))
   clients.forEach((c, i) => (c.id = `cli_${pad(i + 1)}`))
+  // Aproximadamente la mitad llegó por el formulario de la web: guardan lo que se escribió en él.
+  const FORM_TEXTS = [
+    'Quiero una web nueva con catálogo y pedidos por WhatsApp.',
+    'Necesito reservas online y que salga bien en Google Maps.',
+    'Mi web actual es muy antigua. Quiero algo moderno que se vea bien en el móvil.',
+    'Abrimos en dos meses y necesitamos la web lista para entonces.',
+    'Busco una tienda online sencilla con pago con tarjeta.',
+  ]
+  clients.forEach((c, i) => {
+    if (i % 2 === 0) return
+    c.origin = 'FORM'
+    c.sourceId = `lead_${pad(i + 1)}`
+    c.formData = { code: `SB-${pad(i + 1, 4)}`, businessType: c.company.split(' ')[0], description: FORM_TEXTS[i % FORM_TEXTS.length], submittedAt: c.createdAt }
+  })
 
   // Webs ---------------------------------------------------------------------------------
   const websites: Website[] = []

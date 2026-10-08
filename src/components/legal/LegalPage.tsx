@@ -212,8 +212,7 @@ function Cookies() {
   ]
   const rows: [string, string, string, string][] = [
     ['sarebidea-consent', 'Recordar tu elección sobre cookies. Propia, localStorage.', '12 meses', 'Técnica'],
-    ['sarebidea-private-tab', 'Recordar la pestaña abierta en el Área privada (solo la usa la persona administradora). Propia, localStorage.', 'Hasta que se borre', 'Técnica'],
-    ['sb-…-auth-token', 'Mantener la sesión en el Área privada (solo la usa la persona administradora). Supabase, localStorage.', 'Hasta cerrar sesión', 'Técnica'],
+    ['sb-…-auth-token', 'Mantener la sesión en el panel privado (solo la usa la persona administradora). Supabase, localStorage.', 'Hasta cerrar sesión', 'Técnica'],
   ]
   return (
     <>

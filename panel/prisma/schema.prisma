@@ -26,6 +26,11 @@ enum ClientStatus {
   INACTIVE
 }
 
+enum ClientOrigin {
+  MANUAL
+  FORM
+}
+
 enum ServiceType {
   WEB_DESIGN
   HOSTING
@@ -130,6 +135,12 @@ model Client {
   notes       String       @default("")
   /// Archivado lógico: el cliente sigue existiendo pero se oculta de los listados.
   archivedAt  DateTime?
+  /// Cómo llegó: alta manual en el panel o formulario de la web.
+  origin      ClientOrigin @default(MANUAL)
+  /// Si vino del formulario: ID de la solicitud original (tabla `leads` de Supabase). Evita importarla dos veces.
+  sourceId    String?      @unique
+  /// Lo que se escribió en el formulario: { code, businessType, description, submittedAt }.
+  formData    Json?
   createdAt   DateTime     @default(now())
   updatedAt   DateTime     @updatedAt
 
@@ -140,6 +151,7 @@ model Client {
   tasks    Task[]
 
   @@index([status, archivedAt])
+  @@index([origin])
   @@index([company])
   @@index([email])
   @@index([taxId])

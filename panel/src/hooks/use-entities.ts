@@ -90,3 +90,14 @@ export function useResetData() {
     },
   })
 }
+
+export function useClearData() {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: async () => dataSource.clear?.(),
+    onSuccess: () => {
+      qc.invalidateQueries()
+      toast.success('Datos de ejemplo borrados')
+    },
+  })
+}

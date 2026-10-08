@@ -32,7 +32,7 @@ async function main() {
   await prisma.user.createMany({ data: data.users.map((u) => ({ ...u, createdAt: d(u.createdAt)!, updatedAt: d(u.updatedAt)! })) })
 
   await prisma.client.createMany({
-    data: data.clients.map(({ archived, createdAt, updatedAt, ...c }) => ({ ...c, archivedAt: archived ? new Date() : null, createdAt: d(createdAt)!, updatedAt: d(updatedAt)! })),
+    data: data.clients.map(({ archived, createdAt, updatedAt, formData, ...c }) => ({ ...c, formData: formData ? { ...formData } : undefined, archivedAt: archived ? new Date() : null, createdAt: d(createdAt)!, updatedAt: d(updatedAt)! })),
   })
 
   await prisma.website.createMany({

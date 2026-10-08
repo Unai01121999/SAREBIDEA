@@ -1,8 +1,8 @@
 // Base de datos de ejemplo en el navegador (localStorage). Solo se usa con NEXT_PUBLIC_DATA_SOURCE="mock".
 // En producción se sustituye por Prisma + PostgreSQL sin tocar la interfaz (ver src/services).
-import { generateDataset, type Dataset } from '@/mocks/generate'
+import { emptyDataset, generateDataset, type Dataset } from '@/mocks/generate'
 
-const KEY = 'sarebidea-panel-db-v1'
+const KEY = 'sarebidea-panel-db-v2'
 let db: Dataset | null = null
 
 export function getDb(): Dataset {
@@ -26,6 +26,13 @@ export function persistDb() {
 
 export function resetDb() {
   db = generateDataset()
+  persistDb()
+  return db
+}
+
+/** Borra todos los datos de ejemplo y deja el panel vacío. */
+export function clearDb() {
+  db = emptyDataset()
   persistDb()
   return db
 }

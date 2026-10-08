@@ -132,3 +132,8 @@ El panel es completo a nivel de interfaz y de modelo de datos, pero **hoy no tie
 | `npm run db:migrate` | Crear/actualizar tablas |
 | `npm run db:seed` | Cargar datos de ejemplo |
 | `npm run db:studio` | Explorar la base de datos |
+
+## Origen de los clientes (alta manual o formulario)
+Cada cliente guarda cómo llegó (`origin`): **Alta manual** (creado en el panel) o **Formulario web**. Se ve como insignia en la cabecera de la ficha, como columna y filtro en el listado y en la pestaña **Origen** de la ficha, que muestra además lo que la persona escribió en el formulario.
+
+Las solicitudes del formulario se importan solas desde la tabla `leads` de Supabase al abrir el panel y cada 3 minutos (`src/services/leads-sync.ts`). Es idempotente: cada solicitud se identifica por `sourceId` y no se duplica.
