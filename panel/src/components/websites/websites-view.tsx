@@ -12,6 +12,8 @@ import { Button } from '@/components/ui/button'
 import { ConfirmDialog } from '@/components/ui/confirm-dialog'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { WebsiteFormDialog } from '@/components/websites/website-form'
+import { PackDialog } from '@/components/websites/pack-dialog'
+import { packLabel } from '@/lib/packs'
 import { clientsApi, websitesApi } from '@/hooks/use-entities'
 import { useCreateParam } from '@/hooks/use-create-param'
 import { downloadCsv } from '@/lib/csv'
@@ -38,6 +40,7 @@ export function WebsitesView({ estado }: { estado: string }) {
   const remove = websitesApi.useRemove()
   const [tech, setTech] = useState<'ALL' | Technology>('ALL')
   const [createOpen, setCreateOpen] = useCreateParam()
+  const [packOpen, setPackOpen] = useState(false)
   const [editing, setEditing] = useState<Website | undefined>()
   const [toDelete, setToDelete] = useState<Website | undefined>()
 
@@ -57,7 +60,7 @@ export function WebsitesView({ estado }: { estado: string }) {
       cell: ({ row }) => (
         <div className="min-w-0 max-w-[280px]">
           <p className="truncate font-medium">{row.original.name}</p>
-          <p className="truncate text-xs text-muted-foreground">{row.original.domainName || 'Sin dominio'}</p>
+          <p className="truncate text-xs text-muted-foreground">{row.original.domainName || 'Sin dominio'}{row.original.pack ? ` · ${packLabel(row.original.pack)}` : ''}</p>
         </div>
       ),
     },
@@ -107,9 +110,14 @@ export function WebsitesView({ estado }: { estado: string }) {
         description="Todos los proyectos web, por estado."
         crumbs={[{ label: 'Webs' }, { label: view.label }]}
         actions={
-          <Button onClick={() => setCreateOpen(true)}>
-            <Plus /> Nueva web
-          </Button>
+          <div className="flex gap-2">
+            <Button variant="outline" onClick={() => setPackOpen(true)}>
+              <Plus /> Añadir pack
+            </Button>
+            <Button onClick={() => setCreateOpen(true)}>
+              <Plus /> Nueva web
+            </Button>
+          </div>
         }
       />
       <nav aria-label="Estado de las webs" className="mb-4 flex gap-1 overflow-x-auto rounded-lg bg-muted p-1 sm:inline-flex">
@@ -128,7 +136,7 @@ export function WebsitesView({ estado }: { estado: string }) {
         searchText={(w) => `${w.name} ${w.domainName} ${clientName.get(w.clientId) ?? ''} ${technologyLabel[w.technology]}`}
         initialSort={[{ id: 'updatedAt', desc: true }]}
         onRowClick={(w) => router.push(routes.website(w.id))}
-        onExport={(list) => downloadCsv('webs.csv', list.map((w) => ({ Proyecto: w.name, Cliente: clientName.get(w.clientId) ?? '', URL: w.productionUrl, Estado: websiteStatusLabel[w.status], Tecnologia: technologyLabel[w.technology], Creacion: formatDate(w.createdAt), Actualizacion: formatDate(w.updatedAt) })))}
+        onExport={(list) => downloadCsv('webs.csv', list.map((w) => ({ Proyecto: w.name, Cliente: clientName.get(w.clientId) ?? '', URL: w.productionUrl, Estado: websiteStatusLabel[w.status], Tecnologia: technologyLabel[w.technology], Pack: packLabel(w.pack), Creacion: formatDate(w.createdAt), Actualizacion: formatDate(w.updatedAt) })))}
         toolbar={
           <Select value={tech} onValueChange={(v) => setTech(v as typeof tech)}>
             <SelectTrigger className="h-8 w-52" aria-label="Filtrar por tecnología">
@@ -147,6 +155,7 @@ export function WebsitesView({ estado }: { estado: string }) {
         emptyTitle={`No hay webs en «${view.label}»`}
       />
       <WebsiteFormDialog open={createOpen} onOpenChange={setCreateOpen} />
+      <PackDialog open={packOpen} onOpenChange={setPackOpen} />
       <WebsiteFormDialog open={!!editing} onOpenChange={(o) => !o && setEditing(undefined)} website={editing} />
       <ConfirmDialog open={!!toDelete} onOpenChange={(o) => !o && setToDelete(undefined)} title={`Eliminar ${toDelete?.name ?? ''}`} description="La web se eliminará. Sus dominios y hosting quedarán sin web asociada. Si solo quieres ocultarla, usa «Archivar»." loading={remove.isPending} onConfirm={() => toDelete && remove.mutate(toDelete.id, { onSuccess: () => setToDelete(undefined) })} />
     </div>

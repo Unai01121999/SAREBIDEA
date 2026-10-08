@@ -12,6 +12,9 @@ export type ClientOrigin = (typeof CLIENT_ORIGINS)[number]
 export const SERVICE_TYPES = ['WEB_DESIGN', 'HOSTING', 'DOMAIN', 'MAINTENANCE', 'SEO', 'ECOMMERCE'] as const
 export type ServiceType = (typeof SERVICE_TYPES)[number]
 
+export const PACK_TYPES = ['STARTER', 'PROFESSIONAL', 'PREMIUM'] as const
+export type PackType = (typeof PACK_TYPES)[number]
+
 export const WEBSITE_STATUSES = ['DEVELOPMENT', 'PRODUCTION', 'PAUSED', 'ARCHIVED'] as const
 export type WebsiteStatus = (typeof WEBSITE_STATUSES)[number]
 
@@ -78,6 +81,8 @@ export interface Website {
   repoUrl: string
   mainBranch: string
   hostingProvider: string
+  /** Pack contratado (Starter, Professional o Premium), si la web se vendió como pack. */
+  pack?: PackType | null
   startDate: ISODate
   publishDate: ISODate | null
   createdAt: ISODate

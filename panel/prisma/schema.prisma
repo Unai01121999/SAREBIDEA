@@ -173,6 +173,7 @@ model Website {
   repoUrl         String        @default("")
   mainBranch      String        @default("main")
   hostingProvider String        @default("")
+  pack            String? // STARTER | PROFESSIONAL | PREMIUM
   startDate       DateTime
   publishDate     DateTime?
   createdAt       DateTime      @default(now())

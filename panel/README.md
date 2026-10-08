@@ -152,3 +152,7 @@ Además, los formularios nuevos **se rellenan solos** con lo que ya se sabe (`sr
 ## Web, dominio y hosting desde la ficha del cliente
 
 El formulario de cliente (alta y edición) incluye un bloque opcional «Web, dominio y hosting». Si se deja vacío no se crea nada. Si se rellena un apartado, se crea automáticamente el registro en su listado (Webs, Dominios, Hosting), asociado al cliente, y el dominio y el hosting quedan enlazados a la web nueva. El hosting se elige de la lista de proveedores de Configuración. Los campos que falten toman valores por defecto (renovación a un año, plan «Básico», etc.).
+
+## Packs
+
+En **Webs → Añadir pack** se elige cliente y pack: Starter (399 € + IVA, mantenimiento 19 €/mes), Professional (699 € + IVA, 29 €/mes) o Premium (1.199 € + IVA, 49 €/mes). Se crea la web (en desarrollo, con el pack anotado) y, opcionalmente, la factura del pack y la factura recurrente del primer mes de mantenimiento. Los precios están en `src/lib/packs.ts`.
