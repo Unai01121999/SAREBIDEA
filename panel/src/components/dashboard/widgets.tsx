@@ -8,6 +8,7 @@ import { Skeleton } from '@/components/ui/skeleton'
 import { formatCurrency, formatDate, timeAgo } from '@/lib/format'
 import type { Renewal } from '@/lib/metrics'
 import type { ActivityEntry, Client, Task } from '@/types/domain'
+import { routes } from '@/lib/routes'
 
 const entityIcon = { client: UserPlus, website: Globe, domain: Building2, hosting: Server, invoice: CreditCard, task: CheckCircle2 }
 
@@ -57,14 +58,14 @@ export function ActivityFeed({ items, loading }: { items?: ActivityEntry[]; load
   )
 }
 
-export function RenewalList({ items, clients, loading, hrefBase, empty }: { items?: Renewal[]; clients?: Client[]; loading?: boolean; hrefBase: string; empty: string }) {
+export function RenewalList({ items, clients, loading, href, empty }: { items?: Renewal[]; clients?: Client[]; loading?: boolean; href: (id: string) => string; empty: string }) {
   if (loading) return <ListSkeleton />
   if (!items?.length) return <EmptyLine>{empty}</EmptyLine>
   return (
     <ul className="-my-2 divide-y">
       {items.slice(0, 6).map((r) => (
         <li key={r.id}>
-          <Link href={`${hrefBase}/${r.id}`} className="flex items-center gap-3 rounded-lg py-2.5 transition-colors hover:bg-muted/40">
+          <Link href={href(r.id)} className="flex items-center gap-3 rounded-lg py-2.5 transition-colors hover:bg-muted/40">
             <div className="min-w-0 flex-1">
               <p className="truncate text-sm font-medium">{r.label}</p>
               <p className="truncate text-xs text-muted-foreground">
@@ -105,7 +106,7 @@ export function LatestClients({ clients, loading }: { clients?: Client[]; loadin
     <ul className="-my-2 divide-y">
       {clients.map((c) => (
         <li key={c.id}>
-          <Link href={`/clientes/${c.id}`} className="flex items-center gap-3 rounded-lg py-2.5 transition-colors hover:bg-muted/40">
+          <Link href={routes.client(c.id)} className="flex items-center gap-3 rounded-lg py-2.5 transition-colors hover:bg-muted/40">
             <Avatar name={c.company} />
             <div className="min-w-0 flex-1">
               <p className="truncate text-sm font-medium">{c.company}</p>

@@ -21,6 +21,7 @@ import { daysUntil, formatCurrency, formatDate } from '@/lib/format'
 import { expiryLabel, expiryLevel, type ExpiryLevel } from '@/lib/labels'
 import { cn } from '@/lib/utils'
 import type { Domain } from '@/types/domain'
+import { routes } from '@/lib/routes'
 
 const levelOf = (d: Domain) => expiryLevel(daysUntil(d.renewsAt))
 const rowTint: Record<ExpiryLevel, string> = {
@@ -69,7 +70,7 @@ export default function DomainsPage() {
       cell: ({ row }) => (
         <RowActions
           actions={[
-            { label: 'Ver ficha', icon: <Eye />, onSelect: () => router.push(`/dominios/${row.original.id}`) },
+            { label: 'Ver ficha', icon: <Eye />, onSelect: () => router.push(routes.domain(row.original.id)) },
             { label: 'Editar', icon: <Pencil />, onSelect: () => setEditing(row.original) },
             { label: 'Eliminar', icon: <Trash2 />, destructive: true, separatorBefore: true, onSelect: () => setToDelete(row.original) },
           ]}
@@ -105,7 +106,7 @@ export default function DomainsPage() {
         searchPlaceholder="Buscar por dominio, cliente o registrador…"
         searchText={(d) => `${d.name} ${clientName.get(d.clientId) ?? ''} ${d.registrar}`}
         initialSort={[{ id: 'renewsAt', desc: false }]}
-        onRowClick={(d) => router.push(`/dominios/${d.id}`)}
+        onRowClick={(d) => router.push(routes.domain(d.id))}
         rowClassName={(d) => cn('transition-colors', rowTint[levelOf(d)])}
         onExport={(list) => downloadCsv('dominios.csv', list.map((d) => ({ Dominio: d.name, Cliente: clientName.get(d.clientId) ?? '', Registrador: d.registrar, Registro: formatDate(d.registeredAt), Renovacion: formatDate(d.renewsAt), Estado: expiryLabel[levelOf(d)], Coste: d.annualCost, AutoRenovacion: d.autoRenew ? 'Sí' : 'No' })))}
         toolbar={

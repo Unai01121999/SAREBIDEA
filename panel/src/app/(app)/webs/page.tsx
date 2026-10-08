@@ -1,5 +1,12 @@
-import { redirect } from 'next/navigation'
+'use client'
+
+import { useRouter } from 'next/navigation'
+import { useEffect } from 'react'
 
 export default function WebsIndex() {
-  redirect('/webs/produccion')
+  const router = useRouter()
+  useEffect(() => {
+    router.replace('/webs/produccion')
+  }, [router])
+  return null
 }

@@ -7,7 +7,9 @@
     "dev": "vite",
     "build": "tsc -b && vite build",
     "lint": "oxlint",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "build:panel": "cd panel && npm install && npm run build",
+    "build:all": "npm run build && npm run build:panel && node scripts/merge-panel.mjs"
   },
   "dependencies": {
     "@fontsource/funnel-display": "^5.3.0",

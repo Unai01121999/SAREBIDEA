@@ -1,12 +1,13 @@
 'use client'
 
-import { CheckSquare, ChevronDown, CreditCard, Globe, Menu, Plus, Server, Users, Building2 } from 'lucide-react'
+import { Building2, CheckSquare, ChevronDown, CreditCard, Globe, LogOut, Menu, Plus, Server, Users, ArrowLeft } from 'lucide-react'
 import Link from 'next/link'
 import { SearchTrigger } from '@/components/layout/global-search'
 import { ThemeToggle } from '@/components/layout/theme-toggle'
 import { Avatar } from '@/components/ui/avatar'
 import { Button } from '@/components/ui/button'
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
+import { supabase } from '@/lib/supabase'
 import { useUiStore } from '@/store/ui-store'
 
 const QUICK = [
@@ -60,6 +61,16 @@ export function Header() {
             <DropdownMenuItem asChild>
               <Link href="/configuracion">Configuración</Link>
             </DropdownMenuItem>
+            <DropdownMenuItem asChild>
+              <a href="/">
+                <ArrowLeft /> Volver a la web
+              </a>
+            </DropdownMenuItem>
+            {supabase && (
+              <DropdownMenuItem onSelect={() => supabase?.auth.signOut().then(() => window.location.reload())}>
+                <LogOut /> Cerrar sesión
+              </DropdownMenuItem>
+            )}
           </DropdownMenuContent>
         </DropdownMenu>
       </div>

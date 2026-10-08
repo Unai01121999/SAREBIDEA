@@ -18,6 +18,7 @@ import { downloadCsv } from '@/lib/csv'
 import { formatDate } from '@/lib/format'
 import { clientStatusLabel } from '@/lib/labels'
 import { CLIENT_STATUSES, type Client } from '@/types/domain'
+import { routes } from '@/lib/routes'
 
 export default function ClientsPage() {
   const router = useRouter()
@@ -72,7 +73,7 @@ export default function ClientsPage() {
         return (
           <RowActions
             actions={[
-              { label: 'Ver ficha', icon: <Eye />, onSelect: () => router.push(`/clientes/${c.id}`) },
+              { label: 'Ver ficha', icon: <Eye />, onSelect: () => router.push(routes.client(c.id)) },
               { label: 'Editar', icon: <Pencil />, onSelect: () => setEditing(c) },
               { label: c.archived ? 'Restaurar' : 'Archivar', icon: c.archived ? <ArchiveRestore /> : <Archive />, onSelect: () => update.mutate({ id: c.id, patch: { archived: !c.archived } }) },
               { label: 'Eliminar', icon: <Trash2 />, destructive: true, separatorBefore: true, onSelect: () => setToDelete(c) },
@@ -104,7 +105,7 @@ export default function ClientsPage() {
         searchPlaceholder="Buscar por empresa, contacto, email, CIF…"
         searchText={(c) => `${c.company} ${c.contactName} ${c.email} ${c.phone} ${c.taxId} ${c.province}`}
         initialSort={[{ id: 'createdAt', desc: true }]}
-        onRowClick={(c) => router.push(`/clientes/${c.id}`)}
+        onRowClick={(c) => router.push(routes.client(c.id))}
         rowClassName={(c) => (c.archived ? 'opacity-60' : undefined)}
         onExport={(list) =>
           downloadCsv(

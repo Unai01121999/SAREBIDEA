@@ -1,6 +1,6 @@
 'use client'
 
-import { ChevronDown, PanelLeftClose, PanelLeftOpen } from 'lucide-react'
+import { ChevronDown, Inbox, PanelLeftClose, PanelLeftOpen } from 'lucide-react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { useState } from 'react'
@@ -20,6 +20,15 @@ export function SidebarNav({ collapsed = false, onNavigate }: { collapsed?: bool
       {NAV.map((item) => (
         <NavEntry key={item.href} item={item} pathname={pathname} collapsed={collapsed} expanded={open[item.href] ?? isActive(pathname, item.href)} onToggle={() => setOpen((o) => ({ ...o, [item.href]: !(o[item.href] ?? isActive(pathname, item.href)) }))} onNavigate={onNavigate} />
       ))}
+      {/* Solicitudes reales del formulario de la web: viven en el área privada anterior (Supabase) hasta migrarlas aquí. */}
+      <a
+        href="/#area-privada"
+        className={cn('group mt-3 flex h-9 items-center gap-3 rounded-lg border border-dashed px-2.5 text-[13.5px] font-medium text-muted-foreground transition-colors hover:bg-accent/70 hover:text-foreground', collapsed && 'justify-center px-0')}
+        title="Solicitudes del formulario de la web"
+      >
+        <Inbox className="size-[18px] shrink-0" />
+        {!collapsed && <span className="flex-1 truncate">Solicitudes de la web</span>}
+      </a>
     </nav>
   )
 }

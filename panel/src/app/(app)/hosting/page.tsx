@@ -18,6 +18,7 @@ import { useCreateParam } from '@/hooks/use-create-param'
 import { downloadCsv } from '@/lib/csv'
 import { daysUntil, formatCurrency, formatDate } from '@/lib/format'
 import type { Hosting } from '@/types/domain'
+import { routes } from '@/lib/routes'
 
 export default function HostingPage() {
   const router = useRouter()
@@ -56,7 +57,7 @@ export default function HostingPage() {
       cell: ({ row }) => (
         <RowActions
           actions={[
-            { label: 'Ver ficha', icon: <Eye />, onSelect: () => router.push(`/hosting/${row.original.id}`) },
+            { label: 'Ver ficha', icon: <Eye />, onSelect: () => router.push(routes.hosting(row.original.id)) },
             { label: 'Editar', icon: <Pencil />, onSelect: () => setEditing(row.original) },
             { label: 'Eliminar', icon: <Trash2 />, destructive: true, separatorBefore: true, onSelect: () => setToDelete(row.original) },
           ]}
@@ -92,7 +93,7 @@ export default function HostingPage() {
         searchPlaceholder="Buscar por cliente, web, proveedor o plan…"
         searchText={(h) => `${clientName.get(h.clientId) ?? ''} ${h.websiteId ? webName.get(h.websiteId) ?? '' : ''} ${h.provider} ${h.plan}`}
         initialSort={[{ id: 'renewsAt', desc: false }]}
-        onRowClick={(h) => router.push(`/hosting/${h.id}`)}
+        onRowClick={(h) => router.push(routes.hosting(h.id))}
         onExport={(list) => downloadCsv('hosting.csv', list.map((h) => ({ Cliente: clientName.get(h.clientId) ?? '', Web: h.websiteId ? webName.get(h.websiteId) ?? '' : '', Proveedor: h.provider, Plan: h.plan, CosteAnual: h.annualCost, Renovacion: formatDate(h.renewsAt), Activo: h.active ? 'Sí' : 'No' })))}
         toolbar={
           <Select value={provider} onValueChange={setProvider}>

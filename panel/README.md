@@ -8,14 +8,14 @@ Panel privado para gestionar el negocio de webs: **clientes, webs, dominios, hos
 - **react-hook-form + Zod** (formularios) · **dnd-kit** (Kanban) · **Recharts** (gráficos)
 - **Prisma 7 + PostgreSQL** (esquema y seed listos)
 
-Es una aplicación **independiente de la web pública** (que sigue en la raíz del repositorio, con Vite y Hostinger).
+Se compila como **sitio estático** y se publica en `/panel/` junto a la web pública (que sigue en la raíz del repositorio con Vite). El botón «Área privada» de la web abre `/panel/`. Desde la raíz del repositorio, `npm run build:all` compila ambas y las deja unidas en `dist/` para subir a Hostinger.
 
 ## Arrancar
 
 ```bash
 cd panel
 npm install        # instala y genera el cliente de Prisma
-npm run dev        # http://localhost:3000
+npm run dev        # http://localhost:3000/panel
 ```
 
 Sin configurar nada, el panel funciona con **datos de ejemplo** guardados en el navegador (modo `mock`): 48 clientes, 60 webs, 54 dominios, 43 hostings, 166 facturas, 30 tareas y actividad. En *Configuración → Datos* se pueden restablecer.
@@ -114,12 +114,12 @@ Pensado para **más de 500 clientes** (y muchos más):
 
 El panel es completo a nivel de interfaz y de modelo de datos, pero **hoy no tiene backend ni inicio de sesión**. Antes de publicarlo con datos reales:
 
-1. **Autenticación (imprescindible).** Protege todo el panel: Supabase Auth o Auth.js con acceso solo para el correo propietario y segundo factor, y un `middleware.ts` (`proxy.ts` en Next 16) que redirija a `/login`. No lo publiques sin esto.
+1. **Autenticación.** Ya incluida: pantalla de acceso con correo, contraseña y segundo factor (Supabase), la misma sesión que la web pública (`src/components/auth/auth-gate.tsx`). Ojo: protege la *interfaz*; los datos reales deben protegerse además en la base de datos con RLS, porque el código del panel es público.
 2. **Fuente de datos real.** Implementa `DataSource` con Route Handlers o Server Actions que usen Prisma (con validación Zod en el servidor y comprobación de rol en cada operación) y actívala en `src/services/index.ts`. Conversiones a tener en cuenta: `Decimal ↔ number`, `Date ↔ ISO string`, `Client.archivedAt ↔ archived` y `TaskComment` como tabla.
 3. **Paginación y filtros en servidor** cuando las tablas superen unos miles de filas (`manualPagination`, `manualSorting` y `manualFiltering` de TanStack Table).
 4. **Roles**: la matriz de *Configuración → Usuarios y roles* es informativa; hay que aplicarla en el servidor.
 5. **Alertas por correo** de renovaciones (tarea programada que consulte `renewsAt` a 30, 15 y 7 días) y copias de seguridad de la base de datos.
-6. Alojamiento: Vercel o un VPS con Node. **No es compatible con el hosting compartido de Hostinger** (necesita ejecutar Node.js).
+6. Alojamiento: como el panel es estático, **sirve en el hosting compartido de Hostinger** (`public_html/panel`). Para mantenerlo así, los datos deben leerse y escribirse **desde el navegador con Supabase** (protegido con RLS), no con Prisma en un servidor. Prisma + PostgreSQL requiere un servidor Node (Vercel o un VPS).
 
 ## Scripts
 

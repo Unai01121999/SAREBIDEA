@@ -12,6 +12,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Skeleton } from '@/components/ui/skeleton'
 import { clientsApi, domainsApi, hostingsApi, invoicesApi, tasksApi, useActivity, websitesApi } from '@/hooks/use-entities'
 import { formatCurrency } from '@/lib/format'
+import { routes } from '@/lib/routes'
 import { dashboardStats, revenueSeries, upcomingRenewals } from '@/lib/metrics'
 
 export default function DashboardPage() {
@@ -91,7 +92,7 @@ export default function DashboardPage() {
             </Button>
           </CardHeader>
           <CardContent>
-            <RenewalList items={domainRenewals} clients={clients.data} loading={domains.isLoading} hrefBase="/dominios" empty="No hay dominios por renovar." />
+            <RenewalList items={domainRenewals} clients={clients.data} loading={domains.isLoading} href={routes.domain} empty="No hay dominios por renovar." />
           </CardContent>
         </Card>
         <Card>
@@ -105,7 +106,7 @@ export default function DashboardPage() {
             </Button>
           </CardHeader>
           <CardContent>
-            <RenewalList items={hostingRenewals} clients={clients.data} loading={hostings.isLoading} hrefBase="/hosting" empty="No hay hosting por renovar." />
+            <RenewalList items={hostingRenewals} clients={clients.data} loading={hostings.isLoading} href={routes.hosting} empty="No hay hosting por renovar." />
           </CardContent>
         </Card>
       </section>

@@ -8,6 +8,7 @@ import { Dialog, DialogContent, DialogDescription, DialogTitle } from '@/compone
 import { clientsApi, domainsApi, invoicesApi, tasksApi, websitesApi } from '@/hooks/use-entities'
 import { NAV } from '@/lib/nav'
 import { useUiStore } from '@/store/ui-store'
+import { routes } from '@/lib/routes'
 
 /** Botón de la cabecera que parece un campo de búsqueda y abre la paleta de comandos (⌘K / Ctrl+K). */
 export function SearchTrigger() {
@@ -70,7 +71,7 @@ export function GlobalSearch() {
             </CommandGroup>
             <Group heading="Clientes">
               {clients?.slice(0, 200).map((c) => (
-                <CommandItem key={c.id} value={`cliente ${c.company} ${c.contactName} ${c.email} ${c.taxId}`} onSelect={() => go(`/clientes/${c.id}`)}>
+                <CommandItem key={c.id} value={`cliente ${c.company} ${c.contactName} ${c.email} ${c.taxId}`} onSelect={() => go(routes.client(c.id))}>
                   <Users /> <span className="truncate">{c.company}</span>
                   <span className="ml-auto truncate text-xs text-muted-foreground">{c.contactName}</span>
                 </CommandItem>
@@ -78,7 +79,7 @@ export function GlobalSearch() {
             </Group>
             <Group heading="Webs">
               {websites?.map((w) => (
-                <CommandItem key={w.id} value={`web ${w.name} ${w.domainName}`} onSelect={() => go(`/webs/ficha/${w.id}`)}>
+                <CommandItem key={w.id} value={`web ${w.name} ${w.domainName}`} onSelect={() => go(routes.website(w.id))}>
                   <Globe /> <span className="truncate">{w.name}</span>
                   <span className="ml-auto truncate text-xs text-muted-foreground">{w.domainName}</span>
                 </CommandItem>
@@ -86,7 +87,7 @@ export function GlobalSearch() {
             </Group>
             <Group heading="Dominios">
               {domains?.map((d) => (
-                <CommandItem key={d.id} value={`dominio ${d.name} ${clientName(d.clientId)}`} onSelect={() => go(`/dominios/${d.id}`)}>
+                <CommandItem key={d.id} value={`dominio ${d.name} ${clientName(d.clientId)}`} onSelect={() => go(routes.domain(d.id))}>
                   <Building2 /> <span className="truncate">{d.name}</span>
                   <span className="ml-auto truncate text-xs text-muted-foreground">{clientName(d.clientId)}</span>
                 </CommandItem>

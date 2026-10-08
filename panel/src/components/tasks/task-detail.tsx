@@ -13,6 +13,7 @@ import { formatDate, timeAgo } from '@/lib/format'
 import { taskStatusLabel } from '@/lib/labels'
 import { uid } from '@/lib/utils'
 import type { Task } from '@/types/domain'
+import { routes } from '@/lib/routes'
 
 /** Detalle de una tarea con comentarios internos. */
 export function TaskDetailDialog({ task, clientName, webName, onClose, onEdit, onDelete }: { task?: Task; clientName?: string; webName?: string; onClose: () => void; onEdit: (t: Task) => void; onDelete: (t: Task) => void }) {
@@ -43,12 +44,12 @@ export function TaskDetailDialog({ task, clientName, webName, onClose, onEdit, o
               <p className="text-sm whitespace-pre-wrap text-muted-foreground">{task.description || 'Sin descripción.'}</p>
               <div className="flex flex-wrap items-center gap-x-5 gap-y-2 text-sm">
                 {task.clientId && clientName && (
-                  <Link href={`/clientes/${task.clientId}`} className="hover:text-brand hover:underline">
+                  <Link href={routes.client(task.clientId)} className="hover:text-brand hover:underline">
                     Cliente: <span className="font-medium">{clientName}</span>
                   </Link>
                 )}
                 {task.websiteId && webName && (
-                  <Link href={`/webs/ficha/${task.websiteId}`} className="hover:text-brand hover:underline">
+                  <Link href={routes.website(task.websiteId)} className="hover:text-brand hover:underline">
                     Web: <span className="font-medium">{webName}</span>
                   </Link>
                 )}

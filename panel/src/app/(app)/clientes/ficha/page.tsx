@@ -2,7 +2,7 @@
 
 import { Archive, ArchiveRestore, ExternalLink, Mail, MapPin, Pencil, Phone, Plus, Trash2 } from 'lucide-react'
 import Link from 'next/link'
-import { useParams, useRouter } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 import { useMemo, useState } from 'react'
 import { ClientFormDialog } from '@/components/clients/client-form'
 import { DomainFormDialog } from '@/components/domains/domain-form'
@@ -22,9 +22,10 @@ import { clientsApi, domainsApi, hostingsApi, invoicesApi, useActivity, websites
 import { formatCurrency, formatDate, timeAgo } from '@/lib/format'
 import { conceptLabel } from '@/lib/labels'
 import { effectiveStatus, invoiceTotal } from '@/lib/metrics'
+import { routes } from '@/lib/routes'
 
 export default function ClientDetailPage() {
-  const { id } = useParams<{ id: string }>()
+  const id = useSearchParams().get('id') ?? ''
   const router = useRouter()
   const { data: client, isLoading } = clientsApi.useOne(id)
   const websites = websitesApi.useList()
@@ -151,7 +152,7 @@ export default function ClientDetailPage() {
               <CardContent className="space-y-2">
                 {cHostings.length ? (
                   cHostings.map((h) => (
-                    <Link key={h.id} href={`/hosting/${h.id}`} className="flex items-center justify-between gap-2 rounded-lg border px-3 py-2 text-sm transition-colors hover:bg-muted/50">
+                    <Link key={h.id} href={routes.hosting(h.id)} className="flex items-center justify-between gap-2 rounded-lg border px-3 py-2 text-sm transition-colors hover:bg-muted/50">
                       <span className="truncate">
                         {h.provider} · {h.plan}
                       </span>
@@ -181,7 +182,7 @@ export default function ClientDetailPage() {
               </TableHeader>
               <TableBody>
                 {cWebs.map((w) => (
-                  <TableRow key={w.id} className="cursor-pointer" onClick={() => router.push(`/webs/ficha/${w.id}`)}>
+                  <TableRow key={w.id} className="cursor-pointer" onClick={() => router.push(routes.website(w.id))}>
                     <TableCell className="font-medium">{w.name}</TableCell>
                     <TableCell><WebsiteStatusBadge status={w.status} /></TableCell>
                     <TableCell><TechBadge tech={w.technology} /></TableCell>
@@ -218,7 +219,7 @@ export default function ClientDetailPage() {
               </TableHeader>
               <TableBody>
                 {cDomains.map((d) => (
-                  <TableRow key={d.id} className="cursor-pointer" onClick={() => router.push(`/dominios/${d.id}`)}>
+                  <TableRow key={d.id} className="cursor-pointer" onClick={() => router.push(routes.domain(d.id))}>
                     <TableCell className="font-medium">{d.name}</TableCell>
                     <TableCell>{d.registrar}</TableCell>
                     <TableCell className="text-muted-foreground">{formatDate(d.renewsAt)}</TableCell>

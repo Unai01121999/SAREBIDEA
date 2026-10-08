@@ -2,7 +2,7 @@
 
 import { Archive, ExternalLink, GitBranch, Pencil, Trash2 } from 'lucide-react'
 import Link from 'next/link'
-import { useParams, useRouter } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 import { useMemo, useState } from 'react'
 import { PageHeader } from '@/components/layout/page-header'
 import { ExpiryBadge, PriorityBadge, TechBadge, WebsiteStatusBadge } from '@/components/shared/badges'
@@ -14,9 +14,10 @@ import { WebsiteFormDialog } from '@/components/websites/website-form'
 import { clientsApi, domainsApi, hostingsApi, tasksApi, websitesApi } from '@/hooks/use-entities'
 import { formatCurrency, formatDate } from '@/lib/format'
 import { taskStatusLabel } from '@/lib/labels'
+import { routes } from '@/lib/routes'
 
 export default function WebsiteDetailPage() {
-  const { id } = useParams<{ id: string }>()
+  const id = useSearchParams().get('id') ?? ''
   const router = useRouter()
   const { data: web, isLoading } = websitesApi.useOne(id)
   const { data: client } = clientsApi.useOne(web?.clientId)
@@ -94,7 +95,7 @@ export default function WebsiteDetailPage() {
             <dl className="grid gap-x-6 gap-y-4 sm:grid-cols-2">
               <Row label="Cliente">
                 {client ? (
-                  <Link href={`/clientes/${client.id}`} className="hover:text-brand hover:underline">
+                  <Link href={routes.client(client.id)} className="hover:text-brand hover:underline">
                     {client.company}
                   </Link>
                 ) : (
@@ -103,7 +104,7 @@ export default function WebsiteDetailPage() {
               </Row>
               <Row label="Dominio">
                 {wDomains[0] ? (
-                  <Link href={`/dominios/${wDomains[0].id}`} className="hover:text-brand hover:underline">
+                  <Link href={routes.domain(wDomains[0].id)} className="hover:text-brand hover:underline">
                     {wDomains[0].name}
                   </Link>
                 ) : (
@@ -145,7 +146,7 @@ export default function WebsiteDetailPage() {
           <CardContent className="space-y-2">
             {wHostings.length ? (
               wHostings.map((h) => (
-                <Link key={h.id} href={`/hosting/${h.id}`} className="flex items-center justify-between gap-2 rounded-lg border px-3 py-2 text-sm transition-colors hover:bg-muted/50">
+                <Link key={h.id} href={routes.hosting(h.id)} className="flex items-center justify-between gap-2 rounded-lg border px-3 py-2 text-sm transition-colors hover:bg-muted/50">
                   <span className="truncate">
                     {h.provider} · {h.plan} · {formatCurrency(h.annualCost)}
                   </span>

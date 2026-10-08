@@ -5,10 +5,11 @@ import { ClientFormFields, useClientForm } from '@/components/clients/client-for
 import { PageHeader } from '@/components/layout/page-header'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
+import { routes } from '@/lib/routes'
 
 export default function NewClientPage() {
   const router = useRouter()
-  const { form, submit, submitting } = useClientForm(undefined, (saved) => router.push(saved ? `/clientes/${saved.id}` : '/clientes'))
+  const { form, submit, submitting } = useClientForm(undefined, (saved) => router.push(saved ? routes.client(saved.id) : '/clientes'))
   return (
     <div className="animate-fade-up">
       <PageHeader title="Nuevo cliente" description="Datos generales, servicios contratados y notas internas." crumbs={[{ label: 'Clientes', href: '/clientes' }, { label: 'Nuevo cliente' }]} />

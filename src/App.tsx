@@ -16,6 +16,11 @@ import { Faq } from './sections/Faq'
 import { FinalCta } from './sections/FinalCta'
 import { Footer } from './sections/Footer'
 
+/** El botón «Área privada» lleva al panel de administración (publicado en /panel junto a la web). */
+const goToPanel = () => {
+  window.location.assign('/panel/')
+}
+
 export default function App() {
   const reduced = useReducedMotionPref()
   useLenis(!reduced)
@@ -30,7 +35,7 @@ export default function App() {
       >
         Saltar al contenido
       </a>
-      <Navbar onPrivate={privateRoute.show} />
+      <Navbar onPrivate={goToPanel} />
       <main id="main">
         <Hero />
         <Problem />

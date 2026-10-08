@@ -2,7 +2,7 @@
 
 import { Pencil, Trash2 } from 'lucide-react'
 import Link from 'next/link'
-import { useParams, useRouter } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 import { useState } from 'react'
 import { DomainFormDialog } from '@/components/domains/domain-form'
 import { PageHeader } from '@/components/layout/page-header'
@@ -14,9 +14,10 @@ import { ConfirmDialog } from '@/components/ui/confirm-dialog'
 import { Skeleton } from '@/components/ui/skeleton'
 import { clientsApi, domainsApi, websitesApi } from '@/hooks/use-entities'
 import { daysUntil, formatCurrency, formatDate } from '@/lib/format'
+import { routes } from '@/lib/routes'
 
 export default function DomainDetailPage() {
-  const { id } = useParams<{ id: string }>()
+  const id = useSearchParams().get('id') ?? ''
   const router = useRouter()
   const { data: d, isLoading } = domainsApi.useOne(id)
   const { data: client } = clientsApi.useOne(d?.clientId)
@@ -65,8 +66,8 @@ export default function DomainDetailPage() {
           </CardHeader>
           <CardContent>
             <dl className="grid gap-x-6 gap-y-4 sm:grid-cols-2">
-              <Row label="Cliente">{client ? <Link href={`/clientes/${client.id}`} className="hover:text-brand hover:underline">{client.company}</Link> : '—'}</Row>
-              <Row label="Proyecto web relacionado">{web ? <Link href={`/webs/ficha/${web.id}`} className="hover:text-brand hover:underline">{web.name}</Link> : 'Sin web asociada'}</Row>
+              <Row label="Cliente">{client ? <Link href={routes.client(client.id)} className="hover:text-brand hover:underline">{client.company}</Link> : '—'}</Row>
+              <Row label="Proyecto web relacionado">{web ? <Link href={routes.website(web.id)} className="hover:text-brand hover:underline">{web.name}</Link> : 'Sin web asociada'}</Row>
               <Row label="Registrador">{d.registrar}</Row>
               <Row label="Coste anual">{formatCurrency(d.annualCost)}</Row>
               <Row label="Fecha de registro">{formatDate(d.registeredAt)}</Row>
