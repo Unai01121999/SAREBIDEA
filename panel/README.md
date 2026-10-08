@@ -148,3 +148,7 @@ Además, los formularios nuevos **se rellenan solos** con lo que ya se sabe (`sr
 - **Factura:** datos fiscales del cliente (CIF y dirección) a la vista y un selector «Facturar un servicio del cliente» que rellena concepto, descripción, importe y recurrencia desde su hosting, dominio o web. Cada factura queda enlazada (`websiteId`, `domainId`, `hostingId`) y aparece en «Facturas relacionadas» de esa web, dominio o hosting.
 - **Tarea:** si el cliente tiene una sola web, se asocia sola.
 - El cliente **añade solo los servicios contratados** (diseño web, dominio, hosting, mantenimiento…) al crear lo correspondiente.
+
+## Web, dominio y hosting desde la ficha del cliente
+
+El formulario de cliente (alta y edición) incluye un bloque opcional «Web, dominio y hosting». Si se deja vacío no se crea nada. Si se rellena un apartado, se crea automáticamente el registro en su listado (Webs, Dominios, Hosting), asociado al cliente, y el dominio y el hosting quedan enlazados a la web nueva. El hosting se elige de la lista de proveedores de Configuración. Los campos que falten toman valores por defecto (renovación a un año, plan «Básico», etc.).
