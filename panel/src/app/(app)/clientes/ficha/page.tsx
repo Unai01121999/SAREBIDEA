@@ -6,6 +6,7 @@ import { useRouter, useSearchParams } from 'next/navigation'
 import { useMemo, useState } from 'react'
 import { ClientFormDialog } from '@/components/clients/client-form'
 import { DomainFormDialog } from '@/components/domains/domain-form'
+import { HostingFormDialog } from '@/components/hosting/hosting-form'
 import { InvoiceFormDialog } from '@/components/invoices/invoice-form'
 import { PageHeader } from '@/components/layout/page-header'
 import { ClientStatusBadge, ExpiryBadge, InvoiceStatusBadge, ServiceChip, TechBadge, WebsiteStatusBadge } from '@/components/shared/badges'
@@ -37,7 +38,7 @@ export default function ClientDetailPage() {
   const update = clientsApi.useUpdate()
   const remove = clientsApi.useRemove()
 
-  const [dialog, setDialog] = useState<'edit' | 'web' | 'domain' | 'invoice' | 'delete' | null>(null)
+  const [dialog, setDialog] = useState<'edit' | 'web' | 'domain' | 'hosting' | 'invoice' | 'delete' | null>(null)
 
   const cWebs = useMemo(() => (websites.data ?? []).filter((w) => w.clientId === id), [websites.data, id])
   const cDomains = useMemo(() => (domains.data ?? []).filter((d) => d.clientId === id), [domains.data, id])
@@ -151,8 +152,11 @@ export default function ClientDetailPage() {
               </CardContent>
             </Card>
             <Card>
-              <CardHeader>
+              <CardHeader className="flex-row items-start justify-between">
                 <CardTitle>Hosting</CardTitle>
+                <Button variant="ghost" size="sm" onClick={() => setDialog('hosting')}>
+                  <Plus /> Añadir
+                </Button>
               </CardHeader>
               <CardContent className="space-y-2">
                 {cHostings.length ? (
@@ -296,6 +300,7 @@ export default function ClientDetailPage() {
       <ClientFormDialog open={dialog === 'edit'} onOpenChange={(o) => !o && setDialog(null)} client={client} />
       <WebsiteFormDialog open={dialog === 'web'} onOpenChange={(o) => !o && setDialog(null)} clientId={client.id} />
       <DomainFormDialog open={dialog === 'domain'} onOpenChange={(o) => !o && setDialog(null)} clientId={client.id} />
+      <HostingFormDialog open={dialog === 'hosting'} onOpenChange={(o) => !o && setDialog(null)} clientId={client.id} />
       <InvoiceFormDialog open={dialog === 'invoice'} onOpenChange={(o) => !o && setDialog(null)} clientId={client.id} />
       <ConfirmDialog
         open={dialog === 'delete'}

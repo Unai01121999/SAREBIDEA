@@ -2,7 +2,7 @@
 // En producción se sustituye por Prisma + PostgreSQL sin tocar la interfaz (ver src/services).
 import { emptyDataset, generateDataset, type Dataset } from '@/mocks/generate'
 
-const KEY = 'sarebidea-panel-db-v2'
+const KEY = 'sarebidea-panel-db-v3'
 let db: Dataset | null = null
 
 export function getDb(): Dataset {

@@ -335,7 +335,11 @@ export function generateDataset(now: Date = new Date(), seed = 20260707): Datase
     { c: 'SEO', w: 9, min: 300, max: 950, recurring: false, text: 'Optimización SEO local' },
     { c: 'ECOMMERCE', w: 5, min: 1200, max: 3600, recurring: false, text: 'Tienda online' },
   ]
-  const billable = clients.filter((c) => c.status !== 'INACTIVE')
+  const billableIds = new Set(clients.filter((c) => c.status !== 'INACTIVE').map((c) => c.id))
+  const billable = clients.filter((c) => billableIds.has(c.id))
+  const billableWebs = websites.filter((w) => billableIds.has(w.clientId))
+  const billableDomains = domains.filter((d) => billableIds.has(d.clientId))
+  const billableHostings = hostings.filter((h) => billableIds.has(h.clientId))
   const invoices: Invoice[] = []
   const counters: Record<number, number> = {}
   const draft: Omit<Invoice, 'id' | 'number' | 'status' | 'createdAt' | 'updatedAt'>[] = []
@@ -347,15 +351,45 @@ export function generateDataset(now: Date = new Date(), seed = 20260707): Datase
       if (day < 1) continue
       const issued = at(-day)
       const terms = pick([15, 30, 30, 45])
+      // Cada factura se refiere a algo real del cliente: su hosting, su dominio o su web.
+      let clientId = pick(billable).id
+      let websiteId: string | null = null
+      let domainId: string | null = null
+      let hostingId: string | null = null
+      let description = cfg.text
+      let subtotal = money(int(cfg.min * 100, cfg.max * 100) / 100)
+      if (cfg.c === 'HOSTING' && billableHostings.length) {
+        const h = pick(billableHostings)
+        clientId = h.clientId
+        hostingId = h.id
+        websiteId = h.websiteId
+        subtotal = h.annualCost
+        description = `Alojamiento web ${h.provider} ${h.plan}`
+      } else if (cfg.c === 'DOMAIN' && billableDomains.length) {
+        const d = pick(billableDomains)
+        clientId = d.clientId
+        domainId = d.id
+        websiteId = d.websiteId
+        subtotal = d.annualCost
+        description = `Renovación del dominio ${d.name}`
+      } else if (billableWebs.length) {
+        const w = pick(billableWebs)
+        clientId = w.clientId
+        websiteId = w.id
+        description = `${cfg.text} · ${w.domainName}`
+      }
       draft.push({
-        clientId: pick(billable).id,
+        clientId,
         concept: cfg.c,
-        description: cfg.text,
+        description,
         issuedAt: issued,
         dueAt: at(-day + terms),
-        subtotal: money(int(cfg.min * 100, cfg.max * 100) / 100),
+        subtotal,
         taxRate: 21,
         recurring: cfg.recurring,
+        websiteId,
+        domainId,
+        hostingId,
       })
     }
   }

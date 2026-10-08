@@ -137,3 +137,14 @@ El panel es completo a nivel de interfaz y de modelo de datos, pero **hoy no tie
 Cada cliente guarda cómo llegó (`origin`): **Alta manual** (creado en el panel) o **Formulario web**. Se ve como insignia en la cabecera de la ficha, como columna y filtro en el listado y en la pestaña **Origen** de la ficha, que muestra además lo que la persona escribió en el formulario.
 
 Las solicitudes del formulario se importan solas desde la tabla `leads` de Supabase al abrir el panel y cada 3 minutos (`src/services/leads-sync.ts`). Es idempotente: cada solicitud se identifica por `sourceId` y no se duplica.
+
+## Datos enlazados (no rellenar dos veces)
+Todo cuelga de la ficha del cliente: webs, dominios, hosting, facturas y tareas guardan solo el **identificador** del cliente, nunca una copia de sus datos. Si cambias su nombre, correo o dirección, se actualiza en todas partes.
+
+Además, los formularios nuevos **se rellenan solos** con lo que ya se sabe (`src/lib/prefill.ts`; solo toca los campos que no hayas editado):
+- **Web:** nombre, dominio (el de su correo, o el nombre de la empresa), URL de producción y de staging, hosting, tecnología y lo que pidió en el formulario.
+- **Dominio:** el dominio de su web, la web asociada (si solo tiene una), registrador, nameservers y coste según lo que ya tiene.
+- **Hosting:** web asociada, proveedor, plan y coste.
+- **Factura:** datos fiscales del cliente (CIF y dirección) a la vista y un selector «Facturar un servicio del cliente» que rellena concepto, descripción, importe y recurrencia desde su hosting, dominio o web. Cada factura queda enlazada (`websiteId`, `domainId`, `hostingId`) y aparece en «Facturas relacionadas» de esa web, dominio o hosting.
+- **Tarea:** si el cliente tiene una sola web, se asocia sola.
+- El cliente **añade solo los servicios contratados** (diseño web, dominio, hosting, mantenimiento…) al crear lo correspondiente.

@@ -6,6 +6,8 @@ import { useForm, useWatch } from 'react-hook-form'
 import { X } from 'lucide-react'
 import { z } from 'zod'
 import { ClientSelectField, Field, SelectField, WebsiteSelectField } from '@/components/forms/fields'
+import { applyDefaults, usePrefillData } from '@/components/forms/prefill'
+import { onlyWebOf } from '@/lib/prefill'
 import { FormDialog } from '@/components/forms/form-dialog'
 import { Input, Textarea } from '@/components/ui/input'
 import { tasksApi } from '@/hooks/use-entities'
@@ -32,7 +34,9 @@ export function TaskFormDialog({ open, onOpenChange, task, defaultStatus, nextPo
   const update = tasksApi.useUpdate()
   const [labels, setLabels] = useState<string[]>([])
   const [draft, setDraft] = useState('')
-  const { register, control, handleSubmit, reset, formState: { errors: e } } = useForm<Values>({ resolver: zodResolver(schema), defaultValues: blank(defaultStatus) })
+  const prefill = usePrefillData()
+  const form = useForm<Values>({ resolver: zodResolver(schema), defaultValues: blank(defaultStatus) })
+  const { register, control, handleSubmit, reset, formState: { errors: e } } = form
   const clientId = useWatch({ control, name: 'clientId' })
   useEffect(() => {
     if (!open) return
@@ -40,6 +44,13 @@ export function TaskFormDialog({ open, onOpenChange, task, defaultStatus, nextPo
     setLabels(task?.labels ?? [])
     setDraft('')
   }, [open, task, defaultStatus, reset])
+
+  // Si el cliente tiene una sola web, se asocia a la tarea sin tener que elegirla.
+  useEffect(() => {
+    if (!open || task || !clientId || !prefill.ready) return
+    applyDefaults(form, { websiteId: onlyWebOf(clientId, prefill.ctx.websites)?.id })
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [open, task, clientId, prefill.ready])
 
   const addLabel = () => {
     const l = draft.trim()

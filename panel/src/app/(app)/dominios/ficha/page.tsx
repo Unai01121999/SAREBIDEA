@@ -1,10 +1,12 @@
 'use client'
 
-import { Pencil, Trash2 } from 'lucide-react'
+import { Pencil, Receipt, Trash2 } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { useState } from 'react'
 import { DomainFormDialog } from '@/components/domains/domain-form'
+import { InvoiceFormDialog } from '@/components/invoices/invoice-form'
+import { RelatedInvoices } from '@/components/invoices/related-invoices'
 import { PageHeader } from '@/components/layout/page-header'
 import { ExpiryBadge } from '@/components/shared/badges'
 import { Badge } from '@/components/ui/badge'
@@ -23,7 +25,7 @@ export default function DomainDetailPage() {
   const { data: client } = clientsApi.useOne(d?.clientId)
   const { data: web } = websitesApi.useOne(d?.websiteId ?? undefined)
   const remove = domainsApi.useRemove()
-  const [dialog, setDialog] = useState<'edit' | 'delete' | null>(null)
+  const [dialog, setDialog] = useState<'edit' | 'delete' | 'invoice' | null>(null)
 
   if (isLoading) return <Skeleton className="h-96 w-full" />
   if (!d)
@@ -50,6 +52,9 @@ export default function DomainDetailPage() {
         }
         actions={
           <>
+            <Button variant="outline" size="sm" onClick={() => setDialog('invoice')}>
+              <Receipt /> Facturar renovación
+            </Button>
             <Button variant="outline" size="sm" onClick={() => setDialog('edit')}>
               <Pencil /> Editar
             </Button>
@@ -82,6 +87,7 @@ export default function DomainDetailPage() {
           </CardContent>
         </Card>
         <div className="space-y-4">
+          <RelatedInvoices match={(i) => i.domainId === d.id} />
           <Card>
             <CardHeader>
               <CardTitle>Nameservers</CardTitle>
@@ -110,6 +116,7 @@ export default function DomainDetailPage() {
           </Card>
         </div>
       </div>
+      <InvoiceFormDialog open={dialog === 'invoice'} onOpenChange={(o) => !o && setDialog(null)} clientId={d.clientId} serviceKey={`domain:${d.id}`} />
       <DomainFormDialog open={dialog === 'edit'} onOpenChange={(o) => !o && setDialog(null)} domain={d} />
       <ConfirmDialog open={dialog === 'delete'} onOpenChange={(o) => !o && setDialog(null)} title={`Eliminar ${d.name}`} description="Se eliminará el dominio. Esta acción no se puede deshacer." loading={remove.isPending} onConfirm={() => remove.mutate(d.id, { onSuccess: () => router.push('/dominios') })} />
     </div>

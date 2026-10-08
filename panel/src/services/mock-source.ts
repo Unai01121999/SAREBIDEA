@@ -1,6 +1,6 @@
 import { clearDb, getDb, persistDb, resetDb } from '@/lib/mock-db'
 import { sleep, uid } from '@/lib/utils'
-import type { ActivityEntry, EntityMap, EntityName } from '@/types/domain'
+import type { ActivityEntry, EntityMap, EntityName, ServiceType } from '@/types/domain'
 import type { DataSource, Repository } from './repository'
 
 const LATENCY = 90 // ms: permite ver los estados de carga
@@ -40,6 +40,19 @@ function log(name: EntityName, item: { id: string; clientId?: string | null } & 
   db.activity.length = Math.min(db.activity.length, 120)
 }
 
+/** Si se crea una web, un dominio, un hosting o una factura de un servicio, el cliente pasa a tenerlo contratado. */
+function ensureClientService(name: EntityName, item: Record<string, unknown>) {
+  const map: Partial<Record<EntityName, () => ServiceType | undefined>> = {
+    websites: () => 'WEB_DESIGN',
+    domains: () => 'DOMAIN',
+    hostings: () => 'HOSTING',
+    invoices: () => ({ HOSTING: 'HOSTING', DOMAIN: 'DOMAIN', MAINTENANCE: 'MAINTENANCE', SEO: 'SEO', ECOMMERCE: 'ECOMMERCE', WEB_DEVELOPMENT: 'WEB_DESIGN' } as Record<string, ServiceType>)[item.concept as string],
+  }
+  const service = map[name]?.()
+  const client = service && getDb().clients.find((c) => c.id === item.clientId)
+  if (client && service && !client.services.includes(service)) client.services = [...client.services, service]
+}
+
 /** Borrado en cascada igual que las relaciones onDelete: Cascade de Prisma. */
 function cascadeClient(id: string) {
   const db = getDb()
@@ -74,6 +87,7 @@ function createRepo<K extends EntityName>(name: K): Repository<EntityMap[K]> {
       const now = new Date().toISOString()
       const item = { ...input, id: uid(prefixes[name]), createdAt: now, updatedAt: now } as unknown as T
       table().unshift(item)
+      ensureClientService(name, item as unknown as Record<string, unknown>)
       log(name, item as never, 'creado')
       persistDb()
       return item

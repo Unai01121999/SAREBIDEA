@@ -1,9 +1,13 @@
 'use client'
 
-import { Archive, ExternalLink, GitBranch, Pencil, Trash2 } from 'lucide-react'
+import { Archive, ExternalLink, GitBranch, Pencil, Plus, Receipt, Trash2 } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { useMemo, useState } from 'react'
+import { DomainFormDialog } from '@/components/domains/domain-form'
+import { HostingFormDialog } from '@/components/hosting/hosting-form'
+import { InvoiceFormDialog } from '@/components/invoices/invoice-form'
+import { RelatedInvoices } from '@/components/invoices/related-invoices'
 import { PageHeader } from '@/components/layout/page-header'
 import { ExpiryBadge, PriorityBadge, TechBadge, WebsiteStatusBadge } from '@/components/shared/badges'
 import { Button } from '@/components/ui/button'
@@ -26,7 +30,7 @@ export default function WebsiteDetailPage() {
   const tasks = tasksApi.useList()
   const update = websitesApi.useUpdate()
   const remove = websitesApi.useRemove()
-  const [dialog, setDialog] = useState<'edit' | 'delete' | null>(null)
+  const [dialog, setDialog] = useState<'edit' | 'delete' | 'domain' | 'hosting' | 'invoice' | null>(null)
 
   const wDomains = useMemo(() => (domains.data ?? []).filter((d) => d.websiteId === id), [domains.data, id])
   const wHostings = useMemo(() => (hostings.data ?? []).filter((h) => h.websiteId === id), [hostings.data, id])
@@ -140,8 +144,11 @@ export default function WebsiteDetailPage() {
         </Card>
 
         <Card>
-          <CardHeader>
+          <CardHeader className="flex-row items-start justify-between">
             <CardTitle>Hosting</CardTitle>
+            <Button variant="ghost" size="sm" onClick={() => setDialog('hosting')}>
+              <Plus /> Añadir
+            </Button>
           </CardHeader>
           <CardContent className="space-y-2">
             {wHostings.length ? (
@@ -159,7 +166,29 @@ export default function WebsiteDetailPage() {
           </CardContent>
         </Card>
 
-        <Card className="lg:col-span-2">
+        <Card>
+          <CardHeader className="flex-row items-start justify-between">
+            <CardTitle>Dominios</CardTitle>
+            <Button variant="ghost" size="sm" onClick={() => setDialog('domain')}>
+              <Plus /> Añadir
+            </Button>
+          </CardHeader>
+          <CardContent className="space-y-2">
+            {wDomains.length ? (
+              wDomains.map((d) => (
+                <Link key={d.id} href={routes.domain(d.id)} className="flex items-center justify-between gap-2 rounded-lg border px-3 py-2 text-sm transition-colors hover:bg-muted/50">
+                  <span className="truncate">{d.name}</span>
+                  <ExpiryBadge renewsAt={d.renewsAt} />
+                </Link>
+              ))
+            ) : (
+              <p className="text-sm text-muted-foreground">Sin dominio registrado para esta web.</p>
+            )}
+          </CardContent>
+        </Card>
+
+
+        <Card>
           <CardHeader>
             <CardTitle>Tareas relacionadas</CardTitle>
           </CardHeader>
@@ -179,8 +208,13 @@ export default function WebsiteDetailPage() {
             )}
           </CardContent>
         </Card>
+
+        <RelatedInvoices match={(i) => i.websiteId === web.id} className="lg:col-span-3" action={<Button variant="ghost" size="sm" onClick={() => setDialog('invoice')}><Receipt /> Facturar</Button>} />
       </div>
 
+      <DomainFormDialog open={dialog === 'domain'} onOpenChange={(o) => !o && setDialog(null)} clientId={web.clientId} websiteId={web.id} />
+      <HostingFormDialog open={dialog === 'hosting'} onOpenChange={(o) => !o && setDialog(null)} clientId={web.clientId} websiteId={web.id} />
+      <InvoiceFormDialog open={dialog === 'invoice'} onOpenChange={(o) => !o && setDialog(null)} clientId={web.clientId} serviceKey={`website:${web.id}`} />
       <WebsiteFormDialog open={dialog === 'edit'} onOpenChange={(o) => !o && setDialog(null)} website={web} />
       <ConfirmDialog open={dialog === 'delete'} onOpenChange={(o) => !o && setDialog(null)} title={`Eliminar ${web.name}`} description="La web se eliminará. Sus dominios y hosting quedarán sin web asociada." loading={remove.isPending} onConfirm={() => remove.mutate(web.id, { onSuccess: () => router.push('/webs/produccion') })} />
     </div>

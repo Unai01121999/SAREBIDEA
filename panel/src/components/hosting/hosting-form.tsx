@@ -5,10 +5,12 @@ import { useEffect } from 'react'
 import { useForm, useWatch } from 'react-hook-form'
 import { z } from 'zod'
 import { ClientSelectField, Field, SelectField, SwitchField, WebsiteSelectField } from '@/components/forms/fields'
+import { applyDefaults, ClientContext, usePrefillData } from '@/components/forms/prefill'
 import { FormDialog } from '@/components/forms/form-dialog'
 import { Input, Textarea } from '@/components/ui/input'
 import { hostingsApi, useSettings } from '@/hooks/use-entities'
 import { fromDateInput, toDateInput } from '@/lib/format'
+import { hostingDefaults, onlyWebOf } from '@/lib/prefill'
 import type { Hosting } from '@/types/domain'
 
 const schema = z.object({
@@ -25,18 +27,30 @@ const schema = z.object({
 type Values = z.infer<typeof schema>
 
 const today = () => toDateInput(new Date().toISOString())
-const empty = (clientId = ''): Values => ({ clientId, websiteId: '', provider: '', plan: '', annualCost: 60, contractedAt: today(), renewsAt: '', active: true, notes: '' })
+const empty = (clientId = '', websiteId = ''): Values => ({ clientId, websiteId, provider: '', plan: '', annualCost: 60, contractedAt: today(), renewsAt: '', active: true, notes: '' })
 const toValues = (h: Hosting): Values => ({ clientId: h.clientId, websiteId: h.websiteId ?? '', provider: h.provider, plan: h.plan, annualCost: h.annualCost, contractedAt: toDateInput(h.contractedAt), renewsAt: toDateInput(h.renewsAt), active: h.active, notes: h.notes })
 
-export function HostingFormDialog({ open, onOpenChange, hosting, clientId }: { open: boolean; onOpenChange: (o: boolean) => void; hosting?: Hosting; clientId?: string }) {
+export function HostingFormDialog({ open, onOpenChange, hosting, clientId, websiteId }: { open: boolean; onOpenChange: (o: boolean) => void; hosting?: Hosting; clientId?: string; websiteId?: string }) {
   const create = hostingsApi.useCreate()
   const update = hostingsApi.useUpdate()
   const { data: settings } = useSettings()
-  const { register, control, handleSubmit, reset, formState: { errors: e } } = useForm<Values>({ resolver: zodResolver(schema), defaultValues: empty(clientId) })
+  const prefill = usePrefillData()
+  const form = useForm<Values>({ resolver: zodResolver(schema), defaultValues: empty(clientId, websiteId) })
+  const { register, control, handleSubmit, reset, formState: { errors: e } } = form
   const selectedClient = useWatch({ control, name: 'clientId' })
+  const selectedWeb = useWatch({ control, name: 'websiteId' })
   useEffect(() => {
-    if (open) reset(hosting ? toValues(hosting) : empty(clientId))
-  }, [open, hosting, clientId, reset])
+    if (open) reset(hosting ? toValues(hosting) : empty(clientId, websiteId))
+  }, [open, hosting, clientId, websiteId, reset])
+
+  // Alta nueva: con el cliente (y su web) se proponen web asociada, proveedor, plan y coste.
+  const client = prefill.clientById(selectedClient)
+  useEffect(() => {
+    if (!open || hosting || !client || !prefill.ready) return
+    const web = (selectedWeb && prefill.ctx.websites.find((w) => w.id === selectedWeb)) || onlyWebOf(client.id, prefill.ctx.websites)
+    applyDefaults(form, hostingDefaults(client, web, prefill.ctx))
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [open, hosting, client?.id, selectedWeb, prefill.ready])
 
   const submit = handleSubmit(async (v) => {
     const payload = { ...v, websiteId: v.websiteId || null, contractedAt: fromDateInput(v.contractedAt), renewsAt: fromDateInput(v.renewsAt) }
@@ -50,6 +64,7 @@ export function HostingFormDialog({ open, onOpenChange, hosting, clientId }: { o
       <Field label="Cliente" required error={e.clientId?.message} htmlFor="h-client">
         <ClientSelectField control={control} name="clientId" id="h-client" />
       </Field>
+      {!hosting && <ClientContext client={client} note="La web, el proveedor, el plan y el coste se proponen según lo que ya tiene contratado." />}
       <Field label="Web asociada" htmlFor="h-web">
         <WebsiteSelectField control={control} name="websiteId" clientId={selectedClient} id="h-web" />
       </Field>

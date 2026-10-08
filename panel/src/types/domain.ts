@@ -131,6 +131,10 @@ export interface Invoice {
   status: InvoiceStatus
   /** Servicio recurrente (hosting, mantenimiento…): cuenta como ingreso recurrente. */
   recurring: boolean
+  /** A qué se refiere la factura (opcionales): permiten ver las facturas de una web, un dominio o un hosting. */
+  websiteId: string | null
+  domainId: string | null
+  hostingId: string | null
   createdAt: ISODate
   updatedAt: ISODate
 }

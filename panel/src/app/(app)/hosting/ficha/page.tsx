@@ -1,10 +1,12 @@
 'use client'
 
-import { Pencil, Trash2 } from 'lucide-react'
+import { Pencil, Receipt, Trash2 } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { useState } from 'react'
 import { HostingFormDialog } from '@/components/hosting/hosting-form'
+import { InvoiceFormDialog } from '@/components/invoices/invoice-form'
+import { RelatedInvoices } from '@/components/invoices/related-invoices'
 import { PageHeader } from '@/components/layout/page-header'
 import { ExpiryBadge } from '@/components/shared/badges'
 import { Badge } from '@/components/ui/badge'
@@ -23,7 +25,7 @@ export default function HostingDetailPage() {
   const { data: client } = clientsApi.useOne(h?.clientId)
   const { data: web } = websitesApi.useOne(h?.websiteId ?? undefined)
   const remove = hostingsApi.useRemove()
-  const [dialog, setDialog] = useState<'edit' | 'delete' | null>(null)
+  const [dialog, setDialog] = useState<'edit' | 'delete' | 'invoice' | null>(null)
 
   if (isLoading) return <Skeleton className="h-96 w-full" />
   if (!h)
@@ -49,6 +51,9 @@ export default function HostingDetailPage() {
         }
         actions={
           <>
+            <Button variant="outline" size="sm" onClick={() => setDialog('invoice')}>
+              <Receipt /> Facturar
+            </Button>
             <Button variant="outline" size="sm" onClick={() => setDialog('edit')}>
               <Pencil /> Editar
             </Button>
@@ -78,6 +83,8 @@ export default function HostingDetailPage() {
           </dl>
         </CardContent>
       </Card>
+      <RelatedInvoices match={(i) => i.hostingId === h.id} className="mt-4 max-w-3xl" />
+      <InvoiceFormDialog open={dialog === 'invoice'} onOpenChange={(o) => !o && setDialog(null)} clientId={h.clientId} serviceKey={`hosting:${h.id}`} />
       <HostingFormDialog open={dialog === 'edit'} onOpenChange={(o) => !o && setDialog(null)} hosting={h} />
       <ConfirmDialog open={dialog === 'delete'} onOpenChange={(o) => !o && setDialog(null)} title="Eliminar hosting" description="Se eliminará este alojamiento. Esta acción no se puede deshacer." loading={remove.isPending} onConfirm={() => remove.mutate(h.id, { onSuccess: () => router.push('/hosting') })} />
     </div>

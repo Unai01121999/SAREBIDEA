@@ -2,13 +2,15 @@
 
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useEffect } from 'react'
-import { useForm } from 'react-hook-form'
+import { useForm, useWatch } from 'react-hook-form'
 import { z } from 'zod'
 import { ClientSelectField, Field, SelectField } from '@/components/forms/fields'
+import { applyDefaults, ClientContext, usePrefillData } from '@/components/forms/prefill'
 import { FormDialog } from '@/components/forms/form-dialog'
 import { Input, Textarea } from '@/components/ui/input'
 import { websitesApi, useSettings } from '@/hooks/use-entities'
 import { fromDateInput, toDateInput } from '@/lib/format'
+import { webDefaults } from '@/lib/prefill'
 import { technologyLabel, websiteStatusLabel } from '@/lib/labels'
 import { TECHNOLOGIES, WEBSITE_STATUSES, type Website } from '@/types/domain'
 
@@ -37,10 +39,28 @@ export function WebsiteFormDialog({ open, onOpenChange, website, clientId }: { o
   const create = websitesApi.useCreate()
   const update = websitesApi.useUpdate()
   const { data: settings } = useSettings()
-  const { register, control, handleSubmit, reset, formState: { errors: e } } = useForm<Values>({ resolver: zodResolver(schema), defaultValues: empty(clientId) })
+  const prefill = usePrefillData()
+  const form = useForm<Values>({ resolver: zodResolver(schema), defaultValues: empty(clientId) })
+  const { register, control, handleSubmit, reset, formState: { errors: e } } = form
+  const selectedClient = useWatch({ control, name: 'clientId' })
+  const typedDomain = useWatch({ control, name: 'domainName' })
   useEffect(() => {
     if (open) reset(website ? toValues(website) : empty(clientId))
   }, [open, website, clientId, reset])
+
+  // Alta nueva: con el cliente elegido se propone nombre, dominio, URLs, hosting, tecnología y descripción.
+  const client = prefill.clientById(selectedClient)
+  useEffect(() => {
+    if (!open || website || !client || !prefill.ready) return
+    applyDefaults(form, webDefaults(client, prefill.ctx))
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [open, website, client?.id, prefill.ready])
+  // Si se escribe el dominio, las URL se derivan solas (mientras no se hayan editado a mano).
+  useEffect(() => {
+    if (!open || website || !typedDomain) return
+    applyDefaults(form, { productionUrl: `https://${typedDomain}`, stagingUrl: `https://staging.${typedDomain}` })
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [typedDomain])
 
   const submit = handleSubmit(async (v) => {
     const payload = { ...v, startDate: fromDateInput(v.startDate), publishDate: v.publishDate ? fromDateInput(v.publishDate) : null }
@@ -54,6 +74,7 @@ export function WebsiteFormDialog({ open, onOpenChange, website, clientId }: { o
       <Field label="Cliente" required error={e.clientId?.message} htmlFor="w-client">
         <ClientSelectField control={control} name="clientId" id="w-client" />
       </Field>
+      {!website && <ClientContext client={client} note="Nombre, dominio, URLs, hosting y descripción se proponen con los datos del cliente. Cámbialos si hace falta." />}
       <Field label="Nombre del proyecto" required error={e.name?.message} htmlFor="w-name">
         <Input id="w-name" {...register('name')} aria-invalid={!!e.name} placeholder="Web corporativa · Cliente" />
       </Field>

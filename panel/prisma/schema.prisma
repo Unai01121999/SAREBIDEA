@@ -182,6 +182,7 @@ model Website {
   domains  Domain[]
   hostings Hosting[]
   tasks    Task[]
+  invoices Invoice[]
 
   @@index([clientId])
   @@index([status, updatedAt(sort: Desc)])
@@ -208,7 +209,8 @@ model Domain {
   updatedAt    DateTime @updatedAt
 
   client  Client   @relation(fields: [clientId], references: [id], onDelete: Cascade)
-  website Website? @relation(fields: [websiteId], references: [id], onDelete: SetNull)
+  website  Website? @relation(fields: [websiteId], references: [id], onDelete: SetNull)
+  invoices Invoice[]
 
   @@index([renewsAt])
   @@index([clientId])
@@ -233,7 +235,8 @@ model Hosting {
   updatedAt    DateTime @updatedAt
 
   client  Client   @relation(fields: [clientId], references: [id], onDelete: Cascade)
-  website Website? @relation(fields: [websiteId], references: [id], onDelete: SetNull)
+  website  Website? @relation(fields: [websiteId], references: [id], onDelete: SetNull)
+  invoices Invoice[]
 
   @@index([active, renewsAt])
   @@index([clientId])
@@ -259,12 +262,22 @@ model Invoice {
   status      InvoiceStatus  @default(PENDING)
   /// Ingreso recurrente (hosting, mantenimiento, renovaciones).
   recurring   Boolean        @default(false)
+  /// A qué se refiere la factura (opcionales): permiten ver las facturas de una web, un dominio o un hosting.
+  websiteId   String?
+  domainId    String?
+  hostingId   String?
   createdAt   DateTime       @default(now())
   updatedAt   DateTime       @updatedAt
 
   /// Las facturas son documentos legales: si un cliente tiene facturas, no se puede borrar (hay que archivarlo).
-  client Client @relation(fields: [clientId], references: [id], onDelete: Restrict)
+  client  Client   @relation(fields: [clientId], references: [id], onDelete: Restrict)
+  website Website? @relation(fields: [websiteId], references: [id], onDelete: SetNull)
+  domain  Domain?  @relation(fields: [domainId], references: [id], onDelete: SetNull)
+  hosting Hosting? @relation(fields: [hostingId], references: [id], onDelete: SetNull)
 
+  @@index([websiteId])
+  @@index([domainId])
+  @@index([hostingId])
   @@index([clientId, issuedAt(sort: Desc)])
   @@index([status, dueAt])
   @@index([issuedAt])

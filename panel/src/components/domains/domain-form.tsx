@@ -5,10 +5,12 @@ import { useEffect } from 'react'
 import { useForm, useWatch } from 'react-hook-form'
 import { z } from 'zod'
 import { ClientSelectField, Field, SelectField, SwitchField, WebsiteSelectField } from '@/components/forms/fields'
+import { applyDefaults, ClientContext, usePrefillData } from '@/components/forms/prefill'
 import { FormDialog } from '@/components/forms/form-dialog'
 import { Input, Textarea } from '@/components/ui/input'
 import { domainsApi, useSettings } from '@/hooks/use-entities'
 import { fromDateInput, toDateInput } from '@/lib/format'
+import { domainDefaults, onlyWebOf } from '@/lib/prefill'
 import type { Domain } from '@/types/domain'
 
 const schema = z.object({
@@ -27,18 +29,30 @@ const schema = z.object({
 type Values = z.infer<typeof schema>
 
 const today = () => toDateInput(new Date().toISOString())
-const empty = (clientId = ''): Values => ({ clientId, websiteId: '', name: '', registrar: '', registeredAt: today(), renewsAt: '', annualCost: 12, autoRenew: true, nameservers: '', dns: '', notes: '' })
+const empty = (clientId = '', websiteId = ''): Values => ({ clientId, websiteId, name: '', registrar: '', registeredAt: today(), renewsAt: '', annualCost: 12, autoRenew: true, nameservers: '', dns: '', notes: '' })
 const toValues = (d: Domain): Values => ({ clientId: d.clientId, websiteId: d.websiteId ?? '', name: d.name, registrar: d.registrar, registeredAt: toDateInput(d.registeredAt), renewsAt: toDateInput(d.renewsAt), annualCost: d.annualCost, autoRenew: d.autoRenew, nameservers: d.nameservers.join('\n'), dns: d.dns, notes: d.notes })
 
-export function DomainFormDialog({ open, onOpenChange, domain, clientId }: { open: boolean; onOpenChange: (o: boolean) => void; domain?: Domain; clientId?: string }) {
+export function DomainFormDialog({ open, onOpenChange, domain, clientId, websiteId }: { open: boolean; onOpenChange: (o: boolean) => void; domain?: Domain; clientId?: string; websiteId?: string }) {
   const create = domainsApi.useCreate()
   const update = domainsApi.useUpdate()
   const { data: settings } = useSettings()
-  const { register, control, handleSubmit, reset, formState: { errors: e } } = useForm<Values>({ resolver: zodResolver(schema), defaultValues: empty(clientId) })
+  const prefill = usePrefillData()
+  const form = useForm<Values>({ resolver: zodResolver(schema), defaultValues: empty(clientId, websiteId) })
+  const { register, control, handleSubmit, reset, formState: { errors: e } } = form
   const selectedClient = useWatch({ control, name: 'clientId' })
+  const selectedWeb = useWatch({ control, name: 'websiteId' })
   useEffect(() => {
-    if (open) reset(domain ? toValues(domain) : empty(clientId))
-  }, [open, domain, clientId, reset])
+    if (open) reset(domain ? toValues(domain) : empty(clientId, websiteId))
+  }, [open, domain, clientId, websiteId, reset])
+
+  // Alta nueva: con el cliente (y su web) se proponen dominio, registrador, nameservers, coste y web asociada.
+  const client = prefill.clientById(selectedClient)
+  useEffect(() => {
+    if (!open || domain || !client || !prefill.ready) return
+    const web = (selectedWeb && prefill.ctx.websites.find((w) => w.id === selectedWeb)) || onlyWebOf(client.id, prefill.ctx.websites)
+    applyDefaults(form, domainDefaults(client, web, prefill.ctx))
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [open, domain, client?.id, selectedWeb, prefill.ready])
 
   const submit = handleSubmit(async (v) => {
     const payload = { ...v, name: v.name.toLowerCase(), websiteId: v.websiteId || null, registeredAt: fromDateInput(v.registeredAt), renewsAt: fromDateInput(v.renewsAt), nameservers: v.nameservers.split(/[\n,]+/).map((s) => s.trim()).filter(Boolean) }
@@ -58,6 +72,7 @@ export function DomainFormDialog({ open, onOpenChange, domain, clientId }: { ope
       <Field label="Cliente" required error={e.clientId?.message} htmlFor="d-client">
         <ClientSelectField control={control} name="clientId" id="d-client" />
       </Field>
+      {!domain && <ClientContext client={client} note="El dominio se propone a partir de su web o de su correo; registrador, nameservers y coste, de lo que ya tiene contratado." />}
       <Field label="Proyecto web relacionado" htmlFor="d-web">
         <WebsiteSelectField control={control} name="websiteId" clientId={selectedClient} id="d-web" />
       </Field>
