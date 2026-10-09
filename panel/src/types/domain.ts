@@ -171,7 +171,7 @@ export interface Task {
 
 export interface ActivityEntry {
   id: string
-  entity: 'client' | 'website' | 'domain' | 'hosting' | 'invoice' | 'task'
+  entity: 'client' | 'website' | 'domain' | 'hosting' | 'invoice' | 'task' | 'user' | 'settings'
   entityId: string
   clientId: string | null
   message: string

@@ -13,17 +13,6 @@ const db = () => {
 
 const TABLE: Record<EntityName, string> = { clients: 'clients', websites: 'websites', domains: 'domains', hostings: 'hostings', invoices: 'invoices', tasks: 'tasks', users: 'panel_users' }
 const prefixes: Record<EntityName, string> = { clients: 'cli', websites: 'web', domains: 'dom', hostings: 'hos', invoices: 'inv', tasks: 'tsk', users: 'usr' }
-const entityOf: Record<EntityName, ActivityEntry['entity']> = { clients: 'client', websites: 'website', domains: 'domain', hostings: 'hosting', invoices: 'invoice', tasks: 'task', users: 'client' }
-const NOUN: Record<EntityName, { text: string; feminine: boolean }> = {
-  clients: { text: 'Cliente', feminine: false },
-  websites: { text: 'Web', feminine: true },
-  domains: { text: 'Dominio', feminine: false },
-  hostings: { text: 'Hosting', feminine: false },
-  invoices: { text: 'Factura', feminine: true },
-  tasks: { text: 'Tarea', feminine: true },
-  users: { text: 'Usuario', feminine: false },
-}
-
 const snake = (k: string) => k.replace(/[A-Z]/g, (c) => `_${c.toLowerCase()}`)
 const camel = (k: string) => k.replace(/_([a-z])/g, (_, c: string) => c.toUpperCase())
 /** Solo se convierten las claves de primer nivel: `formData` y `comments` son JSON y conservan sus claves. */
@@ -31,24 +20,7 @@ const mapKeys = (o: Record<string, unknown>, fn: (k: string) => string) => Objec
 const toRow = (o: object) => mapKeys(o as Record<string, unknown>, snake)
 const fromRow = <T,>(r: Record<string, unknown>) => mapKeys(r, camel) as T
 
-function describe(name: EntityName, verb: 'creado' | 'actualizado' | 'eliminado', item: Record<string, unknown>) {
-  const label = (item.company as string) ?? (item.name as string) ?? (item.number as string) ?? (item.title as string) ?? (item.plan as string) ?? 'registro'
-  const n = NOUN[name]
-  return `${n.text} ${n.feminine ? verb.replace(/o$/, 'a') : verb}: ${label}`
-}
-
-async function log(name: EntityName, item: { id: string; clientId?: string | null } & Record<string, unknown>, verb: 'creado' | 'actualizado' | 'eliminado') {
-  if (name === 'users') return
-  await db().from('activity').insert({
-    id: uid('act'),
-    entity: entityOf[name],
-    entity_id: item.id,
-    client_id: name === 'clients' ? item.id : (item.clientId ?? null),
-    message: describe(name, verb, item),
-    actor: 'Unai',
-    created_at: new Date().toISOString(),
-  })
-}
+// El historial (tabla `activity`) lo escribe la propia base de datos con disparadores, con el nombre de quien hace el cambio.
 
 /** Si se crea una web, un dominio, un hosting o una factura de un servicio, el cliente pasa a tenerlo contratado. */
 async function ensureClientService(name: EntityName, item: Record<string, unknown>) {
@@ -85,22 +57,17 @@ function createRepo<K extends EntityName>(name: K): Repository<EntityMap[K]> {
       const { error } = await db().from(table).insert(toRow(item))
       if (error) throw error
       await ensureClientService(name, item as unknown as Record<string, unknown>)
-      await log(name, item as never, 'creado')
       return item
     },
     async update(id, patch) {
       const { data, error } = await db().from(table).update(toRow({ ...patch, updatedAt: new Date().toISOString() })).eq('id', id).select('*').single()
       if (error) throw error
       const item = fromRow<T>(data)
-      // Reordenar tarjetas del Kanban (solo cambia `position`) no se registra como actividad.
-      if (!Object.keys(patch).every((k) => k === 'position')) await log(name, item as never, 'actualizado')
       return item
     },
     async remove(id) {
-      const { data } = await db().from(table).select('*').eq('id', id).maybeSingle()
       const { error } = await db().from(table).delete().eq('id', id)
       if (error) throw error
-      if (data) await log(name, fromRow(data) as never, 'eliminado')
     },
   }
 }

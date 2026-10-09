@@ -66,6 +66,9 @@ const store: Store = {
     const { error } = await admin.auth.admin.deleteUser(authId)
     if (error && !/not found/i.test(error.message)) throw new HttpError(500, error.message)
   },
+  async logActivity({ entityId, message, actor }) {
+    await admin.from('activity').insert({ id: `act_${crypto.randomUUID().replace(/-/g, '').slice(0, 12)}`, entity: 'user', entity_id: entityId, client_id: null, message, actor })
+  },
   randomId: () => crypto.randomUUID().replace(/-/g, '').slice(0, 10),
   randomPassword() {
     const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz23456789'

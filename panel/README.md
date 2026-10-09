@@ -182,3 +182,7 @@ Se gestionan en **Configuración → Usuarios y roles** (solo el propietario pue
 | Configuración y usuarios | todo | lectura | sin acceso | sin acceso |
 
 Migración: `supabase/migrations/005_roles_y_usuarios.sql`.
+
+## Historial de cambios (tabla `activity`)
+
+Lo escribe la propia base de datos con disparadores (`supabase/migrations/006_historial_automatico.sql`), así que queda anotado cualquier cambio de clientes, webs, dominios, hosting, facturas, tareas y ajustes, con el **nombre de quien lo hizo** (sale de `panel_users`) y los campos modificados. Las altas, cambios y bajas de usuarios las anota la función `manage-panel-users`. No se anotan los movimientos de tarjetas del tablero ni los cambios automáticos de servicios.

@@ -1,6 +1,6 @@
 'use client'
 
-import { CheckCircle2, CreditCard, Globe, Building2, Server, UserPlus, Activity } from 'lucide-react'
+import { CheckCircle2, CreditCard, Globe, Building2, Server, Settings, UserCog, UserPlus, Activity } from 'lucide-react'
 import Link from 'next/link'
 import { ExpiryBadge } from '@/components/shared/badges'
 import { Avatar } from '@/components/ui/avatar'
@@ -10,7 +10,7 @@ import type { Renewal } from '@/lib/metrics'
 import type { ActivityEntry, Client, Task } from '@/types/domain'
 import { routes } from '@/lib/routes'
 
-const entityIcon = { client: UserPlus, website: Globe, domain: Building2, hosting: Server, invoice: CreditCard, task: CheckCircle2 }
+const entityIcon = { client: UserPlus, website: Globe, domain: Building2, hosting: Server, invoice: CreditCard, task: CheckCircle2, user: UserCog, settings: Settings }
 
 export function ListSkeleton({ rows = 5 }: { rows?: number }) {
   return (

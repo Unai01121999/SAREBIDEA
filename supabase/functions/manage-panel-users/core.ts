@@ -27,6 +27,8 @@ export interface Store {
   authCreateOrReset(email: string, password: string): Promise<{ id: string }>
   authSetPassword(authId: string, password: string): Promise<void>
   authDelete(authId: string): Promise<void>
+  /** Anota la acción en la tabla `activity` (los demás cambios los anota un disparador de la base de datos). */
+  logActivity(entry: { entityId: string; message: string; actor: string }): Promise<void>
   randomId(): string
   randomPassword(): string
 }
@@ -39,6 +41,7 @@ export class HttpError extends Error {
   }
 }
 
+const ROLE_LABEL: Record<Role, string> = { OWNER: 'Propietario', ADMIN: 'Administrador', EDITOR: 'Editor', VIEWER: 'Solo lectura' }
 const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/
 
 async function requireOwner(store: Store, authorization: string | null) {
@@ -71,6 +74,7 @@ export async function handle(store: Store, authorization: string | null, body: R
     const auth = await store.authCreateOrReset(email, password)
     const row: PanelUserRow = { id: `usr_${store.randomId()}`, name, email, role, active: true, auth_id: auth.id }
     await store.insertPanelUser(row)
+    await store.logActivity({ entityId: row.id, actor: me.name, message: `Usuario creado: ${name} (${ROLE_LABEL[role]})` })
     return { user: toPublic(row), tempPassword: password }
   }
 
@@ -95,6 +99,8 @@ export async function handle(store: Store, authorization: string | null, body: R
       patch.active = Boolean(body.active)
     }
     const saved = await store.updatePanelUser(target.id, { ...patch, updated_at: new Date().toISOString() })
+    const what = [patch.name !== undefined && 'nombre', patch.role && `rol: ${ROLE_LABEL[patch.role]}`, patch.active !== undefined && (patch.active ? 'acceso activado' : 'acceso desactivado')].filter(Boolean).join(', ')
+    await store.logActivity({ entityId: target.id, actor: me.name, message: `Usuario actualizado: ${saved.name} (${what})` })
     return { user: toPublic(saved) }
   }
 
@@ -108,12 +114,14 @@ export async function handle(store: Store, authorization: string | null, body: R
     } else {
       await store.authSetPassword(target.auth_id, password)
     }
+    await store.logActivity({ entityId: target.id, actor: me.name, message: `Contraseña restablecida: ${target.name}` })
     return { tempPassword: password }
   }
 
   if (action === 'delete') {
     await store.deletePanelUser(target.id)
     if (target.auth_id) await store.authDelete(target.auth_id)
+    await store.logActivity({ entityId: target.id, actor: me.name, message: `Usuario eliminado: ${target.name}` })
     return { ok: true }
   }
 
