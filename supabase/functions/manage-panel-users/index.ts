@@ -8,6 +8,15 @@ const admin = createClient(Deno.env.get('SUPABASE_URL')!, Deno.env.get('SUPABASE
 const cors = { 'Access-Control-Allow-Origin': '*', 'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type', 'Access-Control-Allow-Methods': 'POST, OPTIONS' }
 const json = (status: number, body: unknown) => new Response(JSON.stringify(body), { status, headers: { ...cors, 'Content-Type': 'application/json' } })
 
+// Tabla `usuarios_panel` (columnas en español) ⇄ filas que usa core.ts
+const T = 'usuarios_panel'
+const aFila = (p: Partial<PanelUserRow>) => {
+  const m: Record<string, string> = { id: 'id', name: 'nombre', email: 'correo', role: 'rol', active: 'activo', auth_id: 'id_autenticacion', created_at: 'creado_el', updated_at: 'actualizado_el' }
+  return Object.fromEntries(Object.entries(p).filter(([, v]) => v !== undefined).map(([k, v]) => [m[k] ?? k, v]))
+}
+// deno-lint-ignore no-explicit-any
+const desdeFila = (r: any): PanelUserRow | null => (r ? { id: r.id, name: r.nombre, email: r.correo, role: r.rol, active: r.activo, auth_id: r.id_autenticacion, created_at: r.creado_el, updated_at: r.actualizado_el } : null)
+
 const b64 = (s: string) => JSON.parse(atob(s.replace(/-/g, '+').replace(/_/g, '/')))
 const must = <T,>(r: { data: T | null; error: { message: string } | null }) => {
   if (r.error) throw new HttpError(500, r.error.message)
@@ -27,19 +36,19 @@ const store: Store = {
     return { email: data.user.email, aal }
   },
   async panelUserByEmail(email) {
-    return must(await admin.from('panel_users').select('*').ilike('email', email).maybeSingle()) as PanelUserRow | null
+    return desdeFila(must(await admin.from(T).select('*').ilike('correo', email).maybeSingle()))
   },
   async panelUserById(id) {
-    return must(await admin.from('panel_users').select('*').eq('id', id).maybeSingle()) as PanelUserRow | null
+    return desdeFila(must(await admin.from(T).select('*').eq('id', id).maybeSingle()))
   },
   async insertPanelUser(row) {
-    must(await admin.from('panel_users').insert(row).select('id').single())
+    must(await admin.from(T).insert(aFila(row)).select('id').single())
   },
   async updatePanelUser(id, patch) {
-    return must(await admin.from('panel_users').update(patch).eq('id', id).select('*').single()) as PanelUserRow
+    return desdeFila(must(await admin.from(T).update(aFila(patch)).eq('id', id).select('*').single())) as PanelUserRow
   },
   async deletePanelUser(id) {
-    must(await admin.from('panel_users').delete().eq('id', id).select('id'))
+    must(await admin.from(T).delete().eq('id', id).select('id'))
   },
   async authCreateOrReset(email, password) {
     const created = await admin.auth.admin.createUser({ email, password, email_confirm: true })
@@ -67,7 +76,7 @@ const store: Store = {
     if (error && !/not found/i.test(error.message)) throw new HttpError(500, error.message)
   },
   async logActivity({ entityId, message, actor }) {
-    await admin.from('activity').insert({ id: `act_${crypto.randomUUID().replace(/-/g, '').slice(0, 12)}`, entity: 'user', entity_id: entityId, client_id: null, message, actor })
+    await admin.from('actividad').insert({ id: `act_${crypto.randomUUID().replace(/-/g, '').slice(0, 12)}`, entidad: 'user', entidad_id: entityId, cliente_id: null, mensaje: message, autor: actor })
   },
   randomId: () => crypto.randomUUID().replace(/-/g, '').slice(0, 10),
   randomPassword() {

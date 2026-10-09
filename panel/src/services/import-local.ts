@@ -2,13 +2,12 @@
 // Es seguro repetirlo: lo que ya existe en la base de datos no se sobrescribe. Las solicitudes del formulario no se duplican
 // (se reconocen por su `sourceId` y se enlazan con el cliente que ya creó la base de datos).
 import { supabase } from '@/lib/supabase'
-import type { Client, Domain, Hosting, Invoice, Task, Website } from '@/types/domain'
+import { aFila, COLUMNAS, TABLAS } from './db-schema'
+import type { Client, Domain, EntityName, Hosting, Invoice, Task, Website } from '@/types/domain'
 
 const KEY = 'sarebidea-panel-db-v3'
 type Local = { clients?: Client[]; websites?: Website[]; domains?: Domain[]; hostings?: Hosting[]; invoices?: Invoice[]; tasks?: Task[] }
 
-const snake = (k: string) => k.replace(/[A-Z]/g, (c) => `_${c.toLowerCase()}`)
-const toRow = (o: object) => Object.fromEntries(Object.entries(o).map(([k, v]) => [snake(k), v]))
 
 export function readLocalData(): Local | null {
   try {
@@ -36,11 +35,11 @@ export function discardLocalData() {
   }
 }
 
-async function insertAll(table: string, rows: object[]) {
+async function insertAll(entity: EntityName, rows: object[]) {
   if (!supabase) throw new Error('Supabase no está configurado')
   for (let i = 0; i < rows.length; i += 200) {
-    const { error } = await supabase.from(table).upsert(rows.slice(i, i + 200).map(toRow), { onConflict: 'id', ignoreDuplicates: true })
-    if (error) throw new Error(`${table}: ${error.message}`)
+    const { error } = await supabase.from(TABLAS[entity]).upsert(rows.slice(i, i + 200).map((r) => aFila(COLUMNAS[entity], r)), { onConflict: 'id', ignoreDuplicates: true })
+    if (error) throw new Error(`${TABLAS[entity]}: ${error.message}`)
   }
 }
 
@@ -49,9 +48,9 @@ export async function importLocalData(): Promise<number> {
   if (!supabase) throw new Error('Supabase no está configurado')
   const d = readLocalData()
   if (!d) return 0
-  const { data: existing, error } = await supabase.from('clients').select('id, source_id').not('source_id', 'is', null)
+  const { data: existing, error } = await supabase.from(TABLAS.clients).select('id, id_origen').not('id_origen', 'is', null)
   if (error) throw new Error(error.message)
-  const bySource = new Map((existing ?? []).map((c) => [c.source_id as string, c.id as string]))
+  const bySource = new Map((existing ?? []).map((c) => [c.id_origen as string, c.id as string]))
   const remap = new Map<string, string>() // id local -> id en la base de datos
   const newClients: Client[] = []
   for (const c of d.clients ?? []) {

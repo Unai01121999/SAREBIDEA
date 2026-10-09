@@ -186,3 +186,11 @@ Migración: `supabase/migrations/005_roles_y_usuarios.sql`.
 ## Historial de cambios (tabla `activity`)
 
 Lo escribe la propia base de datos con disparadores (`supabase/migrations/006_historial_automatico.sql`), así que queda anotado cualquier cambio de clientes, webs, dominios, hosting, facturas, tareas y ajustes, con el **nombre de quien lo hizo** (sale de `panel_users`) y los campos modificados. Las altas, cambios y bajas de usuarios las anota la función `manage-panel-users`. No se anotan los movimientos de tarjetas del tablero ni los cambios automáticos de servicios.
+
+## Nombres de la base de datos (en español)
+
+Tablas: `clientes`, `webs`, `dominios`, `alojamientos` (hosting), `facturas`, `tareas`, `usuarios_panel`, `actividad`, `ajustes`, `solicitudes` (formulario de la web) y `correos_admin`. Las columnas también están en español (`empresa`, `persona_contacto`, `correo`, `fecha_renovacion`, `coste_anual`, `creado_el`…).
+
+La correspondencia con los campos del código está en un único archivo, `src/services/db-schema.ts`. Los valores guardados (`ACTIVE`, `OWNER`, `PENDING`…) siguen en inglés. Los nombres de las funciones SQL (`panel_role`, `panel_can`…) tampoco cambian. Migración documentada en `supabase/migrations/007_nombres_en_espanol.sql`.
+
+La vista `leads` es **temporal**: mantiene vivo el formulario de la versión anterior de la web. Una vez publicada la nueva versión, bórrala en el SQL Editor: `drop view public.leads;`

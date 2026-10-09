@@ -1,9 +1,10 @@
 // Fuente de datos real: Supabase (PostgreSQL). Cada entidad vive en su tabla; las políticas RLS solo dejan entrar
-// a la cuenta administradora con doble factor (is_admin()). Las filas usan snake_case y el panel camelCase.
+// según su rol (políticas RLS). Los nombres de tablas y columnas están en español (ver db-schema.ts).
 import { supabase } from '@/lib/supabase'
 import { uid } from '@/lib/utils'
 import { DEFAULT_SETTINGS } from '@/mocks/generate'
 import type { ActivityEntry, AppSettings, EntityMap, EntityName, ServiceType } from '@/types/domain'
+import { aFila, COLUMNAS, COLUMNAS_ACTIVIDAD, desdeFila, TABLA_ACTIVIDAD, TABLA_AJUSTES, TABLAS } from './db-schema'
 import type { DataSource, Repository } from './repository'
 
 const db = () => {
@@ -11,15 +12,7 @@ const db = () => {
   return supabase
 }
 
-const TABLE: Record<EntityName, string> = { clients: 'clients', websites: 'websites', domains: 'domains', hostings: 'hostings', invoices: 'invoices', tasks: 'tasks', users: 'panel_users' }
 const prefixes: Record<EntityName, string> = { clients: 'cli', websites: 'web', domains: 'dom', hostings: 'hos', invoices: 'inv', tasks: 'tsk', users: 'usr' }
-const snake = (k: string) => k.replace(/[A-Z]/g, (c) => `_${c.toLowerCase()}`)
-const camel = (k: string) => k.replace(/_([a-z])/g, (_, c: string) => c.toUpperCase())
-/** Solo se convierten las claves de primer nivel: `formData` y `comments` son JSON y conservan sus claves. */
-const mapKeys = (o: Record<string, unknown>, fn: (k: string) => string) => Object.fromEntries(Object.entries(o).map(([k, v]) => [fn(k), v]))
-const toRow = (o: object) => mapKeys(o as Record<string, unknown>, snake)
-const fromRow = <T,>(r: Record<string, unknown>) => mapKeys(r, camel) as T
-
 // El historial (tabla `activity`) lo escribe la propia base de datos con disparadores, con el nombre de quien hace el cambio.
 
 /** Si se crea una web, un dominio, un hosting o una factura de un servicio, el cliente pasa a tenerlo contratado. */
@@ -32,24 +25,27 @@ async function ensureClientService(name: EntityName, item: Record<string, unknow
   }
   const service = map[name]?.()
   if (!service || !item.clientId) return
-  const { data } = await db().from('clients').select('services').eq('id', item.clientId as string).maybeSingle()
-  const services = (data?.services as string[] | undefined) ?? []
-  if (data && !services.includes(service)) await db().from('clients').update({ services: [...services, service] }).eq('id', item.clientId as string)
+  const { data } = await db().from(TABLAS.clients).select('servicios').eq('id', item.clientId as string).maybeSingle()
+  const services = (data?.servicios as string[] | undefined) ?? []
+  if (data && !services.includes(service)) await db().from(TABLAS.clients).update({ servicios: [...services, service] }).eq('id', item.clientId as string)
 }
 
 function createRepo<K extends EntityName>(name: K): Repository<EntityMap[K]> {
   type T = EntityMap[K]
-  const table = TABLE[name]
+  const table = TABLAS[name]
+  const cols = COLUMNAS[name]
+  const fromRow = (r: Record<string, unknown>) => desdeFila<T>(cols, r)
+  const toRow = (o: object) => aFila(cols, o)
   return {
     async list() {
-      const { data, error } = await db().from(table).select('*').order('created_at', { ascending: false }).limit(5000)
+      const { data, error } = await db().from(table).select('*').order('creado_el', { ascending: false }).limit(5000)
       if (error) throw error
-      return (data ?? []).map((r) => fromRow<T>(r))
+      return (data ?? []).map((r) => fromRow(r))
     },
     async get(id) {
       const { data, error } = await db().from(table).select('*').eq('id', id).maybeSingle()
       if (error) throw error
-      return data ? fromRow<T>(data) : null
+      return data ? fromRow(data) : null
     },
     async create(input) {
       const now = new Date().toISOString()
@@ -62,7 +58,7 @@ function createRepo<K extends EntityName>(name: K): Repository<EntityMap[K]> {
     async update(id, patch) {
       const { data, error } = await db().from(table).update(toRow({ ...patch, updatedAt: new Date().toISOString() })).eq('id', id).select('*').single()
       if (error) throw error
-      const item = fromRow<T>(data)
+      const item = fromRow(data)
       return item
     },
     async remove(id) {
@@ -77,20 +73,20 @@ export const supabaseSource: DataSource = {
   repo: (name) => createRepo(name),
   activity: {
     async list() {
-      const { data, error } = await db().from('activity').select('*').order('created_at', { ascending: false }).limit(120)
+      const { data, error } = await db().from(TABLA_ACTIVIDAD).select('*').order('creado_el', { ascending: false }).limit(120)
       if (error) throw error
-      return (data ?? []).map((r) => fromRow<ActivityEntry>(r))
+      return (data ?? []).map((r) => desdeFila<ActivityEntry>(COLUMNAS_ACTIVIDAD, r))
     },
   },
   settings: {
     async get() {
-      const { data, error } = await db().from('app_settings').select('data').eq('id', 1).maybeSingle()
+      const { data, error } = await db().from(TABLA_AJUSTES).select('datos').eq('id', 1).maybeSingle()
       if (error) throw error
-      return { ...DEFAULT_SETTINGS, ...((data?.data as Partial<AppSettings>) ?? {}) }
+      return { ...DEFAULT_SETTINGS, ...((data?.datos as Partial<AppSettings>) ?? {}) }
     },
     async update(patch) {
       const next = { ...(await supabaseSource.settings.get()), ...patch }
-      const { error } = await db().from('app_settings').upsert({ id: 1, data: next })
+      const { error } = await db().from(TABLA_AJUSTES).upsert({ id: 1, datos: next })
       if (error) throw error
       return next
     },

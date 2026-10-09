@@ -1,5 +1,5 @@
 // Envío del formulario de contacto. Con Supabase configurado (VITE_SUPABASE_URL y VITE_SUPABASE_ANON_KEY) se guarda
-// en la tabla `leads` (el visitante anónimo solo puede INSERTAR, lo garantiza la base de datos) y aparece en el panel
+// en la tabla `solicitudes` (el visitante anónimo solo puede INSERTAR, lo garantiza la base de datos) y aparece en el panel
 // como cliente con origen «Formulario web». Sin Supabase (desarrollo local) se guarda en localStorage para poder probar.
 import { supabase } from './supabase'
 
@@ -18,13 +18,14 @@ const LOCAL_KEY = 'sarebidea-leads'
 
 export async function createLead(input: LeadInput): Promise<void> {
   if (supabase) {
-    const { error } = await supabase.from('leads').insert({
-      company: input.company,
-      name: input.name,
-      phone: input.phone,
-      email: input.email,
-      business_type: input.businessType,
-      description: input.description,
+    // Tabla `solicitudes` (columnas en español); `nombre` es la persona de contacto.
+    const { error } = await supabase.from('solicitudes').insert({
+      empresa: input.company,
+      nombre: input.name,
+      telefono: input.phone,
+      correo: input.email,
+      tipo_negocio: input.businessType,
+      descripcion: input.description,
     })
     if (error) throw error
     return
