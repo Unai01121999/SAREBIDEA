@@ -252,6 +252,10 @@ export const faqs = [
     a: 'Sí. Cuidamos la velocidad, la estructura y el SEO local, y configuramos tu ficha de Google Business para que te encuentren quienes buscan cerca de ti.',
   },
   {
+    q: '¿Trabajáis con negocios de mi zona?',
+    a: 'Estamos en Gueñes (Bizkaia) y trabajamos con comercios y pequeños negocios de Bizkaia y de toda Euskadi. Si tu negocio está en otro lugar, también podemos ayudarte: todo el proceso se hace online, por videollamada y correo.',
+  },
+  {
     q: '¿Qué pasa si ya tengo una web?',
     a: 'La revisamos contigo, aprovechamos lo que funcione y migramos tu contenido y tu dominio sin que pierdas visitas ni posicionamiento.',
   },
