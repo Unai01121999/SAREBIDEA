@@ -30,7 +30,7 @@ export function Footer() {
         <div className="grid gap-12 md:grid-cols-[1.4fr_1fr_1fr_1fr]">
           <div>
             <Logo tone="paper" size={30} tagline />
-            <p className="mt-6 max-w-[20rem] text-white/55">Diseño web en Gueñes (Bizkaia) para comercios y pequeños negocios que quieren más clientes.</p>
+            <p className="mt-6 max-w-[20rem] text-white/55">Webs profesionales para comercios y pequeños negocios que quieren más clientes.</p>
           </div>
           {cols.map((c) => (
             <nav key={c.title} aria-label={c.title}>

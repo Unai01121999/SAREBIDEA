@@ -34,7 +34,7 @@ export function Hero() {
             className="display text-[clamp(2.9rem,1.2rem+6.6vw,6rem)]"
           />
           <motion.p {...fade(0.55)} className="lede mt-6 max-w-[34rem] sm:mt-8">
-            Creamos páginas web modernas para comercios de Bizkaia y Euskadi que quieren atraer más clientes, generar confianza y destacar frente a su competencia.
+            Creamos páginas web modernas para comercios que quieren atraer más clientes, generar confianza y destacar frente a su competencia.
           </motion.p>
           <motion.div {...fade(0.7)} className="mt-8 flex flex-col gap-3 sm:mt-10 sm:flex-row sm:items-center">
             <Button href="#contacto" size="lg">
