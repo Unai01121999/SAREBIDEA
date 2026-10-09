@@ -9,6 +9,7 @@ import { DomainFormDialog } from '@/components/domains/domain-form'
 import { PageHeader } from '@/components/layout/page-header'
 import { Badge } from '@/components/ui/badge'
 import { ExpiryBadge } from '@/components/shared/badges'
+import { Can } from '@/components/shared/can'
 import { RowActions } from '@/components/shared/row-actions'
 import { StatStrip } from '@/components/shared/stat-strip'
 import { Button } from '@/components/ui/button'
@@ -86,9 +87,11 @@ export default function DomainsPage() {
         description="Control de todos los dominios y de sus renovaciones."
         crumbs={[{ label: 'Dominios' }]}
         actions={
-          <Button onClick={() => setCreateOpen(true)}>
-            <Plus /> Nuevo dominio
-          </Button>
+          <Can module="clients">
+            <Button onClick={() => setCreateOpen(true)}>
+              <Plus /> Nuevo dominio
+            </Button>
+          </Can>
         }
       />
       <StatStrip

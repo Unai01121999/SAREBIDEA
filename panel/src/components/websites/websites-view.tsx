@@ -12,6 +12,7 @@ import { Button } from '@/components/ui/button'
 import { ConfirmDialog } from '@/components/ui/confirm-dialog'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { WebsiteFormDialog } from '@/components/websites/website-form'
+import { Can } from '@/components/shared/can'
 import { PackDialog } from '@/components/websites/pack-dialog'
 import { packLabel } from '@/lib/packs'
 import { clientsApi, websitesApi } from '@/hooks/use-entities'
@@ -110,14 +111,16 @@ export function WebsitesView({ estado }: { estado: string }) {
         description="Todos los proyectos web, por estado."
         crumbs={[{ label: 'Webs' }, { label: view.label }]}
         actions={
-          <div className="flex gap-2">
-            <Button variant="outline" onClick={() => setPackOpen(true)}>
-              <Plus /> Añadir pack
-            </Button>
-            <Button onClick={() => setCreateOpen(true)}>
-              <Plus /> Nueva web
-            </Button>
-          </div>
+          <Can module="clients">
+            <div className="flex gap-2">
+              <Button variant="outline" onClick={() => setPackOpen(true)}>
+                <Plus /> Añadir pack
+              </Button>
+              <Button onClick={() => setCreateOpen(true)}>
+                <Plus /> Nueva web
+              </Button>
+            </div>
+          </Can>
         }
       />
       <nav aria-label="Estado de las webs" className="mb-4 flex gap-1 overflow-x-auto rounded-lg bg-muted p-1 sm:inline-flex">

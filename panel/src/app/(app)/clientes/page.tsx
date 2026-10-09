@@ -8,6 +8,7 @@ import { ClientFormDialog } from '@/components/clients/client-form'
 import { DataTable, type Col } from '@/components/data-table/data-table'
 import { PageHeader } from '@/components/layout/page-header'
 import { ClientStatusBadge } from '@/components/shared/badges'
+import { Can } from '@/components/shared/can'
 import { RowActions } from '@/components/shared/row-actions'
 import { Avatar } from '@/components/ui/avatar'
 import { Badge } from '@/components/ui/badge'
@@ -94,11 +95,13 @@ export default function ClientsPage() {
         description={`${clients?.filter((c) => !c.archived).length ?? '…'} clientes en tu cartera.`}
         crumbs={[{ label: 'Clientes' }, { label: 'Listado' }]}
         actions={
-          <Button asChild>
-            <Link href="/clientes/nuevo">
-              <Plus /> Nuevo cliente
-            </Link>
-          </Button>
+          <Can module="clients">
+            <Button asChild>
+              <Link href="/clientes/nuevo">
+                <Plus /> Nuevo cliente
+              </Link>
+            </Button>
+          </Can>
         }
       />
       <DataTable

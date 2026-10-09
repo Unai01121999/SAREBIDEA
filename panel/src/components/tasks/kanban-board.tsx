@@ -17,6 +17,7 @@ import {
   type DragOverEvent,
   type DragStartEvent,
 } from '@dnd-kit/core'
+import { useCan } from '@/hooks/use-permissions'
 import { arrayMove, SortableContext, sortableKeyboardCoordinates, useSortable, verticalListSortingStrategy } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
 import { Plus } from 'lucide-react'
@@ -44,6 +45,7 @@ export interface TaskChange {
 
 /** Tablero Kanban con arrastrar y soltar (ratón, táctil y teclado). */
 export function KanbanBoard({ tasks, visibleIds, canDrag, saving, clientName, webName, onOpen, onAdd, onMove }: { tasks: Task[]; visibleIds: Set<string>; canDrag: boolean; saving: boolean; clientName: (t: Task) => string | undefined; webName: (t: Task) => string | undefined; onOpen: (t: Task) => void; onAdd: (status: TaskStatus) => void; onMove: (changes: TaskChange[]) => void }) {
+  const canWrite = useCan()('tasks', 'write')
   const [cols, setCols] = useState<Columns>(() => build(tasks))
   const [activeId, setActiveId] = useState<string | null>(null)
   const byId = useMemo(() => new Map(tasks.map((t) => [t.id, t])), [tasks])
@@ -124,7 +126,7 @@ export function KanbanBoard({ tasks, visibleIds, canDrag, saving, clientName, we
         {TASK_STATUSES.map((status) => {
           const ids = cols[status].filter((id) => visibleIds.has(id))
           return (
-            <Column key={status} status={status} count={ids.length} onAdd={() => onAdd(status)}>
+            <Column key={status} status={status} count={ids.length} onAdd={canWrite ? () => onAdd(status) : undefined}>
               <SortableContext items={cols[status]} strategy={verticalListSortingStrategy}>
                 {cols[status].map((id) => {
                   const t = byId.get(id)
@@ -142,7 +144,7 @@ export function KanbanBoard({ tasks, visibleIds, canDrag, saving, clientName, we
   )
 }
 
-function Column({ status, count, onAdd, children }: { status: TaskStatus; count: number; onAdd: () => void; children: React.ReactNode }) {
+function Column({ status, count, onAdd, children }: { status: TaskStatus; count: number; onAdd?: () => void; children: React.ReactNode }) {
   const { setNodeRef, isOver } = useDroppable({ id: status })
   return (
     <section aria-label={taskStatusLabel[status]} className="flex w-[84vw] shrink-0 flex-col rounded-2xl bg-muted/50 p-2.5 sm:w-auto">
@@ -150,9 +152,11 @@ function Column({ status, count, onAdd, children }: { status: TaskStatus; count:
         <span className={cn('size-2 rounded-full', accent[status])} />
         <h2 className="text-[13px] font-semibold">{taskStatusLabel[status]}</h2>
         <span className="rounded-md bg-card px-1.5 text-xs text-muted-foreground tabular">{count}</span>
-        <Button variant="ghost" size="icon-sm" className="ml-auto size-7" onClick={onAdd} aria-label={`Añadir tarea a ${taskStatusLabel[status]}`}>
-          <Plus />
-        </Button>
+        {onAdd && (
+          <Button variant="ghost" size="icon-sm" className="ml-auto size-7" onClick={onAdd} aria-label={`Añadir tarea a ${taskStatusLabel[status]}`}>
+            <Plus />
+          </Button>
+        )}
       </header>
       <div ref={setNodeRef} className={cn('flex min-h-24 flex-1 flex-col gap-2 rounded-xl transition-colors', isOver && 'bg-brand/5')}>
         {children}

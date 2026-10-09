@@ -14,12 +14,15 @@ import { Input } from '@/components/ui/input'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Skeleton } from '@/components/ui/skeleton'
 import { clientsApi, tasksApi, websitesApi } from '@/hooks/use-entities'
+import { Can } from '@/components/shared/can'
 import { useCreateParam } from '@/hooks/use-create-param'
+import { useCan } from '@/hooks/use-permissions'
 import { priorityLabel } from '@/lib/labels'
 import { dataSource } from '@/services'
 import { TASK_PRIORITIES, type Task, type TaskPriority, type TaskStatus } from '@/types/domain'
 
 export default function TasksPage() {
+  const canWrite = useCan()('tasks', 'write')
   const params = useSearchParams()
   const qc = useQueryClient()
   const { data: tasks, isLoading } = tasksApi.useList()
@@ -69,14 +72,16 @@ export default function TasksPage() {
         description="Tablero Kanban: arrastra las tarjetas entre columnas para cambiar su estado."
         crumbs={[{ label: 'Tareas' }]}
         actions={
-          <Button
-            onClick={() => {
-              setCreateStatus('TODO')
-              setCreateOpen(true)
-            }}
-          >
-            <Plus /> Nueva tarea
-          </Button>
+          <Can module="tasks">
+            <Button
+              onClick={() => {
+                setCreateStatus('TODO')
+                setCreateOpen(true)
+              }}
+            >
+              <Plus /> Nueva tarea
+            </Button>
+          </Can>
         }
       />
 
@@ -139,7 +144,7 @@ export default function TasksPage() {
         <KanbanBoard
           tasks={tasks}
           visibleIds={visible}
-          canDrag={!filtersActive}
+          canDrag={!filtersActive && canWrite}
           saving={move.isPending}
           clientName={(t) => (t.clientId ? clientName.get(t.clientId) : undefined)}
           webName={(t) => (t.websiteId ? webName.get(t.websiteId) : undefined)}

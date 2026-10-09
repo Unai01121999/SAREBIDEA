@@ -8,6 +8,7 @@ import { Avatar } from '@/components/ui/avatar'
 import { Button } from '@/components/ui/button'
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Textarea } from '@/components/ui/input'
+import { useCan } from '@/hooks/use-permissions'
 import { tasksApi } from '@/hooks/use-entities'
 import { formatDate, timeAgo } from '@/lib/format'
 import { taskStatusLabel } from '@/lib/labels'
@@ -18,6 +19,7 @@ import { routes } from '@/lib/routes'
 /** Detalle de una tarea con comentarios internos. */
 export function TaskDetailDialog({ task, clientName, webName, onClose, onEdit, onDelete }: { task?: Task; clientName?: string; webName?: string; onClose: () => void; onEdit: (t: Task) => void; onDelete: (t: Task) => void }) {
   const update = tasksApi.useUpdate(true)
+  const canWrite = useCan()('tasks', 'write')
   const [text, setText] = useState('')
 
   const addComment = () => {
@@ -75,14 +77,17 @@ export function TaskDetailDialog({ task, clientName, webName, onClose, onEdit, o
                     </li>
                   ))}
                 </ul>
+                {canWrite && (
                 <div className="mt-3 flex gap-2">
                   <Textarea value={text} onChange={(e) => setText(e.target.value)} onKeyDown={(e) => (e.key === 'Enter' && (e.metaKey || e.ctrlKey) ? addComment() : undefined)} rows={2} placeholder="Escribe un comentario… (Ctrl+Enter para enviar)" aria-label="Nuevo comentario" />
                   <Button size="icon" onClick={addComment} disabled={!text.trim()} aria-label="Enviar comentario" className="shrink-0 self-end">
                     <Send />
                   </Button>
                 </div>
+                )}
               </div>
             </div>
+            {canWrite && (
             <div className="flex justify-between border-t px-6 py-4">
               <Button variant="ghost" className="text-destructive hover:text-destructive" onClick={() => onDelete(task)}>
                 <Trash2 /> Eliminar
@@ -91,6 +96,7 @@ export function TaskDetailDialog({ task, clientName, webName, onClose, onEdit, o
                 <Pencil /> Editar
               </Button>
             </div>
+            )}
           </>
         )}
       </DialogContent>

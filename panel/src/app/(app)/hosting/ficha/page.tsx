@@ -6,6 +6,7 @@ import { useRouter, useSearchParams } from 'next/navigation'
 import { useState } from 'react'
 import { HostingFormDialog } from '@/components/hosting/hosting-form'
 import { InvoiceFormDialog } from '@/components/invoices/invoice-form'
+import { Can } from '@/components/shared/can'
 import { RelatedInvoices } from '@/components/invoices/related-invoices'
 import { PageHeader } from '@/components/layout/page-header'
 import { ExpiryBadge } from '@/components/shared/badges'
@@ -51,15 +52,19 @@ export default function HostingDetailPage() {
         }
         actions={
           <>
-            <Button variant="outline" size="sm" onClick={() => setDialog('invoice')}>
-              <Receipt /> Facturar
-            </Button>
-            <Button variant="outline" size="sm" onClick={() => setDialog('edit')}>
-              <Pencil /> Editar
-            </Button>
-            <Button variant="outline" size="sm" className="text-destructive hover:text-destructive" onClick={() => setDialog('delete')}>
-              <Trash2 /> Eliminar
-            </Button>
+            <Can module="billing">
+              <Button variant="outline" size="sm" onClick={() => setDialog('invoice')}>
+                <Receipt /> Facturar
+              </Button>
+            </Can>
+            <Can module="clients">
+              <Button variant="outline" size="sm" onClick={() => setDialog('edit')}>
+                <Pencil /> Editar
+              </Button>
+              <Button variant="outline" size="sm" className="text-destructive hover:text-destructive" onClick={() => setDialog('delete')}>
+                <Trash2 /> Eliminar
+              </Button>
+            </Can>
           </>
         }
       />

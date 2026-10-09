@@ -6,6 +6,7 @@ import { useRouter, useSearchParams } from 'next/navigation'
 import { useMemo, useState } from 'react'
 import { DomainFormDialog } from '@/components/domains/domain-form'
 import { HostingFormDialog } from '@/components/hosting/hosting-form'
+import { Can } from '@/components/shared/can'
 import { InvoiceFormDialog } from '@/components/invoices/invoice-form'
 import { RelatedInvoices } from '@/components/invoices/related-invoices'
 import { PageHeader } from '@/components/layout/page-header'
@@ -75,17 +76,19 @@ export default function WebsiteDetailPage() {
                 </a>
               </Button>
             )}
-            <Button variant="outline" size="sm" onClick={() => setDialog('edit')}>
-              <Pencil /> Editar información
-            </Button>
-            {web.status !== 'ARCHIVED' && (
-              <Button variant="outline" size="sm" onClick={() => update.mutate({ id: web.id, patch: { status: 'ARCHIVED' } })}>
-                <Archive /> Archivar
+            <Can module="clients">
+              <Button variant="outline" size="sm" onClick={() => setDialog('edit')}>
+                <Pencil /> Editar información
               </Button>
-            )}
-            <Button variant="outline" size="sm" className="text-destructive hover:text-destructive" onClick={() => setDialog('delete')}>
-              <Trash2 />
-            </Button>
+              {web.status !== 'ARCHIVED' && (
+                <Button variant="outline" size="sm" onClick={() => update.mutate({ id: web.id, patch: { status: 'ARCHIVED' } })}>
+                  <Archive /> Archivar
+                </Button>
+              )}
+              <Button variant="outline" size="sm" className="text-destructive hover:text-destructive" onClick={() => setDialog('delete')}>
+                <Trash2 />
+              </Button>
+            </Can>
           </>
         }
       />
@@ -146,9 +149,11 @@ export default function WebsiteDetailPage() {
         <Card>
           <CardHeader className="flex-row items-start justify-between">
             <CardTitle>Hosting</CardTitle>
-            <Button variant="ghost" size="sm" onClick={() => setDialog('hosting')}>
-              <Plus /> Añadir
-            </Button>
+            <Can module="clients">
+              <Button variant="ghost" size="sm" onClick={() => setDialog('hosting')}>
+                <Plus /> Añadir
+              </Button>
+            </Can>
           </CardHeader>
           <CardContent className="space-y-2">
             {wHostings.length ? (
@@ -169,9 +174,11 @@ export default function WebsiteDetailPage() {
         <Card>
           <CardHeader className="flex-row items-start justify-between">
             <CardTitle>Dominios</CardTitle>
-            <Button variant="ghost" size="sm" onClick={() => setDialog('domain')}>
-              <Plus /> Añadir
-            </Button>
+            <Can module="clients">
+              <Button variant="ghost" size="sm" onClick={() => setDialog('domain')}>
+                <Plus /> Añadir
+              </Button>
+            </Can>
           </CardHeader>
           <CardContent className="space-y-2">
             {wDomains.length ? (
@@ -209,7 +216,7 @@ export default function WebsiteDetailPage() {
           </CardContent>
         </Card>
 
-        <RelatedInvoices match={(i) => i.websiteId === web.id} className="lg:col-span-3" action={<Button variant="ghost" size="sm" onClick={() => setDialog('invoice')}><Receipt /> Facturar</Button>} />
+        <RelatedInvoices match={(i) => i.websiteId === web.id} className="lg:col-span-3" action={<Can module="billing"><Button variant="ghost" size="sm" onClick={() => setDialog('invoice')}><Receipt /> Facturar</Button></Can>} />
       </div>
 
       <DomainFormDialog open={dialog === 'domain'} onOpenChange={(o) => !o && setDialog(null)} clientId={web.clientId} websiteId={web.id} />

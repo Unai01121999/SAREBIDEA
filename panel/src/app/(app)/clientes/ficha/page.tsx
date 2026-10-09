@@ -5,6 +5,8 @@ import Link from 'next/link'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { useMemo, useState } from 'react'
 import { ClientFormDialog } from '@/components/clients/client-form'
+import { Can } from '@/components/shared/can'
+import { useCan } from '@/hooks/use-permissions'
 import { DomainFormDialog } from '@/components/domains/domain-form'
 import { HostingFormDialog } from '@/components/hosting/hosting-form'
 import { InvoiceFormDialog } from '@/components/invoices/invoice-form'
@@ -38,6 +40,7 @@ export default function ClientDetailPage() {
   const update = clientsApi.useUpdate()
   const remove = clientsApi.useRemove()
 
+  const canBilling = useCan()('billing', 'read')
   const [dialog, setDialog] = useState<'edit' | 'web' | 'domain' | 'hosting' | 'invoice' | 'delete' | null>(null)
 
   const cWebs = useMemo(() => (websites.data ?? []).filter((w) => w.clientId === id), [websites.data, id])
@@ -81,7 +84,7 @@ export default function ClientDetailPage() {
           </span>
         }
         actions={
-          <>
+          <Can module="clients">
             <Button variant="outline" size="sm" onClick={() => setDialog('edit')}>
               <Pencil /> Editar
             </Button>
@@ -91,16 +94,15 @@ export default function ClientDetailPage() {
             <Button variant="outline" size="sm" className="text-destructive hover:text-destructive" onClick={() => setDialog('delete')}>
               <Trash2 /> Eliminar
             </Button>
-          </>
+          </Can>
         }
       />
 
       <div className="mb-6 grid grid-cols-2 gap-3 lg:grid-cols-4">
         {[
-          { label: 'Webs', value: String(cWebs.length) },
-          { label: 'Dominios', value: String(cDomains.length) },
-          { label: 'Facturado', value: formatCurrency(billed) },
-          { label: 'Pendiente de cobro', value: formatCurrency(pending), warn: pending > 0 },
+          { label: 'Webs', value: String(cWebs.length), warn: false },
+          { label: 'Dominios', value: String(cDomains.length), warn: false },
+          ...(canBilling ? [{ label: 'Facturado', value: formatCurrency(billed), warn: false }, { label: 'Pendiente de cobro', value: formatCurrency(pending), warn: pending > 0 }] : []),
         ].map((s) => (
           <div key={s.label} className="rounded-xl border bg-card px-4 py-3 shadow-xs">
             <p className="text-xs text-muted-foreground">{s.label}</p>
@@ -114,7 +116,7 @@ export default function ClientDetailPage() {
           <TabsTrigger value="datos">Datos</TabsTrigger>
           <TabsTrigger value="webs">Webs ({cWebs.length})</TabsTrigger>
           <TabsTrigger value="dominios">Dominios ({cDomains.length})</TabsTrigger>
-          <TabsTrigger value="facturacion">Facturación ({cInvoices.length})</TabsTrigger>
+          {canBilling && <TabsTrigger value="facturacion">Facturación ({cInvoices.length})</TabsTrigger>}
           <TabsTrigger value="origen">Origen</TabsTrigger>
           <TabsTrigger value="historial">Historial</TabsTrigger>
         </TabsList>
@@ -154,9 +156,11 @@ export default function ClientDetailPage() {
             <Card>
               <CardHeader className="flex-row items-start justify-between">
                 <CardTitle>Hosting</CardTitle>
-                <Button variant="ghost" size="sm" onClick={() => setDialog('hosting')}>
-                  <Plus /> Añadir
-                </Button>
+                <Can module="clients">
+                  <Button variant="ghost" size="sm" onClick={() => setDialog('hosting')}>
+                    <Plus /> Añadir
+                  </Button>
+                </Can>
               </CardHeader>
               <CardContent className="space-y-2">
                 {cHostings.length ? (
@@ -177,7 +181,7 @@ export default function ClientDetailPage() {
         </TabsContent>
 
         <TabsContent value="webs">
-          <SectionBar title="Webs asociadas" action={<Button size="sm" onClick={() => setDialog('web')}><Plus /> Nueva web</Button>} />
+          <SectionBar title="Webs asociadas" action={<Can module="clients"><Button size="sm" onClick={() => setDialog('web')}><Plus /> Nueva web</Button></Can>} />
           <Card>
             <Table>
               <TableHeader>
@@ -214,7 +218,7 @@ export default function ClientDetailPage() {
         </TabsContent>
 
         <TabsContent value="dominios">
-          <SectionBar title="Dominios asociados" action={<Button size="sm" onClick={() => setDialog('domain')}><Plus /> Nuevo dominio</Button>} />
+          <SectionBar title="Dominios asociados" action={<Can module="clients"><Button size="sm" onClick={() => setDialog('domain')}><Plus /> Nuevo dominio</Button></Can>} />
           <Card>
             <Table>
               <TableHeader>
@@ -243,7 +247,7 @@ export default function ClientDetailPage() {
         </TabsContent>
 
         <TabsContent value="facturacion">
-          <SectionBar title="Facturación relacionada" action={<Button size="sm" onClick={() => setDialog('invoice')}><Plus /> Nueva factura</Button>} />
+          <SectionBar title="Facturación relacionada" action={<Can module="billing"><Button size="sm" onClick={() => setDialog('invoice')}><Plus /> Nueva factura</Button></Can>} />
           <Card>
             <Table>
               <TableHeader>

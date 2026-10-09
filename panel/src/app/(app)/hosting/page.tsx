@@ -7,6 +7,7 @@ import { DataTable, type Col } from '@/components/data-table/data-table'
 import { HostingFormDialog } from '@/components/hosting/hosting-form'
 import { PageHeader } from '@/components/layout/page-header'
 import { ExpiryBadge } from '@/components/shared/badges'
+import { Can } from '@/components/shared/can'
 import { RowActions } from '@/components/shared/row-actions'
 import { StatStrip } from '@/components/shared/stat-strip'
 import { Badge } from '@/components/ui/badge'
@@ -73,9 +74,11 @@ export default function HostingPage() {
         description="Alojamientos contratados para tus clientes."
         crumbs={[{ label: 'Hosting' }]}
         actions={
-          <Button onClick={() => setCreateOpen(true)}>
-            <Plus /> Nuevo hosting
-          </Button>
+          <Can module="clients">
+            <Button onClick={() => setCreateOpen(true)}>
+              <Plus /> Nuevo hosting
+            </Button>
+          </Can>
         }
       />
       <StatStrip

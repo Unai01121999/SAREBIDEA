@@ -165,3 +165,20 @@ Con `NEXT_PUBLIC_SUPABASE_URL` y `NEXT_PUBLIC_SUPABASE_ANON_KEY` definidas al co
 - **Formulario → cliente:** un trigger (`leads_to_client`) crea el cliente con origen «Formulario web» al llegar cada solicitud. No hace falta tener el panel abierto.
 - **Datos antiguos del navegador:** en *Configuración → Datos* se pueden subir a Supabase o descartar (sin duplicar los clientes del formulario).
 - Sin esas variables, el panel funciona en modo demostración con datos de ejemplo en el navegador.
+
+## Usuarios y roles
+
+Se gestionan en **Configuración → Usuarios y roles** (solo el propietario puede cambiarlos; el administrador los ve).
+
+- **Alta:** crea la cuenta de acceso en Supabase Authentication con una contraseña temporal (se muestra una sola vez) y una fila en `panel_users` con el rol. La primera vez que entra, la persona configura el doble factor.
+- **Cambios:** rol, activar/desactivar, restablecer contraseña y eliminar. Todo pasa por la Edge Function `manage-panel-users` (`supabase/functions/manage-panel-users`), que solo acepta al propietario con doble factor. `admin_emails` se sincroniza sola desde `panel_users`.
+- **Permisos (los aplica la base de datos con RLS; el panel solo oculta lo que no corresponde):**
+
+| Módulo | Propietario | Administrador | Editor | Solo lectura |
+|---|---|---|---|---|
+| Clientes, webs, dominios, hosting | todo | todo | todo | lectura |
+| Tareas | todo | todo | todo | lectura |
+| Facturación | todo | todo | lectura | sin acceso |
+| Configuración y usuarios | todo | lectura | sin acceso | sin acceso |
+
+Migración: `supabase/migrations/005_roles_y_usuarios.sql`.

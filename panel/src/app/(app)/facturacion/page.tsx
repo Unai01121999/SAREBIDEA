@@ -11,6 +11,7 @@ import { KpiCard } from '@/components/dashboard/kpi-card'
 import { InvoiceFormDialog } from '@/components/invoices/invoice-form'
 import { PageHeader } from '@/components/layout/page-header'
 import { InvoiceStatusBadge } from '@/components/shared/badges'
+import { Can } from '@/components/shared/can'
 import { RowActions } from '@/components/shared/row-actions'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
@@ -20,6 +21,7 @@ import { Skeleton } from '@/components/ui/skeleton'
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { clientsApi, invoicesApi } from '@/hooks/use-entities'
 import { useCreateParam } from '@/hooks/use-create-param'
+import { useCan } from '@/hooks/use-permissions'
 import { downloadCsv } from '@/lib/csv'
 import { formatCurrency, formatDate } from '@/lib/format'
 import { conceptLabel, invoiceStatusLabel } from '@/lib/labels'
@@ -27,6 +29,7 @@ import { billingByClient, billingByConcept, billingStats, effectiveStatus, invoi
 import { INVOICE_CONCEPTS, INVOICE_STATUSES, type Invoice, type InvoiceConcept, type InvoiceStatus } from '@/types/domain'
 
 export default function BillingPage() {
+  const canWrite = useCan()('billing', 'write')
   const params = useSearchParams()
   const { data: invoices, isLoading } = invoicesApi.useList()
   const { data: clients } = clientsApi.useList()
@@ -62,6 +65,7 @@ export default function BillingPage() {
         const i = row.original
         return (
           <RowActions
+            module="billing"
             actions={[
               ...(i.status !== 'PAID' && i.status !== 'CANCELLED' ? [{ label: 'Marcar como pagada', icon: <CheckCircle2 />, onSelect: () => update.mutate({ id: i.id, patch: { status: 'PAID' as const } }) }] : []),
               { label: 'Editar', icon: <Pencil />, onSelect: () => setEditing(i) },
@@ -81,9 +85,11 @@ export default function BillingPage() {
         description="Control financiero: facturas, ingresos y cobros pendientes."
         crumbs={[{ label: 'Facturación' }]}
         actions={
-          <Button onClick={() => setCreateOpen(true)}>
-            <Plus /> Nueva factura
-          </Button>
+          <Can module="billing">
+            <Button onClick={() => setCreateOpen(true)}>
+              <Plus /> Nueva factura
+            </Button>
+          </Can>
         }
       />
 
@@ -138,7 +144,7 @@ export default function BillingPage() {
         initialSearch={params.get('q') ?? ''}
         searchText={(i) => `${i.number} ${clientName.get(i.clientId) ?? ''} ${conceptLabel[i.concept]} ${i.description}`}
         initialSort={[{ id: 'issuedAt', desc: true }]}
-        onRowClick={(i) => setEditing(i)}
+        onRowClick={(i) => canWrite && setEditing(i)}
         onExport={(list) => downloadCsv('facturas.csv', list.map((i) => ({ Numero: i.number, Cliente: clientName.get(i.clientId) ?? '', Concepto: conceptLabel[i.concept], Descripcion: i.description, Emision: formatDate(i.issuedAt), Vencimiento: formatDate(i.dueAt), Base: i.subtotal, IVA: i.taxRate, Total: invoiceTotal(i), Estado: invoiceStatusLabel[effectiveStatus(i)] })))}
         toolbar={
           <Select value={concept} onValueChange={(v) => setConcept(v as typeof concept)}>

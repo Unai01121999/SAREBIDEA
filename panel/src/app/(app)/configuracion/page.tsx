@@ -12,35 +12,43 @@ import { ConfirmDialog } from '@/components/ui/confirm-dialog'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { DatabasePanel } from '@/components/settings/database-panel'
 import { useClearData, useResetData } from '@/hooks/use-entities'
+import { useCan } from '@/hooks/use-permissions'
 import { dataSource } from '@/services'
 
 export default function SettingsPage() {
+  const canWrite = useCan()('settings', 'write')
   const reset = useResetData()
   const clear = useClearData()
   const [confirm, setConfirm] = useState(false)
   const [confirmClear, setConfirmClear] = useState(false)
   return (
     <div className="animate-fade-up">
-      <PageHeader title="Configuración" description="Empresa, impuestos, usuarios, roles y proveedores." crumbs={[{ label: 'Configuración' }]} />
+      <PageHeader title="Configuración" description={canWrite ? 'Empresa, impuestos, usuarios, roles y proveedores.' : 'Solo lectura: únicamente el propietario puede cambiar la configuración.'} crumbs={[{ label: 'Configuración' }]} />
       <Tabs defaultValue="empresa">
         <TabsList className="max-w-full overflow-x-auto">
           <TabsTrigger value="empresa">Empresa</TabsTrigger>
           <TabsTrigger value="impuestos">Impuestos y moneda</TabsTrigger>
           <TabsTrigger value="usuarios">Usuarios y roles</TabsTrigger>
           <TabsTrigger value="proveedores">Proveedores</TabsTrigger>
-          <TabsTrigger value="datos">Datos</TabsTrigger>
+          {canWrite && <TabsTrigger value="datos">Datos</TabsTrigger>}
         </TabsList>
         <TabsContent value="empresa">
-          <CompanyForm />
+          <fieldset disabled={!canWrite} className="contents">
+            <CompanyForm />
+          </fieldset>
         </TabsContent>
         <TabsContent value="impuestos">
-          <TaxForm />
+          <fieldset disabled={!canWrite} className="contents">
+            <TaxForm />
+          </fieldset>
         </TabsContent>
         <TabsContent value="usuarios">
           <UsersPanel />
         </TabsContent>
         <TabsContent value="proveedores">
-          <ProvidersPanel />
+          <fieldset disabled={!canWrite} className="contents">
+            <ProvidersPanel />
+          </fieldset>
         </TabsContent>
         <TabsContent value="datos">
           {dataSource.kind === 'supabase' ? (

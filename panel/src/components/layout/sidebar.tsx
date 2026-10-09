@@ -4,6 +4,8 @@ import { ChevronDown, PanelLeftClose, PanelLeftOpen } from 'lucide-react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { useState } from 'react'
+import { useCan } from '@/hooks/use-permissions'
+import { moduleOfPath } from '@/lib/permissions'
 import { LogoMark } from '@/components/layout/logo'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
 import { isActive, NAV, type NavItem } from '@/lib/nav'
@@ -14,10 +16,16 @@ import { useUiStore } from '@/store/ui-store'
 export function SidebarNav({ collapsed = false, onNavigate }: { collapsed?: boolean; onNavigate?: () => void }) {
   const pathname = usePathname()
   const [open, setOpen] = useState<Record<string, boolean>>({})
+  const can = useCan()
+  // Cada persona solo ve las secciones a las que su rol da acceso.
+  const items = NAV.filter((item) => {
+    const m = moduleOfPath(item.href)
+    return !m || can(m, 'read')
+  }).map((item) => (item.children ? { ...item, children: item.children.filter((c) => c.href !== '/clientes/nuevo' || can('clients', 'write')) } : item))
 
   return (
     <nav aria-label="Principal" className="flex flex-col gap-0.5 px-3 py-2">
-      {NAV.map((item) => (
+      {items.map((item) => (
         <NavEntry key={item.href} item={item} pathname={pathname} collapsed={collapsed} expanded={open[item.href] ?? isActive(pathname, item.href)} onToggle={() => setOpen((o) => ({ ...o, [item.href]: !(o[item.href] ?? isActive(pathname, item.href)) }))} onNavigate={onNavigate} />
       ))}
     </nav>

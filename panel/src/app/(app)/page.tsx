@@ -10,12 +10,14 @@ import { PageHeader } from '@/components/layout/page-header'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Skeleton } from '@/components/ui/skeleton'
+import { useCan } from '@/hooks/use-permissions'
 import { clientsApi, domainsApi, hostingsApi, invoicesApi, tasksApi, useActivity, websitesApi } from '@/hooks/use-entities'
 import { formatCurrency } from '@/lib/format'
 import { routes } from '@/lib/routes'
 import { dashboardStats, revenueSeries, upcomingRenewals } from '@/lib/metrics'
 
 export default function DashboardPage() {
+  const canBilling = useCan()('billing', 'read')
   const clients = clientsApi.useList()
   const websites = websitesApi.useList()
   const domains = domainsApi.useList()
@@ -43,11 +45,13 @@ export default function DashboardPage() {
         title="Dashboard"
         description="Visión global de tu negocio: clientes, webs, renovaciones y facturación."
         actions={
-          <Button asChild variant="outline" size="sm">
-            <Link href="/facturacion">
-              <TrendingUp /> Ver facturación
-            </Link>
-          </Button>
+          canBilling ? (
+            <Button asChild variant="outline" size="sm">
+              <Link href="/facturacion">
+                <TrendingUp /> Ver facturación
+              </Link>
+            </Button>
+          ) : undefined
         }
       />
 
@@ -58,19 +62,21 @@ export default function DashboardPage() {
         <KpiCard label="Webs archivadas" value={String(stats?.webArchived ?? 0)} icon={Archive} accent="warning" hint="Histórico" href="/webs/archivadas" loading={loading} />
         <KpiCard label="Dominios gestionados" value={String(stats?.domains ?? 0)} icon={Building2} accent="info" hint={stats ? `${formatCurrency(stats.domainsCost)}/año` : undefined} href="/dominios" loading={loading} />
         <KpiCard label="Hosting activos" value={String(stats?.hostingActive ?? 0)} icon={Server} accent="success" hint={stats ? `${formatCurrency(stats.hostingCost)}/año` : undefined} href="/hosting" loading={loading} />
-        <KpiCard label="Facturación mensual" value={formatCurrency(stats?.thisMonth ?? 0)} icon={CircleDollarSign} delta={stats?.monthDelta} hint="vs. mismo periodo anterior" spark={spark.slice(-8)} href="/facturacion" loading={loading} />
-        <KpiCard label="Facturación anual" value={formatCurrency(stats?.thisYear ?? 0)} icon={TrendingUp} accent="success" hint="Base imponible del año" spark={spark} href="/facturacion" loading={loading} />
+        {canBilling && <KpiCard label="Facturación mensual" value={formatCurrency(stats?.thisMonth ?? 0)} icon={CircleDollarSign} delta={stats?.monthDelta} hint="vs. mismo periodo anterior" spark={spark.slice(-8)} href="/facturacion" loading={loading} />}
+        {canBilling && <KpiCard label="Facturación anual" value={formatCurrency(stats?.thisYear ?? 0)} icon={TrendingUp} accent="success" hint="Base imponible del año" spark={spark} href="/facturacion" loading={loading} />}
       </section>
 
       <section className="mt-6 grid grid-cols-1 gap-4 lg:grid-cols-3">
-        <Card className="lg:col-span-2">
-          <CardHeader>
-            <CardTitle>Ingresos mensuales</CardTitle>
-            <CardDescription>Últimos 12 meses · cobrado y pendiente (base imponible)</CardDescription>
-          </CardHeader>
-          <CardContent>{loading ? <Skeleton className="h-[280px] w-full" /> : <RevenueChart data={series} />}</CardContent>
-        </Card>
-        <Card>
+        {canBilling && (
+          <Card className="lg:col-span-2">
+            <CardHeader>
+              <CardTitle>Ingresos mensuales</CardTitle>
+              <CardDescription>Últimos 12 meses · cobrado y pendiente (base imponible)</CardDescription>
+            </CardHeader>
+            <CardContent>{loading ? <Skeleton className="h-[280px] w-full" /> : <RevenueChart data={series} />}</CardContent>
+          </Card>
+        )}
+        <Card className={canBilling ? '' : 'lg:col-span-3'}>
           <CardHeader>
             <CardTitle>Actividad reciente</CardTitle>
           </CardHeader>
