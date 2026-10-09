@@ -21,6 +21,7 @@ export function FinalCta() {
     const form = e.currentTarget
     const d = new FormData(form)
     const v = {
+      company: String(d.get('company') ?? ''),
       name: String(d.get('name') ?? ''),
       phone: String(d.get('phone') ?? ''),
       email: String(d.get('email') ?? ''),
@@ -37,7 +38,7 @@ export function FinalCta() {
     }
     setLoading(true)
     try {
-      await createLead({ ...v, name: v.name.trim(), email: v.email.trim(), description: v.description.trim(), source: 'web' })
+      await createLead({ ...v, company: v.company.trim(), name: v.name.trim(), email: v.email.trim(), description: v.description.trim(), source: 'web' })
       setSent(true)
     } catch (e) {
       if ((e as { code?: string })?.code === 'invalid_argument') {
@@ -120,9 +121,16 @@ export function FinalCta() {
                   transition={{ duration: 0.2, ease: easeOut }}
                   aria-label="Solicitar propuesta"
                 >
-                  <div className="sm:col-span-2">
+                  <div>
+                    <label htmlFor="company" className="mb-2 block text-sm text-white/70">
+                      Nombre de la empresa
+                    </label>
+                    <input id="company" name="company" autoComplete="organization" placeholder="Panadería Urrutia" className={field} {...aria('company')} />
+                    {err('company')}
+                  </div>
+                  <div>
                     <label htmlFor="name" className="mb-2 block text-sm text-white/70">
-                      Nombre completo
+                      Persona de contacto
                     </label>
                     <input id="name" name="name" autoComplete="name" placeholder="Ane Etxeberria Goñi" className={field} {...aria('name')} />
                     {err('name')}

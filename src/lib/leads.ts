@@ -4,6 +4,8 @@
 import { supabase } from './supabase'
 
 export type LeadInput = {
+  company: string
+  /** Persona de contacto (columna `name`). */
   name: string
   phone: string
   email: string
@@ -17,6 +19,7 @@ const LOCAL_KEY = 'sarebidea-leads'
 export async function createLead(input: LeadInput): Promise<void> {
   if (supabase) {
     const { error } = await supabase.from('leads').insert({
+      company: input.company,
       name: input.name,
       phone: input.phone,
       email: input.email,
@@ -34,12 +37,13 @@ export async function createLead(input: LeadInput): Promise<void> {
   }
 }
 
-export type LeadFormErrors = Partial<Record<'name' | 'phone' | 'email' | 'businessType' | 'description', string>>
+export type LeadFormErrors = Partial<Record<'company' | 'name' | 'phone' | 'email' | 'businessType' | 'description', string>>
 
 /** Validación del formulario público. */
-export function validateLead(v: { name: string; phone: string; email: string; businessType: string; description: string }) {
+export function validateLead(v: { company: string; name: string; phone: string; email: string; businessType: string; description: string }) {
   const e: LeadFormErrors = {}
-  if (v.name.trim().length < 3) e.name = 'Escribe el nombre completo.'
+  if (v.company.trim().length < 2) e.company = 'Escribe el nombre de la empresa.'
+  if (v.name.trim().length < 3) e.name = 'Escribe la persona de contacto.'
   if (v.phone.replace(/\D/g, '').length < 9) e.phone = 'El teléfono debe tener al menos 9 cifras.'
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(v.email.trim())) e.email = 'Revisa el correo: falta la @ o el dominio.'
   if (!v.businessType) e.businessType = 'Elige el tipo de negocio.'

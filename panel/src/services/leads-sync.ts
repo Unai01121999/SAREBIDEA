@@ -10,6 +10,7 @@ interface LeadRow {
   id: string
   code: string | null
   name: string
+  company?: string | null
   phone: string | null
   email: string | null
   business_type: string | null
@@ -30,7 +31,7 @@ function toClient(l: LeadRow): Client {
   const now = new Date().toISOString()
   return {
     id: uid('cli'),
-    company: l.name,
+    company: l.company?.trim() || l.name,
     contactName: l.name,
     email: l.email ?? '',
     phone: l.phone ?? '',

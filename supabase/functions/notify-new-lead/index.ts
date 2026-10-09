@@ -7,7 +7,7 @@ const WEBHOOK_SECRET = Deno.env.get('WEBHOOK_SECRET')
 const TO = Deno.env.get('NOTIFY_TO') ?? 'sarebidea@sarebidea.com'
 const FROM = Deno.env.get('NOTIFY_FROM') ?? 'Web SAREBIDEA <web@sarebidea.com>'
 
-type Lead = { code: string; created_at: string; name: string; phone: string; email: string; business_type: string; description: string }
+type Lead = { code: string; created_at: string; name: string; company: string | null; phone: string; email: string; business_type: string; description: string }
 
 const esc = (s: unknown) =>
   String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]!)
@@ -21,7 +21,8 @@ Deno.serve(async (req) => {
   const date = new Date(r.created_at).toLocaleString('es-ES', { timeZone: 'Europe/Madrid', dateStyle: 'long', timeStyle: 'short' })
   const rows: [string, string][] = [
     ['ID', r.code],
-    ['Nombre completo', r.name],
+    ['Nombre de la empresa', r.company ?? ''],
+    ['Persona de contacto', r.name],
     ['Teléfono', r.phone],
     ['Correo electrónico', r.email],
     ['Tipo de negocio', r.business_type],
