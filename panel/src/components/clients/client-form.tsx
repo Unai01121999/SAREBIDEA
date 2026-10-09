@@ -35,13 +35,12 @@ export const clientSchema = z.object({
   domainRenewsAt: z.string(),
   domainCost: z.string().trim().refine((v) => v === '' || Number(v.replace(',', '.')) >= 0, 'Importe no válido'),
   hostProvider: z.string(),
-  hostPlan: z.string().trim(),
   hostRenewsAt: z.string(),
   hostCost: z.string().trim().refine((v) => v === '' || Number(v.replace(',', '.')) >= 0, 'Importe no válido'),
 })
 export type ClientValues = z.infer<typeof clientSchema>
 
-const extras = { webName: '', webUrl: '', webTechnology: '', domainName: '', domainRegistrar: '', domainRenewsAt: '', domainCost: '', hostProvider: '', hostPlan: '', hostRenewsAt: '', hostCost: '' }
+const extras = { webName: '', webUrl: '', webTechnology: '', domainName: '', domainRegistrar: '', domainRenewsAt: '', domainCost: '', hostProvider: '', hostRenewsAt: '', hostCost: '' }
 const empty: ClientValues = { company: '', contactName: '', email: '', phone: '', address: '', postalCode: '', province: '', country: 'España', taxId: '', status: 'PENDING', services: [], notes: '', ...extras }
 
 const toValues = (c: Client): ClientValues => ({ company: c.company, contactName: c.contactName, email: c.email, phone: c.phone, address: c.address, postalCode: c.postalCode, province: c.province, country: c.country, taxId: c.taxId, status: c.status, services: c.services, notes: c.notes, ...extras })
@@ -119,7 +118,7 @@ export function useClientForm(client: Client | undefined, onDone: (saved?: Clien
         clientId: c.id,
         websiteId,
         provider: v.hostProvider,
-        plan: v.hostPlan || 'Básico',
+        plan: 'Básico',
         annualCost: num(v.hostCost, 60),
         contractedAt: new Date().toISOString(),
         renewsAt: v.hostRenewsAt ? fromDateInput(v.hostRenewsAt) : inOneYear(),
@@ -130,8 +129,8 @@ export function useClientForm(client: Client | undefined, onDone: (saved?: Clien
   }
 
   const submit = form.handleSubmit(async (v) => {
-    const { webName, webUrl, webTechnology, domainName, domainRegistrar, domainRenewsAt, domainCost, hostProvider, hostPlan, hostRenewsAt, hostCost, ...data } = v
-    void webName, void webUrl, void webTechnology, void domainName, void domainRegistrar, void domainRenewsAt, void domainCost, void hostProvider, void hostPlan, void hostRenewsAt, void hostCost
+    const { webName, webUrl, webTechnology, domainName, domainRegistrar, domainRenewsAt, domainCost, hostProvider, hostRenewsAt, hostCost, ...data } = v
+    void webName, void webUrl, void webTechnology, void domainName, void domainRegistrar, void domainRenewsAt, void domainCost, void hostProvider, void hostRenewsAt, void hostCost
     let saved: Client
     if (client) saved = await update.mutateAsync({ id: client.id, patch: data })
     else saved = await create.mutateAsync({ ...data, archived: false, origin: 'MANUAL', sourceId: null, formData: null })
@@ -211,9 +210,6 @@ export function ClientFormFields({ form }: { form: UseFormReturn<ClientValues> }
       </Field>
       <Field label="Hosting · proveedor" htmlFor="c-hostprov">
         <SelectField control={control} name="hostProvider" id="c-hostprov" allowNone noneLabel="Sin hosting" options={(settings?.hostingProviders ?? []).map((p) => ({ value: p, label: p }))} />
-      </Field>
-      <Field label="Hosting · plan" htmlFor="c-hostplan">
-        <Input id="c-hostplan" {...register('hostPlan')} placeholder="Business" />
       </Field>
       <Field label="Hosting · renovación" htmlFor="c-hostren" hint="Vacío = dentro de un año.">
         <Input id="c-hostren" type="date" {...register('hostRenewsAt')} />
