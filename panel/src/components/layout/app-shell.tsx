@@ -2,7 +2,6 @@
 
 import { Suspense } from 'react'
 import { GlobalSearch } from '@/components/layout/global-search'
-import { LeadSync } from '@/components/layout/lead-sync'
 import { Header } from '@/components/layout/header'
 import { LogoMark } from '@/components/layout/logo'
 import { Sidebar, SidebarNav } from '@/components/layout/sidebar'
@@ -37,7 +36,6 @@ export function AppShell({ children }: { children: React.ReactNode }) {
         </DialogContent>
       </Dialog>
       <GlobalSearch />
-      <LeadSync />
     </div>
   )
 }

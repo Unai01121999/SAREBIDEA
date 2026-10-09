@@ -10,7 +10,9 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { ConfirmDialog } from '@/components/ui/confirm-dialog'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { DatabasePanel } from '@/components/settings/database-panel'
 import { useClearData, useResetData } from '@/hooks/use-entities'
+import { dataSource } from '@/services'
 
 export default function SettingsPage() {
   const reset = useResetData()
@@ -41,6 +43,9 @@ export default function SettingsPage() {
           <ProvidersPanel />
         </TabsContent>
         <TabsContent value="datos">
+          {dataSource.kind === 'supabase' ? (
+            <DatabasePanel />
+          ) : (
           <Card className="max-w-2xl">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
@@ -60,6 +65,7 @@ export default function SettingsPage() {
               <p className="mt-3 text-xs text-muted-foreground">«Borrar todos los datos» deja el panel vacío para empezar con clientes reales. Las solicitudes del formulario de la web se vuelven a importar solas.</p>
             </CardContent>
           </Card>
+          )}
         </TabsContent>
       </Tabs>
       <ConfirmDialog open={confirmClear} onOpenChange={setConfirmClear} title="Borrar todos los datos" description="Se borrarán todos los clientes, webs, dominios, hosting, facturas y tareas guardados en este navegador. Las solicitudes del formulario se importarán de nuevo." confirmLabel="Borrar todo" loading={clear.isPending} onConfirm={() => clear.mutate(undefined, { onSuccess: () => setConfirmClear(false) })} />

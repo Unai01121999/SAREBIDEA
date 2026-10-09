@@ -118,6 +118,7 @@ function createRepo<K extends EntityName>(name: K): Repository<EntityMap[K]> {
 }
 
 export const mockSource: DataSource = {
+  kind: 'mock',
   repo: (name) => createRepo(name),
   activity: {
     async list() {

@@ -1,5 +1,6 @@
 'use client'
 
+import { supabase } from '@/lib/supabase'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { ThemeProvider } from 'next-themes'
 import { useEffect, useState } from 'react'
@@ -9,7 +10,7 @@ import { useUiStore } from '@/store/ui-store'
 
 export function Providers({ children }: { children: React.ReactNode }) {
   const [client] = useState(
-    () => new QueryClient({ defaultOptions: { queries: { staleTime: 30_000, refetchOnWindowFocus: false, retry: 1 } } }),
+    () => new QueryClient({ defaultOptions: { queries: { staleTime: 30_000, refetchOnWindowFocus: !!supabase, retry: 1 } } }),
   )
   // El estado persistido se rehidrata tras el primer render para evitar diferencias con el HTML del servidor.
   useEffect(() => {

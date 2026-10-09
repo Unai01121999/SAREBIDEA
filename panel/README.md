@@ -156,3 +156,12 @@ El formulario de cliente (alta y edición) incluye un bloque opcional «Web, dom
 ## Packs
 
 En **Webs → Añadir pack** se elige cliente y pack: Starter (399 € + IVA, mantenimiento 19 €/mes), Professional (699 € + IVA, 29 €/mes) o Premium (1.199 € + IVA, 49 €/mes). Se crea la web (en desarrollo, con el pack anotado) y, opcionalmente, la factura del pack y la factura recurrente del primer mes de mantenimiento. Los precios están en `src/lib/packs.ts`.
+
+## Datos en Supabase
+
+Con `NEXT_PUBLIC_SUPABASE_URL` y `NEXT_PUBLIC_SUPABASE_ANON_KEY` definidas al compilar, el panel guarda todo en Supabase (`src/services/supabase-source.ts`): `clients`, `websites`, `domains`, `hostings`, `invoices`, `tasks`, `panel_users`, `activity` y `app_settings`. Las tablas se crean con `supabase/migrations/004_panel_datos.sql`.
+
+- **Seguridad:** RLS activado y una única política por tabla, `is_admin()` (correo en `admin_emails` + doble factor). El visitante anónimo no tiene ningún permiso sobre estas tablas.
+- **Formulario → cliente:** un trigger (`leads_to_client`) crea el cliente con origen «Formulario web» al llegar cada solicitud. No hace falta tener el panel abierto.
+- **Datos antiguos del navegador:** en *Configuración → Datos* se pueden subir a Supabase o descartar (sin duplicar los clientes del formulario).
+- Sin esas variables, el panel funciona en modo demostración con datos de ejemplo en el navegador.

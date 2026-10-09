@@ -10,6 +10,8 @@ export interface Repository<T extends { id: string }> {
 }
 
 export interface DataSource {
+  /** Dónde viven los datos: «mock» (navegador, demostración) o «supabase» (base de datos real). */
+  kind: 'mock' | 'supabase'
   repo<K extends EntityName>(name: K): Repository<EntityMap[K]>
   activity: { list(): Promise<ActivityEntry[]> }
   settings: { get(): Promise<AppSettings>; update(patch: Partial<AppSettings>): Promise<AppSettings> }
