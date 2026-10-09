@@ -47,7 +47,9 @@ export function AuthGate({ children }: { children: React.ReactNode }) {
       if (!alive) return
       if (!session) return setStep({ kind: 'signin' })
       const email = session.user.email?.toLowerCase() ?? ''
-      if (!adminEmails.includes(email)) return setStep({ kind: 'forbidden', email })
+      // La lista de cuentas con acceso vive en la base de datos (tabla admin_emails). Si la comprobación no responde, se usa la lista compilada.
+      const { data: allowed, error: allowErr } = await sb.rpc('is_admin_email')
+      if (allowErr ? !adminEmails.includes(email) : allowed !== true) return setStep({ kind: 'forbidden', email })
 
       const { data: aal } = await sb.auth.mfa.getAuthenticatorAssuranceLevel()
       if (aal?.currentLevel === 'aal2') return alive && setStep({ kind: 'ready' })

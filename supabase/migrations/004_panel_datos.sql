@@ -239,3 +239,10 @@ select 'cli_' || substr(replace(l.id::text, '-', ''), 1, 12),
   l.created_at, now()
 from public.leads l
 on conflict (source_id) do nothing;
+
+-- Comprobación de acceso para la pantalla de entrada del panel (solo mira admin_emails; el doble factor se pide después).
+create or replace function public.is_admin_email() returns boolean language sql stable security definer set search_path = public as $fn$
+  select exists (select 1 from public.admin_emails where lower(email) = lower(coalesce(auth.jwt()->>'email', '')));
+$fn$;
+revoke all on function public.is_admin_email() from public, anon;
+grant execute on function public.is_admin_email() to authenticated;
