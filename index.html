@@ -21,21 +21,125 @@
     />
     <meta property="og:url" content="https://sarebidea.com/" />
     <meta property="og:image" content="https://sarebidea.com/og.jpg" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="SAREBIDEA · Páginas web que impulsan tu negocio" />
     <meta name="twitter:card" content="summary_large_image" />
+    <meta name="robots" content="index, follow, max-image-preview:large" />
 
     <link
       rel="icon"
       href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%230D0E12'/%3E%3Cpath d='M5 26 13.9 6h4.2L27 26h-4.8L16 11.8 9.8 26Z' fill='%230A93F5'/%3E%3C/svg%3E"
     />
     <script type="application/ld+json">
-      {
+{
         "@context": "https://schema.org",
-        "@type": "ProfessionalService",
-        "name": "SAREBIDEA",
-        "description": "Diseño y desarrollo de páginas web profesionales para comercios y pequeños negocios.",
-        "url": "https://sarebidea.com/",
-        "areaServed": "ES",
-        "email": "sarebidea@sarebidea.com"
+        "@graph": [
+          {
+            "@type": "WebSite",
+            "@id": "https://sarebidea.com/#website",
+            "url": "https://sarebidea.com/",
+            "name": "SAREBIDEA",
+            "inLanguage": "es-ES"
+          },
+          {
+            "@type": "ProfessionalService",
+            "@id": "https://sarebidea.com/#organization",
+            "name": "SAREBIDEA",
+            "description": "Diseño y desarrollo de páginas web profesionales para comercios y pequeños negocios.",
+            "url": "https://sarebidea.com/",
+            "logo": "https://sarebidea.com/brand/logo-sarebidea-original.png",
+            "image": "https://sarebidea.com/og.jpg",
+            "email": "sarebidea@sarebidea.com",
+            "areaServed": {
+              "@type": "Country",
+              "name": "España"
+            },
+            "address": {
+              "@type": "PostalAddress",
+              "addressLocality": "Gueñes",
+              "addressRegion": "Bizkaia",
+              "addressCountry": "ES"
+            },
+            "knowsAbout": [
+              "Diseño web",
+              "Desarrollo web",
+              "SEO local",
+              "Mantenimiento web",
+              "Hosting y dominios"
+            ]
+          },
+          {
+            "@type": "FAQPage",
+            "@id": "https://sarebidea.com/#faq",
+            "mainEntity": [
+              {
+                "@type": "Question",
+                "name": "¿Cuánto tarda en estar lista mi web?",
+                "acceptedAnswer": {
+                  "@type": "Answer",
+                  "text": "En 1 semana desde nuestra llamada de 15 minutos. Te damos la fecha de entrega concreta antes de empezar."
+                }
+              },
+              {
+                "@type": "Question",
+                "name": "¿Tengo que aportar los textos y fotografías?",
+                "acceptedAnswer": {
+                  "@type": "Answer",
+                  "text": "No. Escribimos los textos a partir de nuestra conversación y te ayudamos con las imágenes. Si tienes fotos propias, mejor; si no, usamos imágenes de calidad o organizamos una sesión."
+                }
+              },
+              {
+                "@type": "Question",
+                "name": "¿La web funciona en móvil?",
+                "acceptedAnswer": {
+                  "@type": "Answer",
+                  "text": "Sí, y no como versión reducida: la diseñamos primero para el móvil, porque es desde donde te buscan la mayoría de tus clientes."
+                }
+              },
+              {
+                "@type": "Question",
+                "name": "¿Incluye dominio y hosting?",
+                "acceptedAnswer": {
+                  "@type": "Answer",
+                  "text": "Sí. Nos encargamos de registrar tu dominio y alojar la web durante el primer año. Si ya tienes dominio, lo conectamos sin coste."
+                }
+              },
+              {
+                "@type": "Question",
+                "name": "¿Puedo modificar la web después?",
+                "acceptedAnswer": {
+                  "@type": "Answer",
+                  "text": "Claro. Puedes pedirnos cambios cuando quieras, y si prefieres hacerlos tú, te dejamos un panel sencillo para editar textos, horarios y fotos."
+                }
+              },
+              {
+                "@type": "Question",
+                "name": "¿Hacéis mantenimiento?",
+                "acceptedAnswer": {
+                  "@type": "Answer",
+                  "text": "Sí. Actualizaciones, seguridad, copias de seguridad y pequeños cambios. Tu web siempre funcionando sin que tengas que pensar en ello."
+                }
+              },
+              {
+                "@type": "Question",
+                "name": "¿Está optimizada para Google?",
+                "acceptedAnswer": {
+                  "@type": "Answer",
+                  "text": "Sí. Cuidamos la velocidad, la estructura y el SEO local, y configuramos tu ficha de Google Business para que te encuentren quienes buscan cerca de ti."
+                }
+              },
+              {
+                "@type": "Question",
+                "name": "¿Qué pasa si ya tengo una web?",
+                "acceptedAnswer": {
+                  "@type": "Answer",
+                  "text": "La revisamos contigo, aprovechamos lo que funcione y migramos tu contenido y tu dominio sin que pierdas visitas ni posicionamiento."
+                }
+              }
+            ]
+          }
+        ]
       }
     </script>
   </head>
