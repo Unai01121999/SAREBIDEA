@@ -56,3 +56,7 @@ SINGLE=1 npm run build   # un único index.html autocontenido (vista previa)
 - El texto legal (`LegalPage`) se descarga solo al abrir una de sus páginas.
 - Fuentes: se quitaron Funnel Display 700 y Montserrat 500 (se sustituyen por la más cercana ya cargada). `scripts/prerender.mjs` precarga Funnel Display 600, Geist 400 y Geist 500, las que se ven al abrir la web.
 - Resultado: JS inicial de 698 KB (204 KB comprimidos) a 428 KB (133 KB comprimidos), y 9 archivos de fuentes en vez de 11.
+
+## Páginas legales con URL propia
+
+`/aviso-legal/`, `/politica-de-privacidad/` y `/politica-de-cookies/` son páginas independientes (no una capa sobre la portada). `scripts/prerender.mjs` genera un HTML estático para cada una, con su título, descripción, URL canónica y etiquetas sociales, y las incluye en `sitemap.xml`. Los enlaces antiguos con `#` (`/#aviso-legal`…) redirigen a la dirección nueva. El texto está en `src/components/legal/LegalPage.tsx`.

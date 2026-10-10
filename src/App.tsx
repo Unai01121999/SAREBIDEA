@@ -1,6 +1,6 @@
-import { AnimatePresence, domAnimation, LazyMotion, MotionConfig } from 'motion/react'
+import { domAnimation, LazyMotion, MotionConfig } from 'motion/react'
 import { lazy, Suspense, useEffect } from 'react'
-import { useLegalRoute } from './hooks/useLegalRoute'
+import { currentLegalPage } from './hooks/useLegalRoute'
 // El texto legal es largo y solo se necesita al abrir una de sus páginas: se descarga entonces.
 const LegalPage = lazy(() => import('./components/legal/LegalPage').then((m) => ({ default: m.LegalPage })))
 import { CookieBanner } from './components/legal/CookieBanner'
@@ -23,9 +23,16 @@ const goToPanel = () => {
   window.location.assign('/panel/')
 }
 
-// Enlaces antiguos a #area-privada también llevan al panel (al cargar y si cambia solo el hash).
+// Enlaces antiguos con # (#area-privada y las páginas legales, que ahora tienen URL propia) se redirigen (al cargar y si cambia el hash).
+const LEGACY: Record<string, string> = {
+  '#area-privada': '/panel/',
+  '#aviso-legal': '/aviso-legal/',
+  '#politica-de-privacidad': '/politica-de-privacidad/',
+  '#politica-de-cookies': '/politica-de-cookies/',
+}
 const redirectLegacy = () => {
-  if (window.location.hash === '#area-privada') window.location.replace('/panel/')
+  const to = LEGACY[window.location.hash]
+  if (to) window.location.replace(to)
 }
 if (typeof window !== 'undefined') redirectLegacy()
 
@@ -36,7 +43,20 @@ export default function App() {
     window.addEventListener('hashchange', redirectLegacy)
     return () => window.removeEventListener('hashchange', redirectLegacy)
   }, [])
-  const legalRoute = useLegalRoute()
+  const legalPage = currentLegalPage()
+
+  // Páginas legales: documento propio (sin la portada), con el aviso de cookies.
+  if (legalPage)
+    return (
+      <LazyMotion features={domAnimation} strict>
+        <MotionConfig reducedMotion="user">
+          <Suspense fallback={null}>
+            <LegalPage page={legalPage} />
+          </Suspense>
+          <CookieBanner />
+        </MotionConfig>
+      </LazyMotion>
+    )
 
   return (
     <LazyMotion features={domAnimation} strict>
@@ -60,9 +80,6 @@ export default function App() {
         <FinalCta />
       </main>
       <Footer />
-      <Suspense fallback={null}>
-        <AnimatePresence>{legalRoute.page && <LegalPage key={legalRoute.page} page={legalRoute.page} onClose={legalRoute.hide} />}</AnimatePresence>
-      </Suspense>
       <CookieBanner />
     </MotionConfig>
     </LazyMotion>

@@ -16,9 +16,9 @@ const cols = [
   {
     title: 'Legal',
     links: [
-      ['Aviso legal', '#aviso-legal'],
-      ['Política de privacidad', '#politica-de-privacidad'],
-      ['Política de cookies', '#politica-de-cookies'],
+      ['Aviso legal', '/aviso-legal/'],
+      ['Política de privacidad', '/politica-de-privacidad/'],
+      ['Política de cookies', '/politica-de-cookies/'],
     ],
   },
 ]

@@ -1,8 +1,6 @@
-import { m } from 'motion/react'
-import { useEffect, type ReactNode } from 'react'
+import type { ReactNode } from 'react'
 import { brand, legal } from '../../data/site'
-import { legalPages, type LegalPageId } from '../../hooks/useLegalRoute'
-import { easeOut } from '../../lib/motion'
+import { legalPages, legalPath, type LegalPageId } from '../../hooks/useLegalRoute'
 import { openPreferences } from '../../lib/consent'
 import { Icon } from '../ui/Icon'
 import { Logo } from '../ui/Logo'
@@ -98,7 +96,7 @@ function AvisoLegal() {
 
       <Section title="6. Protección de datos y cookies">
         <p>
-          El tratamiento de datos personales se describe en la <a href="#politica-de-privacidad" className={A}>Política de privacidad</a> y el uso de cookies y almacenamiento en la <a href="#politica-de-cookies" className={A}>Política de cookies</a>.
+          El tratamiento de datos personales se describe en la <a href="/politica-de-privacidad/" className={A}>Política de privacidad</a> y el uso de cookies y almacenamiento en la <a href="/politica-de-cookies/" className={A}>Política de cookies</a>.
         </p>
       </Section>
 
@@ -295,7 +293,7 @@ function Cookies() {
 
       <Section title="4. Más información">
         <p>
-          Para cualquier duda, escríbenos a {mail}. Consulta también la <a href="#politica-de-privacidad" className={A}>Política de privacidad</a>.
+          Para cualquier duda, escríbenos a {mail}. Consulta también la <a href="/politica-de-privacidad/" className={A}>Política de privacidad</a>.
         </p>
       </Section>
     </>
@@ -308,41 +306,22 @@ const bodies: Record<LegalPageId, () => ReactNode> = {
   'politica-de-cookies': Cookies,
 }
 
-export function LegalPage({ page, onClose }: { page: LegalPageId; onClose: () => void }) {
+export function LegalPage({ page }: { page: LegalPageId }) {
   const Body = bodies[page]
 
-  useEffect(() => {
-    document.documentElement.style.overflow = 'hidden'
-    const onKey = (e: KeyboardEvent) => e.key === 'Escape' && onClose()
-    window.addEventListener('keydown', onKey)
-    return () => {
-      document.documentElement.style.overflow = ''
-      window.removeEventListener('keydown', onKey)
-    }
-  }, [onClose])
-
   return (
-    <m.div
-      data-lenis-prevent
-      className="on-light fixed inset-0 z-[70] overflow-y-auto bg-paper"
-      initial={{ opacity: 0, transform: 'translate3d(0,16px,0)' }}
-      animate={{ opacity: 1, transform: 'translate3d(0,0,0)' }}
-      exit={{ opacity: 0, transform: 'translate3d(0,16px,0)' }}
-      transition={{ duration: 0.3, ease: easeOut }}
-      role="region"
-      aria-label={legalPages[page]}
-    >
+    <div className="on-light min-h-dvh bg-paper">
       <header className="sticky top-0 z-20 border-b border-line bg-paper/85 backdrop-blur-xl">
         <div className="container-x flex h-16 items-center justify-between gap-3">
           <Logo />
-          <button type="button" onClick={onClose} className="inline-flex h-10 items-center gap-2 rounded-full px-4 text-[0.94rem] ring-1 ring-line transition-colors hover:bg-ink/[0.05]">
+          <a href="/" className="inline-flex h-10 items-center gap-2 rounded-full px-4 text-[0.94rem] ring-1 ring-line transition-colors hover:bg-ink/[0.05]">
             <Icon name="arrow" size={16} className="rotate-180" /> <span className="hidden sm:inline">Volver a la web</span>
             <span className="sm:hidden">Volver</span>
-          </button>
+          </a>
         </div>
       </header>
 
-      <main className="container-x pt-10 pb-24 sm:pt-14">
+      <main id="main" className="container-x pt-10 pb-24 sm:pt-14">
         <article className="mx-auto max-w-[46rem]">
           <h1 className="font-display text-[clamp(2rem,1.4rem+2.4vw,3rem)] leading-[1.05] font-semibold tracking-[-0.035em]">{legalPages[page]}</h1>
           <p className="mt-3 text-[0.9rem] text-mute">Última actualización: {legal.updated}</p>
@@ -353,13 +332,13 @@ export function LegalPage({ page, onClose }: { page: LegalPageId; onClose: () =>
             {(Object.keys(legalPages) as LegalPageId[])
               .filter((k) => k !== page)
               .map((k) => (
-                <a key={k} href={`#${k}`} className={A}>
+                <a key={k} href={legalPath(k)} className={A}>
                   {legalPages[k]}
                 </a>
               ))}
           </nav>
         </article>
       </main>
-    </m.div>
+    </div>
   )
 }

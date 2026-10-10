@@ -46,7 +46,7 @@ export function CookieBanner() {
       <p className="mt-2 text-[0.95rem] leading-relaxed text-ink-2">
         Esta web solo usa el almacenamiento técnico imprescindible para funcionar. Las cookies opcionales (analítica y marketing) están{' '}
         <strong className="font-semibold">desactivadas</strong> y no se cargará nada de eso salvo que lo aceptes. Puedes cambiarlo cuando quieras desde «Configurar cookies» en el pie. Más información en la{' '}
-        <a href="#politica-de-cookies" className={LEGAL_LINK}>
+        <a href="/politica-de-cookies/" className={LEGAL_LINK}>
           política de cookies
         </a>
         .
@@ -110,7 +110,7 @@ function Preferences({ initial, onClose }: { initial: ReturnType<typeof useConse
         </h2>
         <p className="mt-2 text-[0.95rem] leading-relaxed text-ink-2">
           Elige qué categorías permites. Todo lo opcional está desactivado por defecto. Consulta el detalle en la{' '}
-          <a href="#politica-de-cookies" className={LEGAL_LINK} onClick={onClose}>
+          <a href="/politica-de-cookies/" className={LEGAL_LINK} onClick={onClose}>
             política de cookies
           </a>
           .
