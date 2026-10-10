@@ -2,11 +2,20 @@
 // de dist/index.html y así buscadores y previsualizadores de enlaces ven el contenido sin ejecutar JavaScript.
 // React lo reemplaza al cargar. Si no hay Chromium disponible, se omite sin romper la compilación.
 import { createServer } from 'node:http'
+import { execSync } from 'node:child_process'
 import { existsSync, readFileSync, writeFileSync } from 'node:fs'
 import { extname, join } from 'node:path'
 
 const dist = 'dist'
 if (!existsSync(join(dist, 'index.html'))) throw new Error('Falta dist/: ejecuta antes `npm run build`.')
+// Marca de versión: https://sarebidea.com/version.txt permite comprobar qué compilación está publicada.
+let commit = ''
+try {
+  commit = execSync('git rev-parse --short HEAD', { stdio: ['ignore', 'pipe', 'ignore'] }).toString().trim()
+} catch {
+  /* sin git */
+}
+writeFileSync(join(dist, 'version.txt'), `SAREBIDEA · compilación ${new Date().toISOString()}${commit ? ` · ${commit}` : ''}\n`)
 const chrome = process.env.CHROMIUM_PATH || '/opt/pw-browsers/chromium'
 let chromium
 try {
