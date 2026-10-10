@@ -10,6 +10,7 @@ import { Hero } from './sections/Hero'
 import { Problem } from './sections/Problem'
 import { Services } from './sections/Services'
 import { Process } from './sections/Process'
+import { Packs } from './sections/Packs'
 import { Showcase } from './sections/Showcase'
 import { About } from './sections/About'
 import { Faq } from './sections/Faq'
@@ -50,6 +51,7 @@ export default function App() {
         <Problem />
         <Services />
         <Process />
+        <Packs />
         <Showcase />
         <About />
         <Faq />
