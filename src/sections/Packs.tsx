@@ -1,20 +1,15 @@
-import { useState } from 'react'
 import { packs } from '../data/site'
 import { Button } from '../components/ui/Button'
 import { Icon } from '../components/ui/Icon'
 import { Reveal } from '../components/ui/Reveal'
 import { TextReveal } from '../components/ui/TextReveal'
-import { useMediaQuery } from '../hooks/useMediaQuery'
 
 type Pack = (typeof packs)[number]
 
-function List({ title, items, inherits, open, onToggle }: { title: string; items: string[]; inherits?: boolean; open: boolean; onToggle: (open: boolean) => void }) {
+function List({ title, items, inherits }: { title: string; items: string[]; inherits?: boolean }) {
   return (
-    <details open={open} onToggle={(e) => onToggle(e.currentTarget.open)} className="group border-t border-current/10 py-4">
-      <summary className="flex cursor-pointer list-none items-center justify-between gap-3 text-[0.95rem] font-semibold [&::-webkit-details-marker]:hidden">
-        {title}
-        <Icon name="chevron" size={16} className="shrink-0 opacity-60 transition-transform group-open:rotate-180" />
-      </summary>
+    <div className="border-t border-current/10 py-5">
+      <h4 className="text-[0.95rem] font-semibold">{title}</h4>
       <ul className="mt-4 space-y-2.5 text-[0.93rem] leading-snug">
         {inherits && <li className="font-semibold">Todo lo anterior</li>}
         {items.map((t) => (
@@ -24,13 +19,11 @@ function List({ title, items, inherits, open, onToggle }: { title: string; items
           </li>
         ))}
       </ul>
-    </details>
+    </div>
   )
 }
 
-function Card({ p, dark, wide }: { p: Pack; dark: boolean; wide: boolean }) {
-  const [web, setWeb] = useState(wide)
-  const [care, setCare] = useState(wide)
+function Card({ p, dark }: { p: Pack; dark: boolean }) {
   return (
     <article
       className={`flex h-full flex-col rounded-[28px] p-7 sm:p-8 ${dark ? 'on-dark bg-ink text-paper shadow-[0_30px_60px_-24px_rgb(13_14_18/0.6)]' : 'bg-tone-hero text-ink ring-1 ring-line'}`}
@@ -52,15 +45,14 @@ function Card({ p, dark, wide }: { p: Pack; dark: boolean; wide: boolean }) {
         </Button>
       </div>
       <div className="mt-7">
-        <List title="Diseño web" items={p.web} inherits={p.inherits} open={web} onToggle={setWeb} />
-        <List title="Mantenimiento" items={p.care} inherits={false} open={care} onToggle={setCare} />
+        <List title="Diseño web" items={p.web} inherits={p.inherits} />
+        <List title="Mantenimiento" items={p.care} />
       </div>
     </article>
   )
 }
 
 export function Packs() {
-  const wide = useMediaQuery('(min-width: 1024px)')
   return (
     <section id="packs" className="relative bg-tone-services py-24 sm:py-32 lg:py-40" aria-labelledby="packs-title">
       <div className="container-x">
@@ -70,15 +62,14 @@ export function Packs() {
             <p className="lede max-w-[26rem] lg:ml-auto">Elige el pack que encaja con tu negocio. Cada uno incluye el diseño de la web y un mantenimiento mensual para que siempre funcione.</p>
           </Reveal>
         </div>
-        {/* key: al cambiar de móvil a escritorio las listas se reabren */}
-        <div key={wide ? 'wide' : 'narrow'} className="mt-14 grid gap-5 lg:grid-cols-3 lg:items-stretch">
+        <div className="mt-14 grid gap-5 lg:grid-cols-3 lg:items-stretch">
           {packs.map((p, i) => (
             <Reveal key={p.key} delay={i * 0.08} className="h-full">
-              <Card p={p} dark={p.key === 'professional'} wide={wide} />
+              <Card p={p} dark={p.key === 'professional'} />
             </Reveal>
           ))}
         </div>
-        <p className="mt-8 text-center text-[0.9rem] text-mute">Los precios del diseño web no incluyen IVA. El mantenimiento se cobra cada mes.</p>
+        <p className="mt-8 text-center text-[0.9rem] text-mute">Los precios del diseño web no incluyen IVA. El mantenimiento se cobra cada mes. ¿Dudas sobre qué incluye cada pack? Escríbenos.</p>
       </div>
     </section>
   )
