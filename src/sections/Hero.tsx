@@ -27,6 +27,7 @@ export function Hero() {
         <div className="relative z-10 max-w-[640px]">
           <TextReveal
             as="h1"
+            eyebrow="Diseño web para negocios locales"
             immediate
             delay={0.1}
             accent={[5]}
