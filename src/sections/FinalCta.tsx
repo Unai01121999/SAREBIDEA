@@ -34,8 +34,7 @@ export function FinalCta() {
     setFailed('')
     const first = Object.keys(errs)[0]
     if (first) {
-      const el = first === 'pack' ? form.querySelector<HTMLElement>('input[name=pack]') : (form.elements.namedItem(first) as HTMLElement | null)
-      el?.focus()
+      ;(form.elements.namedItem(first) as HTMLElement | null)?.focus()
       return
     }
     setLoading(true)
@@ -170,21 +169,28 @@ export function FinalCta() {
                     </div>
                     {err('businessType')}
                   </div>
-                  <fieldset className="sm:col-span-2" aria-describedby={errors.pack ? 'pack-error' : undefined}>
-                    <legend className="mb-2 block text-sm text-white/70">¿Qué pack te interesa?</legend>
-                    <div className="grid grid-cols-2 gap-2.5 sm:grid-cols-4">
-                      {[...packs.map((p) => ({ value: p.key.toUpperCase(), title: p.name, sub: `${p.price} + IVA` })), { value: 'INDECISO', title: 'No lo tengo claro', sub: 'Te aconsejamos' }].map((o) => (
-                        <label key={o.value} className="relative block cursor-pointer">
-                          <input type="radio" name="pack" value={o.value} className="peer sr-only" />
-                          <span className="flex min-h-[4.25rem] flex-col justify-center rounded-2xl bg-white/[0.06] px-3.5 py-2.5 text-[0.95rem] leading-tight font-medium text-paper ring-1 ring-white/12 transition-[box-shadow,background-color] duration-200 hover:bg-white/[0.09] peer-checked:bg-lilac/15 peer-checked:ring-2 peer-checked:ring-lilac peer-focus-visible:ring-2 peer-focus-visible:ring-lilac">
-                            {o.title}
-                            <span className="mt-1 text-[0.8rem] font-normal text-white/55">{o.sub}</span>
-                          </span>
-                        </label>
-                      ))}
+                  <div className="sm:col-span-2">
+                    <label htmlFor="pack" className="mb-2 block text-sm text-white/70">
+                      ¿Qué pack te interesa?
+                    </label>
+                    <div className="relative">
+                      <select id="pack" name="pack" defaultValue="" className={`${field} appearance-none pr-10`} {...aria('pack')}>
+                        <option value="" disabled className="text-ink">
+                          Elige una opción
+                        </option>
+                        {packs.map((p) => (
+                          <option key={p.key} value={p.key.toUpperCase()} className="text-ink">
+                            {p.name} · {p.price} + IVA
+                          </option>
+                        ))}
+                        <option value="INDECISO" className="text-ink">
+                          No lo tengo claro
+                        </option>
+                      </select>
+                      <Icon name="chevron" size={18} className="pointer-events-none absolute top-1/2 right-4 -translate-y-1/2 text-white/50" />
                     </div>
                     {err('pack')}
-                  </fieldset>
+                  </div>
                   <div className="sm:col-span-2">
                     <label htmlFor="description" className="mb-2 block text-sm text-white/70">
                       Breve descripción
