@@ -15,6 +15,10 @@ export type ServiceType = (typeof SERVICE_TYPES)[number]
 export const PACK_TYPES = ['STARTER', 'PROFESSIONAL', 'PREMIUM'] as const
 export type PackType = (typeof PACK_TYPES)[number]
 
+/** Pack que le interesa a un cliente: uno de los 3 o «No lo tengo claro» (INDECISO). */
+export const PACK_INTERESTS = [...PACK_TYPES, 'INDECISO'] as const
+export type PackInterest = (typeof PACK_INTERESTS)[number]
+
 export const WEBSITE_STATUSES = ['DEVELOPMENT', 'PRODUCTION', 'PAUSED', 'ARCHIVED'] as const
 export type WebsiteStatus = (typeof WEBSITE_STATUSES)[number]
 
@@ -51,6 +55,8 @@ export interface Client {
   services: ServiceType[]
   notes: string
   archived: boolean
+  /** Pack por el que preguntó (formulario web) o que se anota a mano; null si no consta. */
+  packInterest?: PackInterest | null
   /** Cómo llegó: dado de alta a mano en el panel o a través del formulario de la web. */
   origin: ClientOrigin
   /** Si vino del formulario: ID de la solicitud en la tabla `leads` de Supabase (evita importarla dos veces). */

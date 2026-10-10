@@ -19,6 +19,7 @@ import { clientsApi, websitesApi } from '@/hooks/use-entities'
 import { downloadCsv } from '@/lib/csv'
 import { formatDate } from '@/lib/format'
 import { clientStatusLabel, originLabel, originTone } from '@/lib/labels'
+import { packInterestLabel } from '@/lib/packs'
 import { CLIENT_ORIGINS, CLIENT_STATUSES, type Client } from '@/types/domain'
 import { routes } from '@/lib/routes'
 
@@ -116,7 +117,7 @@ export default function ClientsPage() {
         onExport={(list) =>
           downloadCsv(
             'clientes.csv',
-            list.map((c) => ({ Empresa: c.company, Contacto: c.contactName, Email: c.email, Telefono: c.phone, CIF: c.taxId, Direccion: c.address, CP: c.postalCode, Provincia: c.province, Pais: c.country, Estado: clientStatusLabel[c.status], Origen: originLabel[c.origin ?? 'MANUAL'], Webs: webCount.get(c.id) ?? 0, Alta: formatDate(c.createdAt) })),
+            list.map((c) => ({ Empresa: c.company, Contacto: c.contactName, Email: c.email, Telefono: c.phone, CIF: c.taxId, Direccion: c.address, CP: c.postalCode, Provincia: c.province, Pais: c.country, 'Pack de interés': packInterestLabel(c.packInterest) || '—', Estado: clientStatusLabel[c.status], Origen: originLabel[c.origin ?? 'MANUAL'], Webs: webCount.get(c.id) ?? 0, Alta: formatDate(c.createdAt) })),
           )
         }
         toolbar={

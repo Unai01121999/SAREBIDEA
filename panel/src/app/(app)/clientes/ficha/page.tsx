@@ -24,6 +24,7 @@ import { WebsiteFormDialog } from '@/components/websites/website-form'
 import { clientsApi, domainsApi, hostingsApi, invoicesApi, useActivity, websitesApi } from '@/hooks/use-entities'
 import { formatCurrency, formatDate, formatDateTime, timeAgo } from '@/lib/format'
 import { conceptLabel, originLabel, originTone } from '@/lib/labels'
+import { packInterestLabel } from '@/lib/packs'
 import { effectiveStatus, invoiceTotal } from '@/lib/metrics'
 import type { Client } from '@/types/domain'
 import { routes } from '@/lib/routes'
@@ -130,6 +131,7 @@ export default function ClientDetailPage() {
               <dl className="grid gap-x-6 gap-y-4 sm:grid-cols-2">
                 <Info label="Persona de contacto" value={client.contactName} />
                 <Info label="CIF / NIF" value={client.taxId} />
+                <Info label="Pack de interés" value={packInterestLabel(client.packInterest)} className="sm:col-span-2" />
                 <Info label="Email" value={client.email} href={`mailto:${client.email}`} icon={<Mail className="size-3.5" />} />
                 <Info label="Teléfono" value={client.phone} href={client.phone ? `tel:${client.phone.replace(/\s/g, '')}` : undefined} icon={<Phone className="size-3.5" />} />
                 <Info label="Dirección" value={[client.address, `${client.postalCode} ${client.province}`.trim(), client.country].filter(Boolean).join(', ')} icon={<MapPin className="size-3.5" />} className="sm:col-span-2" />
@@ -394,6 +396,10 @@ function OriginPanel({ client }: { client: Client }) {
                 <div>
                   <dt className="text-xs text-muted-foreground">Tipo de negocio indicado</dt>
                   <dd className="mt-1 text-sm font-medium">{client.formData?.businessType || '—'}</dd>
+                </div>
+                <div>
+                  <dt className="text-xs text-muted-foreground">Pack elegido en el formulario</dt>
+                  <dd className="mt-1 text-sm font-medium">{packInterestLabel(client.packInterest) || '—'}</dd>
                 </div>
                 <div className="sm:col-span-2">
                   <dt className="text-xs text-muted-foreground">Lo que escribió en el formulario</dt>

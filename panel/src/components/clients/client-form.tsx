@@ -8,10 +8,11 @@ import { CheckboxGroupField, Field, SelectField } from '@/components/forms/field
 import { FormDialog } from '@/components/forms/form-dialog'
 import { Input, Textarea } from '@/components/ui/input'
 import { clientsApi, domainsApi, hostingsApi, useSettings, websitesApi } from '@/hooks/use-entities'
+import { packInterestLabel } from '@/lib/packs'
 import { fromDateInput } from '@/lib/format'
 import { clientStatusLabel, serviceLabel, technologyLabel } from '@/lib/labels'
 import { guessDomain } from '@/lib/prefill'
-import { CLIENT_STATUSES, SERVICE_TYPES, TECHNOLOGIES, type Client, type Technology } from '@/types/domain'
+import { CLIENT_STATUSES, PACK_INTERESTS, SERVICE_TYPES, TECHNOLOGIES, type Client, type PackInterest, type Technology } from '@/types/domain'
 
 export const clientSchema = z.object({
   company: z.string().trim().min(2, 'Escribe el nombre de la empresa'),
@@ -26,6 +27,7 @@ export const clientSchema = z.object({
   status: z.enum(CLIENT_STATUSES),
   services: z.array(z.enum(SERVICE_TYPES)),
   notes: z.string(),
+  packInterest: z.string(),
   // Apartados opcionales: si se dejan vacíos no pasa nada; si se rellenan, se crea el registro en su listado.
   webName: z.string().trim(),
   webUrl: z.string().trim(),
@@ -41,9 +43,9 @@ export const clientSchema = z.object({
 export type ClientValues = z.infer<typeof clientSchema>
 
 const extras = { webName: '', webUrl: '', webTechnology: '', domainName: '', domainRegistrar: '', domainRenewsAt: '', domainCost: '', hostProvider: '', hostRenewsAt: '', hostCost: '' }
-const empty: ClientValues = { company: '', contactName: '', email: '', phone: '', address: '', postalCode: '', province: '', country: 'España', taxId: '', status: 'PENDING', services: [], notes: '', ...extras }
+const empty: ClientValues = { company: '', contactName: '', email: '', phone: '', address: '', postalCode: '', province: '', country: 'España', taxId: '', status: 'PENDING', services: [], notes: '', packInterest: '', ...extras }
 
-const toValues = (c: Client): ClientValues => ({ company: c.company, contactName: c.contactName, email: c.email, phone: c.phone, address: c.address, postalCode: c.postalCode, province: c.province, country: c.country, taxId: c.taxId, status: c.status, services: c.services, notes: c.notes, ...extras })
+const toValues = (c: Client): ClientValues => ({ company: c.company, contactName: c.contactName, email: c.email, phone: c.phone, address: c.address, postalCode: c.postalCode, province: c.province, country: c.country, taxId: c.taxId, status: c.status, services: c.services, notes: c.notes, packInterest: c.packInterest ?? '', ...extras })
 
 /** Lógica del formulario de cliente (alta y edición). La comparten el modal y la página «Nuevo cliente». */
 const inOneYear = () => {
@@ -129,7 +131,8 @@ export function useClientForm(client: Client | undefined, onDone: (saved?: Clien
   }
 
   const submit = form.handleSubmit(async (v) => {
-    const { webName, webUrl, webTechnology, domainName, domainRegistrar, domainRenewsAt, domainCost, hostProvider, hostRenewsAt, hostCost, ...data } = v
+    const { webName, webUrl, webTechnology, domainName, domainRegistrar, domainRenewsAt, domainCost, hostProvider, hostRenewsAt, hostCost, packInterest, ...rest } = v
+    const data = { ...rest, packInterest: (packInterest || null) as PackInterest | null }
     void webName, void webUrl, void webTechnology, void domainName, void domainRegistrar, void domainRenewsAt, void domainCost, void hostProvider, void hostRenewsAt, void hostCost
     let saved: Client
     if (client) saved = await update.mutateAsync({ id: client.id, patch: data })
@@ -177,6 +180,9 @@ export function ClientFormFields({ form }: { form: UseFormReturn<ClientValues> }
       </Field>
       <Field label="Servicios contratados" className="sm:col-span-2">
         <CheckboxGroupField control={control} name="services" options={SERVICE_TYPES.map((s) => ({ value: s, label: serviceLabel[s] }))} />
+      </Field>
+      <Field label="Pack de interés" hint="Lo rellena el formulario de la web; también puedes anotarlo a mano." htmlFor="c-pack" className="sm:col-span-2">
+        <SelectField control={control} name="packInterest" id="c-pack" allowNone noneLabel="Sin indicar" options={PACK_INTERESTS.map((p) => ({ value: p, label: packInterestLabel(p) }))} />
       </Field>
       <Field label="Notas internas" hint="Solo las ves tú." htmlFor="c-notes" className="sm:col-span-2">
         <Textarea id="c-notes" rows={3} {...register('notes')} />

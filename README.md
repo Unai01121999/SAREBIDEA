@@ -66,3 +66,7 @@ SINGLE=1 npm run build   # un único index.html autocontenido (vista previa)
 - **Zonas táctiles**: los enlaces y botones del pie tienen al menos 24 px de alto (comprobado con Playwright, 0 objetivos pequeños en escritorio y móvil).
 - **Ejemplos sin duplicar**: `Showcase` pinta solo la variante que corresponde (carrusel en móvil, composición en escritorio), así el HTML no repite cada proyecto ni su `<h3>`.
 - **`/llms.txt`**: resumen en texto plano de la web (servicios, packs, páginas y contacto) para asistentes de IA. Se encuentra en `public/llms.txt`.
+
+## Pack de interés en el formulario
+
+El formulario pregunta «¿Qué pack te interesa?» (Starter, Professional, Premium o «No lo tengo claro»). Es obligatorio. Se guarda en `solicitudes.pack_interes`, el trigger `lead_to_client` lo copia a `clientes.pack_interes` y aparece en la ficha del cliente (Datos generales y pestaña Origen), editable desde el formulario de cliente y en la exportación. El correo «Nuevo Cliente» también lo incluye. Migración: `supabase/migrations/008_pack_de_interes.sql`.

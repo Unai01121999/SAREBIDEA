@@ -3,6 +3,9 @@
 // como cliente con origen «Formulario web». Sin Supabase (desarrollo local) se guarda en localStorage para poder probar.
 import { supabaseRest } from './supabase'
 
+export const PACK_CHOICES = ['STARTER', 'PROFESSIONAL', 'PREMIUM', 'INDECISO'] as const
+export type PackChoice = (typeof PACK_CHOICES)[number]
+
 export type LeadInput = {
   company: string
   /** Persona de contacto (columna `name`). */
@@ -10,6 +13,8 @@ export type LeadInput = {
   phone: string
   email: string
   businessType: string
+  /** Pack que le interesa: STARTER, PROFESSIONAL, PREMIUM o INDECISO («No lo tengo claro»). */
+  pack: PackChoice
   description: string
   source?: 'web'
 }
@@ -28,6 +33,7 @@ export async function createLead(input: LeadInput): Promise<void> {
         telefono: input.phone,
         correo: input.email,
         tipo_negocio: input.businessType,
+        pack_interes: input.pack,
         descripcion: input.description,
       }),
     })
@@ -42,16 +48,17 @@ export async function createLead(input: LeadInput): Promise<void> {
   }
 }
 
-export type LeadFormErrors = Partial<Record<'company' | 'name' | 'phone' | 'email' | 'businessType' | 'description', string>>
+export type LeadFormErrors = Partial<Record<'company' | 'name' | 'phone' | 'email' | 'businessType' | 'pack' | 'description', string>>
 
 /** Validación del formulario público. */
-export function validateLead(v: { company: string; name: string; phone: string; email: string; businessType: string; description: string }) {
+export function validateLead(v: { company: string; name: string; phone: string; email: string; businessType: string; pack: string; description: string }) {
   const e: LeadFormErrors = {}
   if (v.company.trim().length < 2) e.company = 'Escribe el nombre de la empresa.'
   if (v.name.trim().length < 3) e.name = 'Escribe la persona de contacto.'
   if (v.phone.replace(/\D/g, '').length < 9) e.phone = 'El teléfono debe tener al menos 9 cifras.'
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(v.email.trim())) e.email = 'Revisa el correo: falta la @ o el dominio.'
   if (!v.businessType) e.businessType = 'Elige el tipo de negocio.'
+  if (!(PACK_CHOICES as readonly string[]).includes(v.pack)) e.pack = 'Elige un pack o «No lo tengo claro».'
   if (v.description.trim().length < 10) e.description = 'Cuéntanos un poco más (mínimo 10 caracteres).'
   return e
 }

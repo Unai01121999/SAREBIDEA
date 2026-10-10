@@ -7,7 +7,9 @@ const WEBHOOK_SECRET = Deno.env.get('WEBHOOK_SECRET')
 const TO = Deno.env.get('NOTIFY_TO') ?? 'sarebidea@sarebidea.com'
 const FROM = Deno.env.get('NOTIFY_FROM') ?? 'Web SAREBIDEA <web@sarebidea.com>'
 
-type Solicitud = { codigo: string; creado_el: string; nombre: string; empresa: string | null; telefono: string; correo: string; tipo_negocio: string; descripcion: string }
+type Solicitud = { codigo: string; creado_el: string; nombre: string; empresa: string | null; telefono: string; correo: string; tipo_negocio: string; pack_interes: string | null; descripcion: string }
+
+const PACKS: Record<string, string> = { STARTER: 'Pack Starter (399 € + IVA)', PROFESSIONAL: 'Pack Professional (699 € + IVA)', PREMIUM: 'Pack Premium (1.199 € + IVA)', INDECISO: 'No lo tiene claro' }
 
 const esc = (s: unknown) =>
   String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]!)
@@ -26,6 +28,7 @@ Deno.serve(async (req) => {
     ['Teléfono', r.telefono],
     ['Correo electrónico', r.correo],
     ['Tipo de negocio', r.tipo_negocio],
+    ['Pack que le interesa', r.pack_interes ? (PACKS[r.pack_interes] ?? r.pack_interes) : ''],
     ['Descripción', r.descripcion],
     ['Fecha', date],
   ]
