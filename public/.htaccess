@@ -1,0 +1,67 @@
+# SAREBIDEA · Configuración del servidor (Hostinger / Apache o LiteSpeed)
+# Todo va dentro de <IfModule>: si el servidor no tiene un módulo, esa parte se ignora y la web sigue funcionando.
+
+Options -Indexes
+AddDefaultCharset UTF-8
+DirectoryIndex index.html
+ErrorDocument 404 /404.html
+
+# ── 1. Una sola dirección: https://sarebidea.com (sin www y siempre con HTTPS) ─────────────────────────────
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+  # www → sin www (y a HTTPS) en un solo salto
+  RewriteCond %{HTTP_HOST} ^www\.sarebidea\.com$ [NC]
+  RewriteRule ^ https://sarebidea.com%{REQUEST_URI} [L,R=301]
+  # HTTP → HTTPS (solo para sarebidea.com, para no romper la dirección de pruebas de Hostinger)
+  RewriteCond %{HTTP_HOST} ^sarebidea\.com$ [NC]
+  RewriteCond %{HTTPS} !=on
+  RewriteCond %{HTTP:X-Forwarded-Proto} !https
+  RewriteRule ^ https://sarebidea.com%{REQUEST_URI} [L,R=301]
+</IfModule>
+
+# ── 2. Tipos de archivo ─────────────────────────────────────────────────────────────────────────────────
+<IfModule mod_mime.c>
+  AddType font/woff2 .woff2
+  AddType font/woff .woff
+  AddType image/svg+xml .svg
+  AddType application/manifest+json .webmanifest
+  AddType text/plain .txt
+</IfModule>
+
+# ── 3. Compresión ───────────────────────────────────────────────────────────────────────────────────────
+<IfModule mod_deflate.c>
+  AddOutputFilterByType DEFLATE text/html text/css text/plain text/xml application/xml application/json application/ld+json application/manifest+json application/javascript text/javascript image/svg+xml font/woff
+</IfModule>
+
+# ── 4. Caché ────────────────────────────────────────────────────────────────────────────────────────────
+# Las páginas se revalidan siempre (así una versión nueva se ve al momento). Los archivos con huella (carpeta /assets/)
+# llevan su propio .htaccess con caché de 1 año. Imágenes y archivos sin huella: 30 días.
+<IfModule mod_headers.c>
+  <FilesMatch "\.(html|json|xml|txt|webmanifest)$">
+    Header set Cache-Control "no-cache"
+  </FilesMatch>
+  <FilesMatch "\.(jpg|jpeg|png|webp|avif|gif|svg|ico)$">
+    Header set Cache-Control "public, max-age=2592000"
+  </FilesMatch>
+</IfModule>
+
+# ── 5. Cabeceras de seguridad ───────────────────────────────────────────────────────────────────────────
+<IfModule mod_headers.c>
+  Header always set Strict-Transport-Security "max-age=31536000"
+  Header always set X-Content-Type-Options "nosniff"
+  Header always set X-Frame-Options "SAMEORIGIN"
+  Header always set Referrer-Policy "strict-origin-when-cross-origin"
+  Header always set Permissions-Policy "camera=(), microphone=(), geolocation=(), payment=(), usb=(), interest-cohort=()"
+  Header always set Cross-Origin-Opener-Policy "same-origin-allow-popups"
+  # Política de contenido de la web pública: solo el propio sitio, Supabase (formulario) y Google Analytics (si se aceptan las cookies de analítica).
+  Header always set Content-Security-Policy "default-src 'self'; script-src 'self' https://*.googletagmanager.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: https://*.google-analytics.com https://*.googletagmanager.com https://*.g.doubleclick.net; font-src 'self' data:; connect-src 'self' https://acipnrmskjupfznxjpvt.supabase.co https://*.google-analytics.com https://*.analytics.google.com https://*.googletagmanager.com https://*.g.doubleclick.net; frame-ancestors 'self'; base-uri 'self'; form-action 'self'; object-src 'none'"
+  Header unset X-Powered-By
+</IfModule>
+
+# ── 6. Archivos que nunca deben servirse ────────────────────────────────────────────────────────────────
+<FilesMatch "^\.ht">
+  Require all denied
+</FilesMatch>
+<FilesMatch "(^\.env|\.(env|log|sql|bak|map|md|lock|ya?ml)$|~$)">
+  Require all denied
+</FilesMatch>

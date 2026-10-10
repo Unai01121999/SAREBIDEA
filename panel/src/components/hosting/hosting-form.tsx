@@ -3,7 +3,7 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useEffect } from 'react'
 import { useForm, useWatch } from 'react-hook-form'
-import { z } from 'zod'
+import { z } from '@/lib/zod'
 import { ClientSelectField, Field, SelectField, SwitchField, WebsiteSelectField } from '@/components/forms/fields'
 import { applyDefaults, ClientContext, usePrefillData } from '@/components/forms/prefill'
 import { FormDialog } from '@/components/forms/form-dialog'

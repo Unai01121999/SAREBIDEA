@@ -3,7 +3,7 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useEffect } from 'react'
 import { useForm, type UseFormReturn } from 'react-hook-form'
-import { z } from 'zod'
+import { z } from '@/lib/zod'
 import { CheckboxGroupField, Field, SelectField } from '@/components/forms/fields'
 import { FormDialog } from '@/components/forms/form-dialog'
 import { Input, Textarea } from '@/components/ui/input'

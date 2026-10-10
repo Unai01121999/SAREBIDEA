@@ -1,0 +1,6 @@
+# Archivos con huella en el nombre (cambian si cambia el contenido): se pueden guardar un año sin riesgo.
+<IfModule mod_headers.c>
+  <FilesMatch "\.(js|css|woff2?|png|jpg|svg|webp)$">
+    Header set Cache-Control "public, max-age=31536000, immutable"
+  </FilesMatch>
+</IfModule>

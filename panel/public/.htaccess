@@ -1,0 +1,8 @@
+# Panel privado: nunca debe indexarse y tiene su propia política de contenido
+# (la exportación estática de Next.js necesita scripts en línea; no hay forma de usar nonces en hosting estático).
+<IfModule mod_headers.c>
+  Header always set X-Robots-Tag "noindex, nofollow, noarchive"
+  Header always set X-Frame-Options "DENY"
+  Header set Cache-Control "no-cache"
+  Header always set Content-Security-Policy "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self' data:; connect-src 'self' https://acipnrmskjupfznxjpvt.supabase.co; frame-ancestors 'none'; base-uri 'self'; form-action 'self'; object-src 'none'"
+</IfModule>
