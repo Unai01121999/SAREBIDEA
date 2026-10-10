@@ -70,3 +70,7 @@ SINGLE=1 npm run build   # un único index.html autocontenido (vista previa)
 ## Pack de interés en el formulario
 
 El formulario pregunta «¿Qué pack te interesa?» en un menú desplegable (Starter, Professional, Premium o «No lo tengo claro»). Es obligatorio. Se guarda en `solicitudes.pack_interes`, el trigger `lead_to_client` lo copia a `clientes.pack_interes` y aparece en la ficha del cliente (Datos generales y pestaña Origen), editable desde el formulario de cliente y en la exportación. El correo «Nuevo Cliente» también lo incluye. Migración: `supabase/migrations/008_pack_de_interes.sql`.
+
+## Alta de cliente: web, dominio y hosting
+
+En la ficha del cliente solo se piden la URL de la web, el dominio y el proveedor de hosting. Si se rellenan, se crean en Webs, Dominios y Hosting (la web se llama como el negocio). El resto de datos (tecnología, registrador, renovación, costes…) se completan después en cada sección.

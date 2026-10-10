@@ -29,20 +29,13 @@ export const clientSchema = z.object({
   notes: z.string(),
   packInterest: z.string(),
   // Apartados opcionales: si se dejan vacíos no pasa nada; si se rellenan, se crea el registro en su listado.
-  webName: z.string().trim(),
   webUrl: z.string().trim(),
-  webTechnology: z.string(),
   domainName: z.string().trim(),
-  domainRegistrar: z.string(),
-  domainRenewsAt: z.string(),
-  domainCost: z.string().trim().refine((v) => v === '' || Number(v.replace(',', '.')) >= 0, 'Importe no válido'),
   hostProvider: z.string(),
-  hostRenewsAt: z.string(),
-  hostCost: z.string().trim().refine((v) => v === '' || Number(v.replace(',', '.')) >= 0, 'Importe no válido'),
 })
 export type ClientValues = z.infer<typeof clientSchema>
 
-const extras = { webName: '', webUrl: '', webTechnology: '', domainName: '', domainRegistrar: '', domainRenewsAt: '', domainCost: '', hostProvider: '', hostRenewsAt: '', hostCost: '' }
+const extras = { webUrl: '', domainName: '', hostProvider: '' }
 const empty: ClientValues = { company: '', contactName: '', email: '', phone: '', address: '', postalCode: '', province: '', country: 'España', taxId: '', status: 'PENDING', services: [], notes: '', packInterest: '', ...extras }
 
 const toValues = (c: Client): ClientValues => ({ company: c.company, contactName: c.contactName, email: c.email, phone: c.phone, address: c.address, postalCode: c.postalCode, province: c.province, country: c.country, taxId: c.taxId, status: c.status, services: c.services, notes: c.notes, packInterest: c.packInterest ?? '', ...extras })
@@ -75,7 +68,7 @@ export function useClientForm(client: Client | undefined, onDone: (saved?: Clien
   /** Crea web, dominio y hosting solo si su apartado se ha rellenado; domino y hosting quedan enlazados a la web. */
   const createExtras = async (c: Client, v: ClientValues) => {
     const url = v.webUrl.trim()
-    const hasWeb = !!(v.webName || url)
+    const hasWeb = !!url
     const hasDomain = !!v.domainName
     const hasHosting = !!v.hostProvider
     if (!hasWeb && !hasDomain && !hasHosting) return
@@ -85,9 +78,9 @@ export function useClientForm(client: Client | undefined, onDone: (saved?: Clien
       const host = hostOf(url) || domainName || guessDomain(c)
       const web = await createWeb.mutateAsync({
         clientId: c.id,
-        name: v.webName || `Web · ${c.company}`,
+        name: c.company,
         status: 'DEVELOPMENT',
-        technology: (TECHNOLOGIES as readonly string[]).includes(v.webTechnology) ? (v.webTechnology as Technology) : 'WORDPRESS',
+        technology: 'WORDPRESS',
         description: c.formData?.description ? `Solicitud original: ${c.formData.description}` : '',
         domainName: host,
         productionUrl: url ? (/^https?:\/\//i.test(url) ? url : `https://${url}`) : `https://${host}`,
@@ -105,10 +98,10 @@ export function useClientForm(client: Client | undefined, onDone: (saved?: Clien
         clientId: c.id,
         websiteId,
         name: domainName,
-        registrar: v.domainRegistrar || settings?.domainRegistrars[0] || '',
+        registrar: settings?.domainRegistrars[0] || '',
         registeredAt: new Date().toISOString(),
-        renewsAt: v.domainRenewsAt ? fromDateInput(v.domainRenewsAt) : inOneYear(),
-        annualCost: num(v.domainCost, 15),
+        renewsAt: inOneYear(),
+        annualCost: 15,
         autoRenew: true,
         dns: '',
         nameservers: [],
@@ -121,9 +114,9 @@ export function useClientForm(client: Client | undefined, onDone: (saved?: Clien
         websiteId,
         provider: v.hostProvider,
         plan: 'Básico',
-        annualCost: num(v.hostCost, 60),
+        annualCost: 60,
         contractedAt: new Date().toISOString(),
-        renewsAt: v.hostRenewsAt ? fromDateInput(v.hostRenewsAt) : inOneYear(),
+        renewsAt: inOneYear(),
         active: true,
         notes: '',
       })
@@ -131,9 +124,9 @@ export function useClientForm(client: Client | undefined, onDone: (saved?: Clien
   }
 
   const submit = form.handleSubmit(async (v) => {
-    const { webName, webUrl, webTechnology, domainName, domainRegistrar, domainRenewsAt, domainCost, hostProvider, hostRenewsAt, hostCost, packInterest, ...rest } = v
+    const { webUrl, domainName, hostProvider, packInterest, ...rest } = v
     const data = { ...rest, packInterest: (packInterest || null) as PackInterest | null }
-    void webName, void webUrl, void webTechnology, void domainName, void domainRegistrar, void domainRenewsAt, void domainCost, void hostProvider, void hostRenewsAt, void hostCost
+    void webUrl, void domainName, void hostProvider
     let saved: Client
     if (client) saved = await update.mutateAsync({ id: client.id, patch: data })
     else saved = await create.mutateAsync({ ...data, archived: false, origin: 'MANUAL', sourceId: null, formData: null })
@@ -190,38 +183,16 @@ export function ClientFormFields({ form }: { form: UseFormReturn<ClientValues> }
 
       <div className="sm:col-span-2">
         <p className="text-sm font-medium">Web, dominio y hosting (opcional)</p>
-        <p className="text-muted-foreground text-xs">Si rellenas un apartado, se crea solo en su listado con estos datos. Si lo dejas vacío, no se crea nada.</p>
+        <p className="text-muted-foreground text-xs">Si rellenas un apartado, se crea solo en su listado (la web se llamará como el negocio). El resto de datos (tecnología, registrador, renovación, costes…) se completan después desde Webs, Dominios y Hosting.</p>
       </div>
-      <Field label="Web · nombre" htmlFor="c-webname">
-        <Input id="c-webname" {...register('webName')} placeholder="Web corporativa" />
-      </Field>
       <Field label="Web · dirección (URL)" htmlFor="c-weburl">
         <Input id="c-weburl" {...register('webUrl')} placeholder="https://midominio.com" />
       </Field>
-      <Field label="Web · tecnología" htmlFor="c-webtech">
-        <SelectField control={control} name="webTechnology" id="c-webtech" allowNone noneLabel="WordPress (por defecto)" options={TECHNOLOGIES.map((t) => ({ value: t, label: technologyLabel[t] }))} />
-      </Field>
-      <div className="hidden sm:block" />
       <Field label="Dominio" htmlFor="c-domname">
         <Input id="c-domname" {...register('domainName')} placeholder="midominio.com" />
       </Field>
-      <Field label="Dominio · registrador" htmlFor="c-domreg">
-        <SelectField control={control} name="domainRegistrar" id="c-domreg" allowNone noneLabel="Por defecto" options={(settings?.domainRegistrars ?? []).map((r) => ({ value: r, label: r }))} />
-      </Field>
-      <Field label="Dominio · renovación" htmlFor="c-domren" hint="Vacío = dentro de un año.">
-        <Input id="c-domren" type="date" {...register('domainRenewsAt')} />
-      </Field>
-      <Field label="Dominio · coste anual (€)" error={e.domainCost?.message} htmlFor="c-domcost">
-        <Input id="c-domcost" inputMode="decimal" {...register('domainCost')} placeholder="15" />
-      </Field>
       <Field label="Hosting · proveedor" htmlFor="c-hostprov">
         <SelectField control={control} name="hostProvider" id="c-hostprov" allowNone noneLabel="Sin hosting" options={(settings?.hostingProviders ?? []).map((p) => ({ value: p, label: p }))} />
-      </Field>
-      <Field label="Hosting · renovación" htmlFor="c-hostren" hint="Vacío = dentro de un año.">
-        <Input id="c-hostren" type="date" {...register('hostRenewsAt')} />
-      </Field>
-      <Field label="Hosting · coste anual (€)" error={e.hostCost?.message} htmlFor="c-hostcost">
-        <Input id="c-hostcost" inputMode="decimal" {...register('hostCost')} placeholder="60" />
       </Field>
     </>
   )
