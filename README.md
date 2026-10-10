@@ -60,3 +60,9 @@ SINGLE=1 npm run build   # un único index.html autocontenido (vista previa)
 ## Páginas legales con URL propia
 
 `/aviso-legal/`, `/politica-de-privacidad/` y `/politica-de-cookies/` son páginas independientes (no una capa sobre la portada). `scripts/prerender.mjs` genera un HTML estático para cada una, con su título, descripción, URL canónica y etiquetas sociales, y las incluye en `sitemap.xml`. Los enlaces antiguos con `#` (`/#aviso-legal`…) redirigen a la dirección nueva. El texto está en `src/components/legal/LegalPage.tsx`.
+
+## Ajustes menores de SEO y accesibilidad
+
+- **Zonas táctiles**: los enlaces y botones del pie tienen al menos 24 px de alto (comprobado con Playwright, 0 objetivos pequeños en escritorio y móvil).
+- **Ejemplos sin duplicar**: `Showcase` pinta solo la variante que corresponde (carrusel en móvil, composición en escritorio), así el HTML no repite cada proyecto ni su `<h3>`.
+- **`/llms.txt`**: resumen en texto plano de la web (servicios, packs, páginas y contacto) para asistentes de IA. Se encuentra en `public/llms.txt`.

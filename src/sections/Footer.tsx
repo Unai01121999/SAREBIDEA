@@ -35,17 +35,17 @@ export function Footer() {
           {cols.map((c) => (
             <nav key={c.title} aria-label={c.title}>
               <h2 className="text-sm text-white/40">{c.title}</h2>
-              <ul className="mt-4 space-y-2.5">
+              <ul className="mt-3 md:space-y-0.5">
                 {c.links.map(([l, h]) => (
                   <li key={l}>
-                    <a href={h} className="text-white/80 transition-colors hover:text-white">
+                    <a href={h} className="inline-block py-2.5 text-white/80 transition-colors hover:text-white md:py-1.5">
                       {l}
                     </a>
                   </li>
                 ))}
                 {c.title === 'Legal' && (
                   <li>
-                    <button type="button" onClick={openPreferences} className="text-white/80 transition-colors hover:text-white">
+                    <button type="button" onClick={openPreferences} className="inline-block py-2.5 text-white/80 transition-colors hover:text-white md:py-1.5">
                       Configurar cookies
                     </button>
                   </li>
@@ -55,9 +55,9 @@ export function Footer() {
           ))}
           <div>
             <h2 className="text-sm text-white/40">Contacto</h2>
-            <ul className="mt-4 space-y-2.5 text-white/80">
+            <ul className="mt-3 text-white/80">
               <li>
-                <a href={`mailto:${brand.email}`} className="hover:text-white">
+                <a href={`mailto:${brand.email}`} className="inline-block py-2.5 hover:text-white md:py-1.5">
                   {brand.email}
                 </a>
               </li>
@@ -83,7 +83,7 @@ export function Footer() {
       </div>
       <div className="container-x flex flex-col gap-2 border-t border-white/10 py-6 text-sm text-white/40 sm:flex-row sm:justify-between">
         <span>© {new Date().getFullYear()} SAREBIDEA. Todos los derechos reservados.</span>
-        <a href="#top" className="hover:text-white/80">
+        <a href="#top" className="inline-block py-2 hover:text-white/80">
           Volver arriba ↑
         </a>
       </div>

@@ -1,0 +1,25 @@
+# SAREBIDEA
+
+> SAREBIDEA es el estudio de Unai Padura Larrea que diseña páginas web que impulsan a los negocios locales a atraer más clientes. Rápido, sencillo y sin rodeos.
+
+Web: https://sarebidea.com/
+Contacto: sarebidea@sarebidea.com
+
+## Servicios y precios
+
+Cada pack incluye el diseño de la web y un mantenimiento mensual. Los precios del diseño web no incluyen IVA.
+
+- Pack Starter: 399 € + IVA. Mantenimiento 19 €/mes. Inicio, servicios, «Sobre nosotros» y contacto; botón de WhatsApp y Google Maps; formulario de contacto básico; diseño responsive; SEO básico; dominio + hosting 1 año y SSL.
+- Pack Professional: 699 € + IVA. Mantenimiento 29 €/mes. Todo lo de Starter, con diseño personalizado, página individual para cada servicio, Google Business, Analytics y Search Console, SEO on-page y optimización de velocidad, copy orientado a conversión y galería de proyectos.
+- Pack Premium: 1.199 € + IVA. Mantenimiento 49 €/mes. Todo lo anterior, con web totalmente personalizada, base de datos con Supabase, panel de administración, reservas, usuarios y áreas privadas, formularios avanzados, automatizaciones y SEO avanzado.
+
+## Páginas
+
+- [Inicio](https://sarebidea.com/): servicios, cómo funciona, packs, ejemplos, quién soy y preguntas frecuentes.
+- [Aviso legal](https://sarebidea.com/aviso-legal/)
+- [Política de privacidad](https://sarebidea.com/politica-de-privacidad/)
+- [Política de cookies](https://sarebidea.com/politica-de-cookies/)
+
+## Notas
+
+- El área privada (/panel/) es de uso interno y no está pensada para rastreo ni resumen.

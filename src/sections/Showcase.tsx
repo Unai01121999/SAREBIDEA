@@ -7,7 +7,7 @@ import { Button } from '../components/ui/Button'
 import { Icon } from '../components/ui/Icon'
 import { Reveal } from '../components/ui/Reveal'
 import { TextReveal } from '../components/ui/TextReveal'
-import { useFinePointer, useReducedMotionPref } from '../hooks/useMediaQuery'
+import { useFinePointer, useMediaQuery, useReducedMotionPref } from '../hooks/useMediaQuery'
 
 const slug = (p: Project) => p.business.toLowerCase().normalize('NFD').replace(/[^a-z]/g, '') + '.es'
 
@@ -73,6 +73,8 @@ function TiltProject({ p, className = '', big = false }: { p: Project; className
 
 export function Showcase() {
   const [a, b, c, d, e, f, g] = projects
+  // Solo se pinta una de las dos composiciones (no las dos con una oculta): así el HTML no repite cada proyecto.
+  const wide = useMediaQuery('(min-width: 768px)')
   return (
     <section id="ejemplos" className="relative overflow-hidden bg-tone-showcase py-24 sm:py-32 lg:py-40" aria-labelledby="showcase-title">
       <div className="container-x">
@@ -87,7 +89,8 @@ export function Showcase() {
       </div>
 
       {/* Móvil: carrusel de teléfonos, pensado para el pulgar */}
-      <div className="mt-12 md:hidden">
+      {!wide && (
+      <div className="mt-12">
         <ul className="flex snap-x snap-mandatory gap-4 overflow-x-auto px-[max(1rem,calc((100vw-260px)/2))] pb-6 [scrollbar-width:none]" aria-label="Ejemplos de webs">
           {projects.map((p) => (
             <li key={p.id} className="w-[min(64vw,250px)] shrink-0 snap-center">
@@ -107,9 +110,11 @@ export function Showcase() {
           Desliza para ver más →
         </p>
       </div>
+      )}
 
       {/* Tablet y escritorio: composición editorial de mockups */}
-      <div className="container-x mt-16 hidden md:block lg:mt-20">
+      {wide && (
+      <div className="container-x mt-16 lg:mt-20">
         <div className="grid grid-cols-12 gap-x-6 gap-y-14 lg:gap-x-8 lg:gap-y-20">
           <Reveal className="col-span-12 lg:col-span-7">
             <TiltProject p={a} big />
@@ -138,6 +143,7 @@ export function Showcase() {
           <Button href="#contacto">Quiero ver cómo quedaría la mía</Button>
         </Reveal>
       </div>
+      )}
     </section>
   )
 }
