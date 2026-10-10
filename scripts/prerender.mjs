@@ -15,6 +15,9 @@ try {
 } catch {
   /* sin git */
 }
+// El sitemap lleva como fecha de última modificación la de esta compilación.
+const sitemap = join(dist, 'sitemap.xml')
+if (existsSync(sitemap)) writeFileSync(sitemap, readFileSync(sitemap, 'utf8').replace(/<lastmod>[^<]*<\/lastmod>/, `<lastmod>${new Date().toISOString().slice(0, 10)}</lastmod>`))
 writeFileSync(join(dist, 'version.txt'), `SAREBIDEA · compilación ${new Date().toISOString()}${commit ? ` · ${commit}` : ''}\n`)
 const chrome = process.env.CHROMIUM_PATH || '/opt/pw-browsers/chromium'
 let chromium
