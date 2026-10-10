@@ -34,7 +34,7 @@ export function Logo({ className = '', tone = 'ink', size = 21, tagline = false 
         </span>
       </span>
       {tagline && (
-        <span aria-hidden="true" className="mt-[0.55em] font-brand font-medium whitespace-nowrap uppercase" style={{ fontSize: size * 0.3, letterSpacing: '0.22em', color }}>
+        <span aria-hidden="true" className="mt-[0.55em] font-display font-medium whitespace-nowrap uppercase" style={{ fontSize: size * 0.3, letterSpacing: '0.22em', color }}>
           Páginas web que impulsan tu negocio
         </span>
       )}

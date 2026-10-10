@@ -1,4 +1,4 @@
-import { motion, useReducedMotion } from 'motion/react'
+import { m, useReducedMotion } from 'motion/react'
 import { easeOut } from '../../lib/motion'
 
 type Props = {
@@ -18,7 +18,7 @@ type Props = {
 /** Titular que se revela palabra a palabra, cada una saliendo de una máscara. */
 export function TextReveal({ text, className = '', as = 'h2', delay = 0, immediate = false, accent = [], id, eyebrow }: Props) {
   const reduced = useReducedMotion()
-  const Tag = motion[as]
+  const Tag = m[as]
   const words = text.split(' ')
   const trigger = immediate ? { animate: 'show' } : { whileInView: 'show', viewport: { once: true, margin: '0px 0px -10% 0px' } }
 
@@ -33,7 +33,7 @@ export function TextReveal({ text, className = '', as = 'h2', delay = 0, immedia
       {eyebrow && ' '}
       {words.map((w, i) => (
         <span key={i} aria-hidden="true" className="inline-block overflow-hidden pb-[0.12em] -mb-[0.12em] align-bottom">
-          <motion.span
+          <m.span
             className={`inline-block ${accent.includes(i) ? 'font-serif font-normal italic tracking-[-0.01em]' : ''}`}
             variants={{
               hidden: reduced ? { opacity: 0 } : { transform: 'translate3d(0, 105%, 0) rotate(4deg)' },
@@ -42,7 +42,7 @@ export function TextReveal({ text, className = '', as = 'h2', delay = 0, immedia
             transition={{ duration: reduced ? 0.3 : 1, ease: easeOut, delay: delay + i * 0.055 }}
           >
             {w}
-          </motion.span>
+          </m.span>
           {i < words.length - 1 && ' '}
         </span>
       ))}

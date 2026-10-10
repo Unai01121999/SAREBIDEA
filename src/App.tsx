@@ -1,7 +1,8 @@
-import { AnimatePresence, MotionConfig } from 'motion/react'
-import { useEffect } from 'react'
+import { AnimatePresence, domAnimation, LazyMotion, MotionConfig } from 'motion/react'
+import { lazy, Suspense, useEffect } from 'react'
 import { useLegalRoute } from './hooks/useLegalRoute'
-import { LegalPage } from './components/legal/LegalPage'
+// El texto legal es largo y solo se necesita al abrir una de sus páginas: se descarga entonces.
+const LegalPage = lazy(() => import('./components/legal/LegalPage').then((m) => ({ default: m.LegalPage })))
 import { CookieBanner } from './components/legal/CookieBanner'
 import { useLenis } from './hooks/useLenis'
 import { useReducedMotionPref } from './hooks/useMediaQuery'
@@ -38,6 +39,7 @@ export default function App() {
   const legalRoute = useLegalRoute()
 
   return (
+    <LazyMotion features={domAnimation} strict>
     <MotionConfig reducedMotion="user">
       <a
         href="#main"
@@ -58,8 +60,11 @@ export default function App() {
         <FinalCta />
       </main>
       <Footer />
-      <AnimatePresence>{legalRoute.page && <LegalPage key={legalRoute.page} page={legalRoute.page} onClose={legalRoute.hide} />}</AnimatePresence>
+      <Suspense fallback={null}>
+        <AnimatePresence>{legalRoute.page && <LegalPage key={legalRoute.page} page={legalRoute.page} onClose={legalRoute.hide} />}</AnimatePresence>
+      </Suspense>
       <CookieBanner />
     </MotionConfig>
+    </LazyMotion>
   )
 }

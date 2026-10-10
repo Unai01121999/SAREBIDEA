@@ -1,4 +1,4 @@
-import { motion } from 'motion/react'
+import { m } from 'motion/react'
 import { useEffect, type ReactNode } from 'react'
 import { brand, legal } from '../../data/site'
 import { legalPages, type LegalPageId } from '../../hooks/useLegalRoute'
@@ -322,7 +322,7 @@ export function LegalPage({ page, onClose }: { page: LegalPageId; onClose: () =>
   }, [onClose])
 
   return (
-    <motion.div
+    <m.div
       data-lenis-prevent
       className="on-light fixed inset-0 z-[70] overflow-y-auto bg-paper"
       initial={{ opacity: 0, transform: 'translate3d(0,16px,0)' }}
@@ -360,6 +360,6 @@ export function LegalPage({ page, onClose }: { page: LegalPageId; onClose: () =>
           </nav>
         </article>
       </main>
-    </motion.div>
+    </m.div>
   )
 }

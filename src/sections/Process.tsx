@@ -1,4 +1,4 @@
-import { motion, useScroll, useSpring, useTransform } from 'motion/react'
+import { m, useScroll, useSpring, useTransform } from 'motion/react'
 import { useRef } from 'react'
 import { steps } from '../data/site'
 import { Button } from '../components/ui/Button'
@@ -29,7 +29,7 @@ export function Process() {
         <ol ref={list} className="relative">
           {/* Línea de progreso ligada al scroll */}
           <span aria-hidden="true" className="absolute top-2 bottom-2 left-[27px] w-px bg-ink/10 sm:left-[35px]" />
-          <motion.span
+          <m.span
             aria-hidden="true"
             className="absolute top-2 bottom-2 left-[27px] w-px origin-top bg-cobalt sm:left-[35px]"
             style={{ transform: line }}

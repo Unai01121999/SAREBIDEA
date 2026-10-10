@@ -3,7 +3,7 @@
 // React lo reemplaza al cargar. Si no hay Chromium disponible, se omite sin romper la compilación.
 import { createServer } from 'node:http'
 import { execSync } from 'node:child_process'
-import { existsSync, readFileSync, writeFileSync } from 'node:fs'
+import { existsSync, readdirSync, readFileSync, writeFileSync } from 'node:fs'
 import { extname, join } from 'node:path'
 
 const dist = 'dist'
@@ -49,7 +49,13 @@ try {
     return root.innerHTML
   })
   const index = readFileSync(join(dist, 'index.html'), 'utf8')
-  const out = index.replace('<div id="root"></div>', `<div id="root">${html}</div>`)
+  // Precarga de las fuentes que se ven al abrir la web (titular, texto y botones): el navegador las pide a la vez que el CSS.
+  const preload = ['funnel-display-latin-600-normal', 'geist-latin-400-normal', 'geist-latin-500-normal']
+    .map((name) => readdirSync(join(dist, 'assets')).find((f) => f.startsWith(`${name}-`) && f.endsWith('.woff2')))
+    .filter(Boolean)
+    .map((f) => `    <link rel="preload" as="font" type="font/woff2" href="/assets/${f}" crossorigin />\n`)
+    .join('')
+  const out = index.replace('</head>', `${preload}  </head>`).replace('<div id="root"></div>', `<div id="root">${html}</div>`)
   if (out === index) throw new Error('No se encontró <div id="root"></div> en dist/index.html (¿ya prerenderizado?).')
   writeFileSync(join(dist, 'index.html'), out)
   console.log(`Prerender listo: ${Math.round(html.length / 1024)} KB de HTML en la portada.`)

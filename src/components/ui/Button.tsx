@@ -1,4 +1,4 @@
-import { motion, useMotionValue, useSpring, useTransform } from 'motion/react'
+import { m, useMotionValue, useSpring, useTransform } from 'motion/react'
 import type { ReactNode, PointerEvent } from 'react'
 import { useFinePointer, useReducedMotionPref } from '../../hooks/useMediaQuery'
 import { Icon } from './Icon'
@@ -49,7 +49,7 @@ export function Button({ href, children, variant = 'primary', size = 'md', icon 
   const pad = size === 'lg' ? 'h-14 px-7 text-[1.0625rem]' : 'h-11 px-5 text-[0.95rem]'
 
   return (
-    <motion.a
+    <m.a
       href={href}
       onClick={onClick}
       onPointerMove={onMove}
@@ -57,7 +57,7 @@ export function Button({ href, children, variant = 'primary', size = 'md', icon 
       style={magnetic ? { transform } : undefined}
       className={`group relative inline-flex select-none items-center justify-center gap-2 rounded-full font-medium tracking-[-0.01em] transition-[background-color,box-shadow,scale] duration-200 ease-[var(--ease-out-strong)] active:scale-[0.97] ${pad} ${styles[variant]} ${className}`}
     >
-      <motion.span className="inline-flex items-center gap-2" style={magnetic ? { transform: innerTransform } : undefined}>
+      <m.span className="inline-flex items-center gap-2" style={magnetic ? { transform: innerTransform } : undefined}>
         {children}
         {icon && (
           <span className="relative -mr-1 inline-flex size-6 items-center justify-center overflow-hidden rounded-full">
@@ -73,7 +73,7 @@ export function Button({ href, children, variant = 'primary', size = 'md', icon 
             />
           </span>
         )}
-      </motion.span>
-    </motion.a>
+      </m.span>
+    </m.a>
   )
 }

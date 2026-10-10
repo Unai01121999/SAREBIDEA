@@ -1,4 +1,4 @@
-import { motion, useMotionValue, useScroll, useSpring, useTransform } from 'motion/react'
+import { m, useMotionValue, useScroll, useSpring, useTransform } from 'motion/react'
 import { useEffect, useRef } from 'react'
 import { projects } from '../data/site'
 import { easeOut } from '../lib/motion'
@@ -53,18 +53,18 @@ export function HeroScene() {
   return (
     <div ref={ref} className="relative aspect-[1/0.92] w-full [perspective:2600px] sm:[perspective:1800px] sm:aspect-[1/0.8] lg:aspect-[1/0.95]">
       {/* Luz ambiental detrás de la escena */}
-      <motion.div aria-hidden="true" className="absolute inset-[-10%] -z-10" style={{ transform: glow }}>
+      <m.div aria-hidden="true" className="absolute inset-[-10%] -z-10" style={{ transform: glow }}>
         <div className="absolute top-[18%] left-[20%] h-[60%] w-[70%] rounded-full bg-[radial-gradient(closest-side,rgb(58_63_242/0.28),transparent)]" />
         <div className="absolute top-[42%] left-[48%] h-[48%] w-[50%] rounded-full bg-[radial-gradient(closest-side,rgb(255_201_168/0.55),transparent)]" />
-      </motion.div>
+      </m.div>
 
-      <motion.div
+      <m.div
         className="preserve-3d absolute inset-0"
         initial={reduced ? { opacity: 0 } : { opacity: 0, transform: 'translate3d(0, 60px, 0) rotateX(24deg) rotateY(-24deg)' }}
         animate={{ opacity: 1, transform: 'translate3d(0, 0px, 0) rotateX(0deg) rotateY(0deg)' }}
         transition={{ duration: 1.6, ease: easeOut, delay: 0.35 }}
       >
-        <motion.div className="preserve-3d absolute inset-0" style={{ transform: rootTransform }}>
+        <m.div className="preserve-3d absolute inset-0" style={{ transform: rootTransform }}>
           {/* Capa trasera: otra web, más lejos */}
           <div
             className="absolute top-[0%] left-[30%] w-[66%] opacity-60"
@@ -83,7 +83,7 @@ export function HeroScene() {
                 <SiteDesktop p={main} />
               </BrowserFrame>
               {/* Reflejo especular que se desplaza con la luz */}
-              <motion.div
+              <m.div
                 aria-hidden="true"
                 className="pointer-events-none absolute inset-0 rounded-[14px] mix-blend-soft-light"
                 style={{
@@ -131,8 +131,8 @@ export function HeroScene() {
               </span>
             </div>
           </div>
-        </motion.div>
-      </motion.div>
+        </m.div>
+      </m.div>
     </div>
   )
 }

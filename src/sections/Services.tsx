@@ -1,4 +1,4 @@
-import { motion, useReducedMotion } from 'motion/react'
+import { m, useReducedMotion } from 'motion/react'
 import type { ReactNode } from 'react'
 import { projects, serviceExtras, services, type ServiceKey } from '../data/site'
 import { easeOut } from '../lib/motion'
@@ -81,7 +81,7 @@ function ConversionVisual() {
   return (
     <ul className="space-y-2" aria-hidden="true">
       {leads.map((l, i) => (
-        <motion.li
+        <m.li
           key={l.t}
           className="flex items-center gap-3 rounded-2xl bg-white/[0.07] px-3.5 py-2.5 ring-1 ring-white/10"
           initial={{ opacity: 0, transform: reduced ? 'none' : 'translate3d(24px,0,0)' }}
@@ -94,7 +94,7 @@ function ConversionVisual() {
           </span>
           <span className="flex-1 text-[14px] text-paper">{l.t}</span>
           <span className="text-[12px] text-white/50 tabular">{l.h}</span>
-        </motion.li>
+        </m.li>
       ))}
     </ul>
   )
@@ -121,7 +121,7 @@ function SpeedVisual() {
               <span className={`tabular ${b.you ? 'font-medium text-cobalt' : 'text-mute'}`}>{b.value}</span>
             </div>
             <div className="h-2 overflow-hidden rounded-full bg-ink/[0.06]">
-              <motion.div
+              <m.div
                 className={`h-full origin-left rounded-full ${b.you ? 'bg-cobalt' : 'bg-ink/25'}`}
                 style={{ width: `${b.width}%` }}
                 initial={{ transform: reduced ? 'scaleX(1)' : 'scaleX(0)' }}

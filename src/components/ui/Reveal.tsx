@@ -1,4 +1,4 @@
-import { motion, useReducedMotion } from 'motion/react'
+import { m, useReducedMotion } from 'motion/react'
 import type { ReactNode } from 'react'
 import { easeOut } from '../../lib/motion'
 
@@ -13,7 +13,7 @@ type Props = {
 /** Revelado al entrar en viewport. Con reduced motion: solo fundido. */
 export function Reveal({ children, delay = 0, y = 24, className, as = 'div' }: Props) {
   const reduced = useReducedMotion()
-  const M = motion[as]
+  const M = m[as]
   return (
     <M
       className={className}

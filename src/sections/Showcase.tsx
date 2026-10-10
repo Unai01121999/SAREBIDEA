@@ -1,4 +1,4 @@
-import { motion, useMotionValue, useSpring, useTransform } from 'motion/react'
+import { m, useMotionValue, useSpring, useTransform } from 'motion/react'
 import type { PointerEvent } from 'react'
 import { projects, type Project } from '../data/site'
 import { BrowserFrame, PhoneFrame } from '../components/mockups/Frames'
@@ -47,7 +47,7 @@ function TiltProject({ p, className = '', big = false }: { p: Project; className
   return (
     <article className={`group ${className}`} onPointerMove={onMove} onPointerLeave={reset}>
       <a href="#contacto" className="block rounded-[16px]" aria-label={`${p.business}, ${p.sector}. Quiero una web así`}>
-        <motion.div className="relative" style={on ? { transform, boxShadow: shadow, borderRadius: 14 } : { borderRadius: 14 }}>
+        <m.div className="relative" style={on ? { transform, boxShadow: shadow, borderRadius: 14 } : { borderRadius: 14 }}>
           <BrowserFrame url={slug(p)} className="shadow-[var(--shadow-soft)]">
             <SiteDesktop p={p} />
           </BrowserFrame>
@@ -61,7 +61,7 @@ function TiltProject({ p, className = '', big = false }: { p: Project; className
               Quiero una así <Icon name="arrowUpRight" size={14} />
             </span>
           </div>
-        </motion.div>
+        </m.div>
       </a>
       <div className="mt-4 flex items-baseline justify-between gap-4 px-1">
         <h3 className={`font-display font-semibold tracking-[-0.02em] ${big ? 'text-[1.5rem]' : 'text-[1.2rem]'}`}>{p.business}</h3>

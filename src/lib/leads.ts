@@ -1,7 +1,7 @@
 // Envío del formulario de contacto. Con Supabase configurado (VITE_SUPABASE_URL y VITE_SUPABASE_ANON_KEY) se guarda
 // en la tabla `solicitudes` (el visitante anónimo solo puede INSERTAR, lo garantiza la base de datos) y aparece en el panel
 // como cliente con origen «Formulario web». Sin Supabase (desarrollo local) se guarda en localStorage para poder probar.
-import { supabase } from './supabase'
+import { supabaseRest } from './supabase'
 
 export type LeadInput = {
   company: string
@@ -17,17 +17,21 @@ export type LeadInput = {
 const LOCAL_KEY = 'sarebidea-leads'
 
 export async function createLead(input: LeadInput): Promise<void> {
-  if (supabase) {
+  if (supabaseRest) {
     // Tabla `solicitudes` (columnas en español); `nombre` es la persona de contacto.
-    const { error } = await supabase.from('solicitudes').insert({
-      empresa: input.company,
-      nombre: input.name,
-      telefono: input.phone,
-      correo: input.email,
-      tipo_negocio: input.businessType,
-      descripcion: input.description,
+    const res = await fetch(`${supabaseRest.url}/rest/v1/solicitudes`, {
+      method: 'POST',
+      headers: { apikey: supabaseRest.anonKey, Authorization: `Bearer ${supabaseRest.anonKey}`, 'Content-Type': 'application/json', Prefer: 'return=minimal' },
+      body: JSON.stringify({
+        empresa: input.company,
+        nombre: input.name,
+        telefono: input.phone,
+        correo: input.email,
+        tipo_negocio: input.businessType,
+        descripcion: input.description,
+      }),
     })
-    if (error) throw error
+    if (!res.ok) throw Object.assign(new Error(`No se pudo guardar la solicitud (${res.status})`), { status: res.status })
     return
   }
   try {

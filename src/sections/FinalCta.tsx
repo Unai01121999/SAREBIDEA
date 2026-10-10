@@ -1,4 +1,4 @@
-import { AnimatePresence, motion } from 'motion/react'
+import { AnimatePresence, m } from 'motion/react'
 import { useState, type FormEvent } from 'react'
 import { createLead, validateLead, type LeadFormErrors } from '../lib/leads'
 import { brand, businessTypes } from '../data/site'
@@ -97,7 +97,7 @@ export function FinalCta() {
           <div className="relative rounded-[30px] bg-white/[0.04] p-6 shadow-[0_1px_0_rgb(255_255_255/0.08)_inset,0_40px_80px_-30px_rgb(0_0_0/0.6)] ring-1 ring-white/10 backdrop-blur-xl sm:p-9">
             <AnimatePresence mode="wait" initial={false}>
               {sent ? (
-                <motion.div
+                <m.div
                   key="ok"
                   className="flex min-h-[380px] flex-col items-center justify-center text-center"
                   initial={{ opacity: 0, transform: 'scale(0.96)' }}
@@ -110,9 +110,9 @@ export function FinalCta() {
                   </span>
                   <h3 className="mt-6 font-display text-[1.9rem] font-semibold tracking-[-0.03em]">¡Recibido!</h3>
                   <p className="mt-3 max-w-[22rem] text-white/65">Te escribimos muy pronto para conocer tu negocio y preparar tu propuesta.</p>
-                </motion.div>
+                </m.div>
               ) : (
-                <motion.form
+                <m.form
                   key="form"
                   onSubmit={onSubmit}
                   noValidate
@@ -202,7 +202,7 @@ export function FinalCta() {
                       </>
                     )}
                   </button>
-                </motion.form>
+                </m.form>
               )}
             </AnimatePresence>
           </div>

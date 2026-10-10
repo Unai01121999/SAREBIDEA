@@ -48,3 +48,11 @@ SINGLE=1 npm run build   # un único index.html autocontenido (vista previa)
 - Página 404 propia (`public/404.html`, con `noindex`), `/.well-known/security.txt`, listado de carpetas desactivado y archivos sensibles bloqueados.
 
 **Si añades un servicio externo** (mapa de Google, vídeo de YouTube, Calendly…) hay que permitirlo en la CSP de `public/.htaccess`, o el navegador lo bloqueará. Para volver atrás basta con borrar el `.htaccess` del servidor.
+
+## Rendimiento (peso de la web)
+
+- La portada ya no usa la librería `@supabase/supabase-js`: el formulario hace un único `fetch` a la API REST (`src/lib/supabase.ts`, `src/lib/leads.ts`). El panel sí la sigue usando (tiene su propio `package.json`).
+- Animaciones con `LazyMotion` + `domAnimation` y componentes `m.*` en lugar de `motion.*` (no se carga el motor de arrastre ni el de layout).
+- El texto legal (`LegalPage`) se descarga solo al abrir una de sus páginas.
+- Fuentes: se quitaron Funnel Display 700 y Montserrat 500 (se sustituyen por la más cercana ya cargada). `scripts/prerender.mjs` precarga Funnel Display 600, Geist 400 y Geist 500, las que se ven al abrir la web.
+- Resultado: JS inicial de 698 KB (204 KB comprimidos) a 428 KB (133 KB comprimidos), y 9 archivos de fuentes en vez de 11.

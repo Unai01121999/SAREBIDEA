@@ -1,15 +1,7 @@
-// Backend de producción (Supabase): login con correo y contraseña + segundo factor, y base de datos.
-// Si no hay variables de entorno (por ejemplo, en la vista previa de claude.ai), la web sigue funcionando
-// con el almacén de la vista previa o con localStorage.
-import { createClient, type SupabaseClient } from '@supabase/supabase-js'
-
+// Conexión mínima con Supabase para el formulario de contacto: un solo POST a la API REST (PostgREST).
+// No se carga la librería oficial (supabase-js pesa ~90 KB comprimidos y aquí solo hace falta insertar una fila).
+// Si no hay variables de entorno (desarrollo local), el formulario guarda en localStorage.
 const url = import.meta.env.VITE_SUPABASE_URL as string | undefined
 const anonKey = import.meta.env.VITE_SUPABASE_ANON_KEY as string | undefined
 
-export const supabase: SupabaseClient | null = url && anonKey ? createClient(url, anonKey) : null
-
-/** Cuentas con acceso al Área privada. La base de datos lo vuelve a comprobar (tabla admin_emails). */
-export const adminEmails = ((import.meta.env.VITE_ADMIN_EMAILS as string | undefined) ?? 'sarebidea@sarebidea.com')
-  .split(',')
-  .map((e) => e.trim().toLowerCase())
-  .filter(Boolean)
+export const supabaseRest = url && anonKey ? { url: url.replace(/\/$/, ''), anonKey } : null

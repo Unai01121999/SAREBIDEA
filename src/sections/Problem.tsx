@@ -1,4 +1,4 @@
-import { motion, useReducedMotion } from 'motion/react'
+import { m, useReducedMotion } from 'motion/react'
 import { problems } from '../data/site'
 import { Reveal } from '../components/ui/Reveal'
 import { TextReveal } from '../components/ui/TextReveal'
@@ -67,7 +67,7 @@ export function Problem() {
             <div className="relative">
               <OldSite />
               {pins.map((p, i) => (
-                <motion.span
+                <m.span
                   key={i}
                   className="absolute flex size-7 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full bg-[#e5484d] text-[12px] font-semibold text-white shadow-[0_6px_16px_-4px_rgb(229_72_77/0.6)] ring-4 ring-paper tabular"
                   style={{ left: p.x, top: p.y }}
@@ -78,7 +78,7 @@ export function Problem() {
                   aria-hidden="true"
                 >
                   {i + 1}
-                </motion.span>
+                </m.span>
               ))}
             </div>
             <p className="mt-4 text-center text-sm text-mute">Te suena, ¿verdad?</p>

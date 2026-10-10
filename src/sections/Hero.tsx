@@ -1,4 +1,4 @@
-import { motion, useReducedMotion } from 'motion/react'
+import { m, useReducedMotion } from 'motion/react'
 import { easeOut } from '../lib/motion'
 import { Button } from '../components/ui/Button'
 import { Icon } from '../components/ui/Icon'
@@ -34,18 +34,18 @@ export function Hero() {
             text="La web que tu negocio necesita."
             className="display text-[clamp(2.9rem,1.2rem+6.6vw,6rem)]"
           />
-          <motion.p {...fade(0.55)} className="lede mt-6 max-w-[34rem] sm:mt-8">
+          <m.p {...fade(0.55)} className="lede mt-6 max-w-[34rem] sm:mt-8">
             Creamos páginas web modernas para comercios que quieren atraer más clientes, generar confianza y destacar frente a su competencia.
-          </motion.p>
-          <motion.div {...fade(0.7)} className="mt-8 flex flex-col gap-3 sm:mt-10 sm:flex-row sm:items-center">
+          </m.p>
+          <m.div {...fade(0.7)} className="mt-8 flex flex-col gap-3 sm:mt-10 sm:flex-row sm:items-center">
             <Button href="#contacto" size="lg">
               Quiero mi web
             </Button>
             <Button href="#ejemplos" size="lg" variant="ghost" icon={false}>
               Ver ejemplos
             </Button>
-          </motion.div>
-          <motion.ul {...fade(0.85)} className="mt-8 flex flex-wrap gap-x-5 gap-y-2 text-[0.92rem] text-ink-2" aria-label="Qué incluye">
+          </m.div>
+          <m.ul {...fade(0.85)} className="mt-8 flex flex-wrap gap-x-5 gap-y-2 text-[0.92rem] text-ink-2" aria-label="Qué incluye">
             {['Web profesional', 'Optimizada para móvil', 'Lista para vender'].map((t) => (
               <li key={t} className="flex items-center gap-1.5">
                 <span className="flex size-[18px] items-center justify-center rounded-full bg-cobalt/10 text-cobalt">
@@ -54,7 +54,7 @@ export function Hero() {
                 {t}
               </li>
             ))}
-          </motion.ul>
+          </m.ul>
         </div>
 
         <div className="relative mx-auto w-full max-w-[560px] lg:max-w-none lg:translate-x-[4%]">
@@ -63,7 +63,7 @@ export function Hero() {
       </div>
 
       {/* Sectores: ¿me sirve a mí? → sí. */}
-      <motion.div {...fade(1.1)} className="mt-14 border-y border-line py-5 lg:mt-20">
+      <m.div {...fade(1.1)} className="mt-14 border-y border-line py-5 lg:mt-20">
         <div className="container-x flex items-center gap-8">
           <p className="hidden shrink-0 text-sm text-mute md:block">Webs para</p>
           <div className="relative min-w-0 flex-1 overflow-hidden [mask-image:linear-gradient(90deg,transparent,#000_10%,#000_90%,transparent)]">
@@ -77,7 +77,7 @@ export function Hero() {
             </div>
           </div>
         </div>
-      </motion.div>
+      </m.div>
     </section>
   )
 }

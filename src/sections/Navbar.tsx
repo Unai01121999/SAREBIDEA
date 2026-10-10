@@ -1,4 +1,4 @@
-import { AnimatePresence, motion, useMotionValueEvent, useScroll } from 'motion/react'
+import { AnimatePresence, m, useMotionValueEvent, useScroll } from 'motion/react'
 import { useEffect, useState } from 'react'
 import { nav } from '../data/site'
 import { easeOut } from '../lib/motion'
@@ -85,7 +85,7 @@ export function Navbar({ onPrivate }: { onPrivate: () => void }) {
 
       <AnimatePresence>
         {open && (
-          <motion.div
+          <m.div
             id="mobile-menu"
             className="fixed inset-0 z-40 flex flex-col bg-paper/95 px-6 pt-28 pb-10 backdrop-blur-2xl lg:hidden"
             initial={{ clipPath: 'inset(0 0 100% 0 round 0 0 32px 32px)' }}
@@ -95,7 +95,7 @@ export function Navbar({ onPrivate }: { onPrivate: () => void }) {
           >
             <ul className="flex flex-col">
               {nav.map((l, i) => (
-                <motion.li
+                <m.li
                   key={l.href}
                   initial={{ opacity: 0, transform: 'translate3d(0,24px,0)' }}
                   animate={{ opacity: 1, transform: 'translate3d(0,0,0)' }}
@@ -110,10 +110,10 @@ export function Navbar({ onPrivate }: { onPrivate: () => void }) {
                     {l.label}
                     <Icon name="arrowUpRight" size={22} className="text-mute" />
                   </a>
-                </motion.li>
+                </m.li>
               ))}
             </ul>
-            <motion.div
+            <m.div
               className="mt-auto flex flex-col gap-3"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
@@ -134,8 +134,8 @@ export function Navbar({ onPrivate }: { onPrivate: () => void }) {
                 Área privada
               </button>
               <p className="text-center text-sm text-mute">Respuesta en menos de 24 h laborables</p>
-            </motion.div>
-          </motion.div>
+            </m.div>
+          </m.div>
         )}
       </AnimatePresence>
     </>
