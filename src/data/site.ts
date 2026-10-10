@@ -25,6 +25,7 @@ export const nav = [
   { label: 'Servicios', href: '#servicios' },
   { label: 'Cómo funciona', href: '#como-funciona' },
   { label: 'Ejemplos', href: '#ejemplos' },
+  { label: 'Quién soy', href: '#quien-soy' },
   { label: 'FAQ', href: '#faq' },
 ]
 

@@ -11,6 +11,7 @@ import { Problem } from './sections/Problem'
 import { Services } from './sections/Services'
 import { Process } from './sections/Process'
 import { Showcase } from './sections/Showcase'
+import { About } from './sections/About'
 import { Faq } from './sections/Faq'
 import { FinalCta } from './sections/FinalCta'
 import { Footer } from './sections/Footer'
@@ -50,6 +51,7 @@ export default function App() {
         <Services />
         <Process />
         <Showcase />
+        <About />
         <Faq />
         <FinalCta />
       </main>
