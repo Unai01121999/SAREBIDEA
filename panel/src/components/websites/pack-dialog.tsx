@@ -24,7 +24,6 @@ export function PackDialog({ open, onOpenChange, clientId }: { open: boolean; on
   const [name, setName] = useState('')
   const [domain, setDomain] = useState('')
   const [billPack, setBillPack] = useState(true)
-  const [billMaint, setBillMaint] = useState(true)
   const [error, setError] = useState('')
 
   useEffect(() => {
@@ -34,7 +33,6 @@ export function PackDialog({ open, onOpenChange, clientId }: { open: boolean; on
       setName('')
       setDomain('')
       setBillPack(true)
-      setBillMaint(true)
       setError('')
     }
   }, [open, clientId])
@@ -73,8 +71,8 @@ export function PackDialog({ open, onOpenChange, clientId }: { open: boolean; on
     const due = new Date(now.getTime() + 30 * 864e5).toISOString()
     let n = 1
     const base = { clientId: selected.id, issuedAt: now.toISOString(), dueAt: due, taxRate: vat, status: 'PENDING' as const, websiteId: web.id, domainId: null, hostingId: null }
-    if (billPack) await createInvoice.mutateAsync({ ...base, number: numbers(n++), concept: 'WEB_DEVELOPMENT', description: `${p.label} · diseño y desarrollo web`, subtotal: p.price, recurring: false })
-    if (billMaint) await createInvoice.mutateAsync({ ...base, number: numbers(n++), concept: 'MAINTENANCE', description: `Mantenimiento mensual ${p.label} (${p.maintenance} €/mes)`, subtotal: p.maintenance, recurring: true })
+    // Primera factura conjunta: pack en la base imponible + mantenimiento del primer mes. Los meses siguientes se generan solos (solo mantenimiento).
+    if (billPack) await createInvoice.mutateAsync({ ...base, number: numbers(n++), concept: 'WEB_DEVELOPMENT', description: `${p.label} · diseño y desarrollo web + mantenimiento del primer mes`, subtotal: p.price, pack, maintenance: p.maintenance, originId: null, recurring: false })
     onOpenChange(false)
   }
 
@@ -105,11 +103,10 @@ export function PackDialog({ open, onOpenChange, clientId }: { open: boolean; on
       </Field>
       <label className="flex items-start gap-2 text-sm sm:col-span-2">
         <input type="checkbox" className="mt-1" checked={billPack} onChange={(e) => setBillPack(e.target.checked)} />
-        <span>Crear factura del pack: {formatCurrency(p.price)} + {vat} % IVA = {formatCurrency(p.price * (1 + vat / 100))}</span>
-      </label>
-      <label className="flex items-start gap-2 text-sm sm:col-span-2">
-        <input type="checkbox" className="mt-1" checked={billMaint} onChange={(e) => setBillMaint(e.target.checked)} />
-        <span>Crear factura recurrente del primer mes de mantenimiento: {formatCurrency(p.maintenance)} + IVA</span>
+        <span>
+          Crear la primera factura (pack + primer mes de mantenimiento): {formatCurrency(p.price)} + {formatCurrency(p.maintenance)} + {vat} % IVA = {formatCurrency((p.price + p.maintenance) * (1 + vat / 100))}
+          <span className="block text-xs text-muted-foreground">Los meses siguientes se facturan solos, en facturas independientes de {formatCurrency(p.maintenance)}/mes + IVA.</span>
+        </span>
       </label>
     </FormDialog>
   )

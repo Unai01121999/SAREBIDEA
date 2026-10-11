@@ -6,7 +6,7 @@ import { invoicesApi } from '@/hooks/use-entities'
 import { useCan } from '@/hooks/use-permissions'
 import { formatCurrency, formatDate } from '@/lib/format'
 import { conceptLabel } from '@/lib/labels'
-import { effectiveStatus, invoiceTotal } from '@/lib/metrics'
+import { effectiveStatus, invoiceBase, invoiceTotal } from '@/lib/metrics'
 import type { Invoice } from '@/types/domain'
 
 /** Facturas ligadas a una web, un dominio o un hosting (a través de sus campos websiteId / domainId / hostingId). */
@@ -14,7 +14,7 @@ export function RelatedInvoices({ match, action, className }: { match: (i: Invoi
   const canBilling = useCan()('billing', 'read')
   const { data } = invoicesApi.useList()
   const rows = (data ?? []).filter(match).sort((a, b) => b.issuedAt.localeCompare(a.issuedAt))
-  const total = rows.filter((i) => i.status !== 'CANCELLED').reduce((a, i) => a + i.subtotal, 0)
+  const total = rows.filter((i) => i.status !== 'CANCELLED').reduce((a, i) => a + invoiceBase(i), 0)
   if (!canBilling) return null
   return (
     <Card className={className}>

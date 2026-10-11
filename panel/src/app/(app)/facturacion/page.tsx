@@ -25,7 +25,8 @@ import { useCan } from '@/hooks/use-permissions'
 import { downloadCsv } from '@/lib/csv'
 import { formatCurrency, formatDate } from '@/lib/format'
 import { conceptLabel, invoiceStatusLabel } from '@/lib/labels'
-import { billingByClient, billingByConcept, billingStats, effectiveStatus, invoiceTotal, revenueSeries } from '@/lib/metrics'
+import { packLabel } from '@/lib/packs'
+import { billingByClient, billingByConcept, billingStats, effectiveStatus, invoiceBase, invoiceTotal, revenueSeries } from '@/lib/metrics'
 import { INVOICE_CONCEPTS, INVOICE_STATUSES, type Invoice, type InvoiceConcept, type InvoiceStatus } from '@/types/domain'
 
 export default function BillingPage() {
@@ -54,7 +55,7 @@ export default function BillingPage() {
     { id: 'concept', header: 'Concepto', accessorFn: (i) => conceptLabel[i.concept], cell: ({ row }) => <div className="max-w-[240px]"><p className="truncate">{conceptLabel[row.original.concept]}</p><p className="truncate text-xs text-muted-foreground">{row.original.description}</p></div> },
     { id: 'issuedAt', header: 'Emisión', accessorFn: (i) => i.issuedAt, cell: ({ row }) => <span className="whitespace-nowrap text-muted-foreground">{formatDate(row.original.issuedAt)}</span> },
     { id: 'dueAt', header: 'Vencimiento', accessorFn: (i) => i.dueAt, cell: ({ row }) => <span className="whitespace-nowrap text-muted-foreground">{formatDate(row.original.dueAt)}</span> },
-    { id: 'amount', header: 'Importe', accessorFn: (i) => invoiceTotal(i), cell: ({ row }) => <div className="text-right"><p className="font-medium tabular">{formatCurrency(invoiceTotal(row.original), 'EUR')}</p><p className="text-xs text-muted-foreground tabular">base {formatCurrency(row.original.subtotal)}</p></div> },
+    { id: 'amount', header: 'Importe', accessorFn: (i) => invoiceTotal(i), cell: ({ row }) => <div className="text-right"><p className="font-medium tabular">{formatCurrency(invoiceTotal(row.original), 'EUR')}</p><p className="text-xs text-muted-foreground tabular">base {formatCurrency(invoiceBase(row.original))}{row.original.maintenance ? ` (incl. mant. ${formatCurrency(row.original.maintenance)})` : ''}</p></div> },
     { id: 'status', header: 'Estado', accessorFn: (i) => effectiveStatus(i), cell: ({ row }) => <InvoiceStatusBadge status={effectiveStatus(row.original)} /> },
     {
       id: 'actions',
@@ -145,7 +146,7 @@ export default function BillingPage() {
         searchText={(i) => `${i.number} ${clientName.get(i.clientId) ?? ''} ${conceptLabel[i.concept]} ${i.description}`}
         initialSort={[{ id: 'issuedAt', desc: true }]}
         onRowClick={(i) => canWrite && setEditing(i)}
-        onExport={(list) => downloadCsv('facturas.csv', list.map((i) => ({ Numero: i.number, Cliente: clientName.get(i.clientId) ?? '', Concepto: conceptLabel[i.concept], Descripcion: i.description, Emision: formatDate(i.issuedAt), Vencimiento: formatDate(i.dueAt), Base: i.subtotal, IVA: i.taxRate, Total: invoiceTotal(i), Estado: invoiceStatusLabel[effectiveStatus(i)] })))}
+        onExport={(list) => downloadCsv('facturas.csv', list.map((i) => ({ Numero: i.number, Cliente: clientName.get(i.clientId) ?? '', Concepto: conceptLabel[i.concept], Descripcion: i.description, Emision: formatDate(i.issuedAt), Vencimiento: formatDate(i.dueAt), Pack: i.pack ? packLabel(i.pack) : '', 'Base imponible (pack)': i.subtotal, Mantenimiento: i.maintenance ?? 0, IVA: i.taxRate, Total: invoiceTotal(i), Estado: invoiceStatusLabel[effectiveStatus(i)] })))}
         toolbar={
           <Select value={concept} onValueChange={(v) => setConcept(v as typeof concept)}>
             <SelectTrigger className="h-8 w-52" aria-label="Filtrar por concepto">

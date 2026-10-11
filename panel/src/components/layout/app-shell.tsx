@@ -4,6 +4,7 @@ import { ShieldAlert } from 'lucide-react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { Suspense } from 'react'
+import { useAutoMaintenance } from '@/hooks/use-auto-maintenance'
 import { useCan, useMe } from '@/hooks/use-permissions'
 import { moduleOfPath } from '@/lib/permissions'
 import { GlobalSearch } from '@/components/layout/global-search'
@@ -12,6 +13,12 @@ import { LogoMark } from '@/components/layout/logo'
 import { Sidebar, SidebarNav } from '@/components/layout/sidebar'
 import { Dialog, DialogContent, DialogDescription, DialogTitle } from '@/components/ui/dialog'
 import { useUiStore } from '@/store/ui-store'
+
+/** Genera las facturas mensuales de mantenimiento pendientes. Solo se monta con permiso de facturación (quien no lo tiene no carga facturas). */
+function AutoMaintenance() {
+  useAutoMaintenance()
+  return null
+}
 
 export function AppShell({ children }: { children: React.ReactNode }) {
   const mobileOpen = useUiStore((s) => s.mobileNavOpen)
@@ -26,6 +33,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
       <a href="#contenido" className="sr-only focus:not-sr-only focus:fixed focus:top-3 focus:left-3 focus:z-[70] focus:rounded-lg focus:bg-foreground focus:px-4 focus:py-2 focus:text-background">
         Saltar al contenido
       </a>
+      {can('billing', 'write') && <AutoMaintenance />}
       <Sidebar />
       <div className="flex min-w-0 flex-1 flex-col">
         <Header />

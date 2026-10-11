@@ -36,13 +36,16 @@ export interface Option {
 }
 
 /** Select controlado por react-hook-form. Si `allowNone`, la opción vacía se guarda como ''. */
-export function SelectField<T extends FieldValues>({ control, name, options, placeholder = 'Selecciona…', allowNone, noneLabel = 'Ninguno', id }: { control: Control<T>; name: Path<T>; options: Option[]; placeholder?: string; allowNone?: boolean; noneLabel?: string; id?: string }) {
+export function SelectField<T extends FieldValues>({ control, name, options, placeholder = 'Selecciona…', allowNone, noneLabel = 'Ninguno', id, onValueChange }: { control: Control<T>; name: Path<T>; options: Option[]; placeholder?: string; allowNone?: boolean; noneLabel?: string; id?: string; /** Se llama tras cambiar el valor (para rellenar otros campos). */ onValueChange?: (value: string) => void }) {
   return (
     <Controller
       control={control}
       name={name}
       render={({ field, fieldState }) => (
-        <Select value={field.value ? String(field.value) : allowNone ? NONE : undefined} onValueChange={(v) => field.onChange(v === NONE ? '' : v)}>
+        <Select value={field.value ? String(field.value) : allowNone ? NONE : undefined} onValueChange={(v) => {
+            field.onChange(v === NONE ? '' : v)
+            onValueChange?.(v === NONE ? '' : v)
+          }}>
           <SelectTrigger id={id} aria-invalid={!!fieldState.error}>
             <SelectValue placeholder={placeholder} />
           </SelectTrigger>

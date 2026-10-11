@@ -34,7 +34,7 @@ export default function HostingDetailPage() {
       <div className="py-24 text-center">
         <p className="text-lg font-medium">Hosting no encontrado</p>
         <Button asChild variant="outline" className="mt-4">
-          <Link href="/hosting">Volver a hosting</Link>
+          <Link href="/clientes">Volver a clientes</Link>
         </Button>
       </div>
     )
@@ -42,7 +42,7 @@ export default function HostingDetailPage() {
   return (
     <div className="animate-fade-up">
       <PageHeader
-        crumbs={[{ label: 'Hosting', href: '/hosting' }, { label: `${h.provider} · ${h.plan}` }]}
+        crumbs={[{ label: 'Clientes', href: '/clientes' }, { label: `${h.provider} · ${h.plan}` }]}
         title={`${h.provider} · ${h.plan}`}
         description={
           <span className="flex flex-wrap items-center gap-2">
@@ -91,7 +91,7 @@ export default function HostingDetailPage() {
       <RelatedInvoices match={(i) => i.hostingId === h.id} className="mt-4 max-w-3xl" />
       <InvoiceFormDialog open={dialog === 'invoice'} onOpenChange={(o) => !o && setDialog(null)} clientId={h.clientId} serviceKey={`hosting:${h.id}`} />
       <HostingFormDialog open={dialog === 'edit'} onOpenChange={(o) => !o && setDialog(null)} hosting={h} />
-      <ConfirmDialog open={dialog === 'delete'} onOpenChange={(o) => !o && setDialog(null)} title="Eliminar hosting" description="Se eliminará este alojamiento. Esta acción no se puede deshacer." loading={remove.isPending} onConfirm={() => remove.mutate(h.id, { onSuccess: () => router.push('/hosting') })} />
+      <ConfirmDialog open={dialog === 'delete'} onOpenChange={(o) => !o && setDialog(null)} title="Eliminar hosting" description="Se eliminará este alojamiento. Esta acción no se puede deshacer." loading={remove.isPending} onConfirm={() => remove.mutate(h.id, { onSuccess: () => router.push(routes.client(h.clientId)) })} />
     </div>
   )
 }

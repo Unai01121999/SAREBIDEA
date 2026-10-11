@@ -25,7 +25,7 @@ import { clientsApi, domainsApi, hostingsApi, invoicesApi, useActivity, websites
 import { formatCurrency, formatDate, formatDateTime, timeAgo } from '@/lib/format'
 import { conceptLabel, originLabel, originTone } from '@/lib/labels'
 import { packInterestLabel } from '@/lib/packs'
-import { effectiveStatus, invoiceTotal } from '@/lib/metrics'
+import { effectiveStatus, invoiceBase, invoiceTotal } from '@/lib/metrics'
 import type { Client } from '@/types/domain'
 import { routes } from '@/lib/routes'
 
@@ -50,8 +50,8 @@ export default function ClientDetailPage() {
   const cInvoices = useMemo(() => (invoices.data ?? []).filter((i) => i.clientId === id).sort((a, b) => b.issuedAt.localeCompare(a.issuedAt)), [invoices.data, id])
   const cActivity = useMemo(() => (activity.data ?? []).filter((a) => a.clientId === id), [activity.data, id])
 
-  const billed = cInvoices.filter((i) => i.status !== 'CANCELLED').reduce((a, i) => a + i.subtotal, 0)
-  const pending = cInvoices.filter((i) => ['PENDING', 'OVERDUE'].includes(effectiveStatus(i))).reduce((a, i) => a + i.subtotal, 0)
+  const billed = cInvoices.filter((i) => i.status !== 'CANCELLED').reduce((a, i) => a + invoiceBase(i), 0)
+  const pending = cInvoices.filter((i) => ['PENDING', 'OVERDUE'].includes(effectiveStatus(i))).reduce((a, i) => a + invoiceBase(i), 0)
 
   if (isLoading) return <Skeleton className="h-96 w-full" />
   if (!client)

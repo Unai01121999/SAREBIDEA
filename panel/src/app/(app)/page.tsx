@@ -61,7 +61,7 @@ export default function DashboardPage() {
         <KpiCard label="Webs en desarrollo" value={String(stats?.webDevelopment ?? 0)} icon={Code2} accent="info" hint="Proyectos en marcha" href="/webs/desarrollo" loading={loading} />
         <KpiCard label="Webs archivadas" value={String(stats?.webArchived ?? 0)} icon={Archive} accent="warning" hint="Histórico" href="/webs/archivadas" loading={loading} />
         <KpiCard label="Dominios gestionados" value={String(stats?.domains ?? 0)} icon={Building2} accent="info" hint={stats ? `${formatCurrency(stats.domainsCost)}/año` : undefined} href="/dominios" loading={loading} />
-        <KpiCard label="Hosting activos" value={String(stats?.hostingActive ?? 0)} icon={Server} accent="success" hint={stats ? `${formatCurrency(stats.hostingCost)}/año` : undefined} href="/hosting" loading={loading} />
+        <KpiCard label="Hosting activos" value={String(stats?.hostingActive ?? 0)} icon={Server} accent="success" hint={stats ? `${formatCurrency(stats.hostingCost)}/año` : undefined} loading={loading} />
         {canBilling && <KpiCard label="Facturación mensual" value={formatCurrency(stats?.thisMonth ?? 0)} icon={CircleDollarSign} delta={stats?.monthDelta} hint="vs. mismo periodo anterior" spark={spark.slice(-8)} href="/facturacion" loading={loading} />}
         {canBilling && <KpiCard label="Facturación anual" value={formatCurrency(stats?.thisYear ?? 0)} icon={TrendingUp} accent="success" hint="Base imponible del año" spark={spark} href="/facturacion" loading={loading} />}
       </section>
@@ -107,9 +107,6 @@ export default function DashboardPage() {
               <CardTitle>Renovaciones de hosting</CardTitle>
               <CardDescription>Caducados y próximos 45 días</CardDescription>
             </div>
-            <Button asChild variant="ghost" size="sm">
-              <Link href="/hosting">Ver todos</Link>
-            </Button>
           </CardHeader>
           <CardContent>
             <RenewalList items={hostingRenewals} clients={clients.data} loading={hostings.isLoading} href={routes.hosting} empty="No hay hosting por renovar." />

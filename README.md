@@ -78,3 +78,9 @@ En la ficha del cliente solo se piden la URL de la web, el dominio y el proveedo
 ## Menú del panel
 
 «Clientes» abre el listado (con el botón «Nuevo cliente» encima) y «Webs» abre la pestaña «Todas las webs», la primera; desde ahí se cambia a Producción, Desarrollo, Pausadas o Archivadas.
+
+## Facturación por pack
+
+Cada factura nueva se hace eligiendo el pack: el precio del pack va en la **base imponible** y el mantenimiento mensual del pack en otro apartado (**Mantenimiento**); el total es (base + mantenimiento) + IVA. La **primera factura** es conjunta (pack + primer mes de mantenimiento). A partir del mes siguiente el panel genera solo una **factura independiente de mantenimiento** por mes (misma fecha de emisión, pendiente de cobro), al abrir el panel con permiso de facturación. No se repiten: en Supabase lo impide el índice único `facturas_mantenimiento_unica`. Las facturas antiguas sin pack se pueden seguir editando a mano. Migración: `supabase/migrations/009_facturacion_por_pack.sql`. «Añadir pack» (Webs) crea la primera factura conjunta.
+
+El hosting ya no es una sección del menú: se gestiona desde la ficha de cada cliente.

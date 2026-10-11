@@ -23,15 +23,17 @@ function createEntityHooks<K extends EntityName>(name: K) {
     // Un cambio puede afectar a otras entidades (cascadas) y a la actividad reciente.
     return () => qc.invalidateQueries()
   }
-  function useCreate() {
+  function useCreate(silent = false) {
     const done = useInvalidate()
     return useMutation({
       mutationFn: (input: NewEntity<T>) => repo().create(input),
       onSuccess: () => {
         done()
-        toast.success(`${NOUN[name]} creado`)
+        if (!silent) toast.success(`${NOUN[name]} creado`)
       },
-      onError: () => toast.error('No se ha podido crear'),
+      onError: () => {
+        if (!silent) toast.error('No se ha podido crear')
+      },
     })
   }
   function useUpdate(silent = false) {

@@ -5,8 +5,10 @@ import { conceptLabel } from '@/lib/labels'
 import type { Client, Domain, Hosting, Invoice, InvoiceConcept, Task, Website } from '@/types/domain'
 import { daysUntil } from './format'
 
-export const invoiceTotal = (i: Pick<Invoice, 'subtotal' | 'taxRate'>) => Math.round(i.subtotal * (1 + i.taxRate / 100) * 100) / 100
-export const invoiceTax = (i: Pick<Invoice, 'subtotal' | 'taxRate'>) => invoiceTotal(i) - i.subtotal
+/** Base imponible total: precio del pack (`subtotal`) + mantenimiento mensual, si lleva. */
+export const invoiceBase = (i: Pick<Invoice, 'subtotal' | 'maintenance'>) => Math.round((i.subtotal + (i.maintenance ?? 0)) * 100) / 100
+export const invoiceTotal = (i: Pick<Invoice, 'subtotal' | 'maintenance' | 'taxRate'>) => Math.round(invoiceBase(i) * (1 + i.taxRate / 100) * 100) / 100
+export const invoiceTax = (i: Pick<Invoice, 'subtotal' | 'maintenance' | 'taxRate'>) => Math.round((invoiceTotal(i) - invoiceBase(i)) * 100) / 100
 
 /** Una factura vencida es una pendiente cuya fecha de vencimiento ya pasó (o marcada así a mano). */
 export const effectiveStatus = (i: Invoice) => (i.status === 'PENDING' && (daysUntil(i.dueAt) ?? 0) < 0 ? ('OVERDUE' as const) : i.status)
@@ -19,19 +21,19 @@ export function revenueSeries(invoices: Invoice[], months = 12, now = new Date()
   return Array.from({ length: months }, (_, k) => {
     const m = addMonths(start, k)
     const inMonth = invoices.filter((i) => billed(i) && isSameMonth(parseISO(i.issuedAt), m))
-    const paid = sum(inMonth.filter((i) => i.status === 'PAID').map((i) => i.subtotal))
-    const open = sum(inMonth.filter((i) => i.status !== 'PAID').map((i) => i.subtotal))
+    const paid = sum(inMonth.filter((i) => i.status === 'PAID').map(invoiceBase))
+    const open = sum(inMonth.filter((i) => i.status !== 'PAID').map(invoiceBase))
     return { key: format(m, 'yyyy-MM'), label: format(m, 'MMM', { locale: es }), full: format(m, 'MMMM yyyy', { locale: es }), paid: Math.round(paid), open: Math.round(open), total: Math.round(paid + open) }
   })
 }
 
 export function billingStats(invoices: Invoice[], now = new Date()) {
   const ok = invoices.filter(billed)
-  const thisMonth = sum(ok.filter((i) => isSameMonth(parseISO(i.issuedAt), now)).map((i) => i.subtotal))
+  const thisMonth = sum(ok.filter((i) => isSameMonth(parseISO(i.issuedAt), now)).map(invoiceBase))
   // Comparación justa: el mes en curso solo se compara con el mismo tramo (hasta el mismo día) del mes anterior.
-  const prevMonth = sum(ok.filter((i) => isSameMonth(parseISO(i.issuedAt), subMonths(now, 1)) && parseISO(i.issuedAt).getDate() <= now.getDate()).map((i) => i.subtotal))
-  const thisYear = sum(ok.filter((i) => isSameYear(parseISO(i.issuedAt), now)).map((i) => i.subtotal))
-  const last12 = sum(ok.filter((i) => parseISO(i.issuedAt) >= subMonths(now, 12) && i.recurring).map((i) => i.subtotal))
+  const prevMonth = sum(ok.filter((i) => isSameMonth(parseISO(i.issuedAt), subMonths(now, 1)) && parseISO(i.issuedAt).getDate() <= now.getDate()).map(invoiceBase))
+  const thisYear = sum(ok.filter((i) => isSameYear(parseISO(i.issuedAt), now)).map(invoiceBase))
+  const last12 = sum(ok.filter((i) => parseISO(i.issuedAt) >= subMonths(now, 12) && i.recurring).map(invoiceBase))
   const pending = invoices.filter((i) => effectiveStatus(i) === 'PENDING')
   const overdue = invoices.filter((i) => effectiveStatus(i) === 'OVERDUE')
   return {
@@ -41,15 +43,15 @@ export function billingStats(invoices: Invoice[], now = new Date()) {
     thisYear,
     recurringMonthly: last12 / 12,
     pendingCount: pending.length,
-    pendingAmount: sum(pending.map((i) => i.subtotal)),
+    pendingAmount: sum(pending.map(invoiceBase)),
     overdueCount: overdue.length,
-    overdueAmount: sum(overdue.map((i) => i.subtotal)),
+    overdueAmount: sum(overdue.map(invoiceBase)),
   }
 }
 
 export function billingByClient(invoices: Invoice[], clients: Client[], limit = 8) {
   const byId = new Map<string, number>()
-  for (const i of invoices.filter(billed)) byId.set(i.clientId, (byId.get(i.clientId) ?? 0) + i.subtotal)
+  for (const i of invoices.filter(billed)) byId.set(i.clientId, (byId.get(i.clientId) ?? 0) + invoiceBase(i))
   return [...byId.entries()]
     .map(([id, total]) => ({ name: clients.find((c) => c.id === id)?.company ?? 'Cliente', total: Math.round(total) }))
     .sort((a, b) => b.total - a.total)
@@ -58,7 +60,7 @@ export function billingByClient(invoices: Invoice[], clients: Client[], limit = 
 
 export function billingByConcept(invoices: Invoice[]) {
   const map = new Map<InvoiceConcept, number>()
-  for (const i of invoices.filter(billed)) map.set(i.concept, (map.get(i.concept) ?? 0) + i.subtotal)
+  for (const i of invoices.filter(billed)) map.set(i.concept, (map.get(i.concept) ?? 0) + invoiceBase(i))
   return [...map.entries()].map(([concept, total]) => ({ concept, name: conceptLabel[concept], total: Math.round(total) })).sort((a, b) => b.total - a.total)
 }
 

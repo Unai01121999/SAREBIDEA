@@ -137,6 +137,12 @@ export interface Invoice {
   dueAt: ISODate
   /** Base imponible en euros. */
   subtotal: number
+  /** Pack facturado (en `subtotal` va el precio del pack); null en facturas libres antiguas. */
+  pack?: PackType | null
+  /** Mantenimiento mensual (sin IVA) que lleva la factura, aparte de la base imponible del pack. */
+  maintenance?: number
+  /** En las facturas mensuales solo de mantenimiento: id de la primera factura (pack + 1.er mes) de la que salen. */
+  originId?: string | null
   /** IVA en porcentaje (21 = 21 %). */
   taxRate: number
   status: InvoiceStatus
