@@ -6,12 +6,13 @@ import { useEffect, useRef } from 'react'
 import { invoicesApi, useSettings } from '@/hooks/use-entities'
 import { useCan } from '@/hooks/use-permissions'
 import { PACKS } from '@/lib/packs'
+import { supabase } from '@/lib/supabase'
 
 /**
  * Facturación del mantenimiento: la primera factura de un pack lleva pack + primer mes; a partir del mes siguiente se genera
  * una factura independiente solo de mantenimiento, una por mes, con la misma fecha de emisión (día del mes) que la primera.
- * Se ejecuta al abrir el panel (solo con permiso de facturación) y es idempotente: no repite meses ya facturados
- * (en Supabase lo garantiza además un índice único por factura de origen y fecha).
+ * Solo para el modo demostración (sin Supabase). Con Supabase las genera la propia base de datos cada día a las 04:05 UTC
+ * (función `generar_facturas_mantenimiento`, tarea `facturas-mantenimiento-mensual` de pg_cron), aunque nadie abra el panel.
  */
 export function useAutoMaintenance() {
   const can = useCan()
@@ -23,7 +24,7 @@ export function useAutoMaintenance() {
   const created = useRef({ keys: new Set<string>(), max: 0 })
 
   useEffect(() => {
-    if (!invoices || !settings || !can('billing', 'write') || running.current) return
+    if (supabase || !invoices || !settings || !can('billing', 'write') || running.current) return
     const now = new Date()
     const exists = new Set(invoices.filter((i) => i.originId).map((i) => `${i.originId}|${new Date(i.issuedAt).toISOString()}`))
     const year = now.getFullYear()

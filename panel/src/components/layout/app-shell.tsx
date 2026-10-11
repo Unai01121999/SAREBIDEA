@@ -14,7 +14,7 @@ import { Sidebar, SidebarNav } from '@/components/layout/sidebar'
 import { Dialog, DialogContent, DialogDescription, DialogTitle } from '@/components/ui/dialog'
 import { useUiStore } from '@/store/ui-store'
 
-/** Genera las facturas mensuales de mantenimiento pendientes. Solo se monta con permiso de facturación (quien no lo tiene no carga facturas). */
+/** Facturas mensuales de mantenimiento en modo demostración (con Supabase las genera la base de datos). Solo con permiso de facturación. */
 function AutoMaintenance() {
   useAutoMaintenance()
   return null
