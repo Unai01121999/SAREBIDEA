@@ -13,20 +13,11 @@ export const NAV: NavItem[] = [
     label: 'Clientes',
     href: '/clientes',
     icon: Users,
-    children: [
-      { label: 'Listado de clientes', href: '/clientes' },
-      { label: 'Nuevo cliente', href: '/clientes/nuevo' },
-    ],
   },
   {
     label: 'Webs',
     href: '/webs',
     icon: Globe,
-    children: [
-      { label: 'Producción', href: '/webs/produccion' },
-      { label: 'Desarrollo', href: '/webs/desarrollo' },
-      { label: 'Archivadas', href: '/webs/archivadas' },
-    ],
   },
   { label: 'Dominios', href: '/dominios', icon: Building2 },
   { label: 'Hosting', href: '/hosting', icon: Server },

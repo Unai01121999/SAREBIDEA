@@ -1,7 +1,7 @@
 'use client'
 
 import { zodResolver } from '@hookform/resolvers/zod'
-import { useEffect } from 'react'
+import { useEffect, useMemo } from 'react'
 import { useForm, type UseFormReturn } from 'react-hook-form'
 import { z } from '@/lib/zod'
 import { CheckboxGroupField, Field, SelectField } from '@/components/forms/fields'
@@ -12,7 +12,7 @@ import { packInterestLabel } from '@/lib/packs'
 import { fromDateInput } from '@/lib/format'
 import { clientStatusLabel, serviceLabel, technologyLabel } from '@/lib/labels'
 import { guessDomain } from '@/lib/prefill'
-import { CLIENT_STATUSES, PACK_INTERESTS, SERVICE_TYPES, TECHNOLOGIES, type Client, type PackInterest, type Technology } from '@/types/domain'
+import { CLIENT_STATUSES, PACK_INTERESTS, SERVICE_TYPES, TECHNOLOGIES, type Client, type Domain, type Hosting, type PackInterest, type Technology, type Website } from '@/types/domain'
 
 export const clientSchema = z.object({
   company: z.string().trim().min(2, 'Escribe el nombre de la empresa'),
@@ -38,7 +38,7 @@ export type ClientValues = z.infer<typeof clientSchema>
 const extras = { webUrl: '', domainName: '', hostProvider: '' }
 const empty: ClientValues = { company: '', contactName: '', email: '', phone: '', address: '', postalCode: '', province: '', country: 'España', taxId: '', status: 'PENDING', services: [], notes: '', packInterest: '', ...extras }
 
-const toValues = (c: Client): ClientValues => ({ company: c.company, contactName: c.contactName, email: c.email, phone: c.phone, address: c.address, postalCode: c.postalCode, province: c.province, country: c.country, taxId: c.taxId, status: c.status, services: c.services, notes: c.notes, packInterest: c.packInterest ?? '', ...extras })
+const toValues = (c: Client, extra: typeof extras = extras): ClientValues => ({ company: c.company, contactName: c.contactName, email: c.email, phone: c.phone, address: c.address, postalCode: c.postalCode, province: c.province, country: c.country, taxId: c.taxId, status: c.status, services: c.services, notes: c.notes, packInterest: c.packInterest ?? '', ...extra })
 
 /** Lógica del formulario de cliente (alta y edición). La comparten el modal y la página «Nuevo cliente». */
 const inOneYear = () => {
@@ -61,9 +61,28 @@ export function useClientForm(client: Client | undefined, onDone: (saved?: Clien
   const createWeb = websitesApi.useCreate()
   const createDomain = domainsApi.useCreate()
   const createHosting = hostingsApi.useCreate()
+  const updateWeb = websitesApi.useUpdate(true)
+  const updateDomain = domainsApi.useUpdate(true)
+  const updateHosting = hostingsApi.useUpdate(true)
   const { data: settings } = useSettings()
-  const form = useForm<ClientValues>({ resolver: zodResolver(clientSchema), defaultValues: client ? toValues(client) : empty })
-  const submitting = create.isPending || update.isPending || createWeb.isPending || createDomain.isPending || createHosting.isPending
+  const { data: webs } = websitesApi.useList()
+  const { data: domains } = domainsApi.useList()
+  const { data: hostings } = hostingsApi.useList()
+
+  // Registros ya guardados de este cliente: se muestran en el formulario y se actualizan en vez de duplicarse.
+  const existing = useMemo(() => {
+    if (!client) return { web: undefined, domain: undefined, hosting: undefined }
+    const web: Website | undefined = (webs ?? []).find((w) => w.clientId === client.id && w.status !== 'ARCHIVED') ?? (webs ?? []).find((w) => w.clientId === client.id)
+    const mine = <T extends { clientId: string; websiteId: string | null }>(list: T[] | undefined) => (list ?? []).filter((x) => x.clientId === client.id)
+    const pick = <T extends { clientId: string; websiteId: string | null }>(list: T[] | undefined) => mine(list).find((x) => web && x.websiteId === web.id) ?? mine(list)[0]
+    const domain: Domain | undefined = pick(domains)
+    const hosting: Hosting | undefined = pick(hostings)
+    return { web, domain, hosting }
+  }, [client, webs, domains, hostings])
+  const extraValues = useMemo(() => ({ webUrl: existing.web?.productionUrl ?? '', domainName: existing.domain?.name ?? existing.web?.domainName ?? '', hostProvider: existing.hosting?.provider ?? existing.web?.hostingProvider ?? '' }), [existing])
+
+  const form = useForm<ClientValues>({ resolver: zodResolver(clientSchema), defaultValues: client ? toValues(client, extraValues) : empty })
+  const submitting = create.isPending || update.isPending || createWeb.isPending || createDomain.isPending || createHosting.isPending || updateWeb.isPending || updateDomain.isPending || updateHosting.isPending
 
   /** Crea web, dominio y hosting solo si su apartado se ha rellenado; domino y hosting quedan enlazados a la web. */
   const createExtras = async (c: Client, v: ClientValues) => {
@@ -73,8 +92,11 @@ export function useClientForm(client: Client | undefined, onDone: (saved?: Clien
     const hasHosting = !!v.hostProvider
     if (!hasWeb && !hasDomain && !hasHosting) return
     const domainName = v.domainName.replace(/^https?:\/\//i, '').replace(/\/.*$/, '').toLowerCase() || hostOf(url)
-    let websiteId: string | null = null
-    if (hasWeb) {
+    let websiteId: string | null = existing.web?.id ?? null
+    if (hasWeb && existing.web) {
+      const host = hostOf(url) || domainName || existing.web.domainName
+      await updateWeb.mutateAsync({ id: existing.web.id, patch: { productionUrl: /^https?:\/\//i.test(url) ? url : `https://${url}`, domainName: host, hostingProvider: v.hostProvider } })
+    } else if (hasWeb) {
       const host = hostOf(url) || domainName || guessDomain(c)
       const web = await createWeb.mutateAsync({
         clientId: c.id,
@@ -93,7 +115,9 @@ export function useClientForm(client: Client | undefined, onDone: (saved?: Clien
       })
       websiteId = web.id
     }
-    if (hasDomain) {
+    if (hasDomain && existing.domain) {
+      await updateDomain.mutateAsync({ id: existing.domain.id, patch: { name: domainName, websiteId: existing.domain.websiteId ?? websiteId } })
+    } else if (hasDomain) {
       await createDomain.mutateAsync({
         clientId: c.id,
         websiteId,
@@ -108,7 +132,9 @@ export function useClientForm(client: Client | undefined, onDone: (saved?: Clien
         notes: '',
       })
     }
-    if (hasHosting) {
+    if (hasHosting && existing.hosting) {
+      await updateHosting.mutateAsync({ id: existing.hosting.id, patch: { provider: v.hostProvider, websiteId: existing.hosting.websiteId ?? websiteId } })
+    } else if (hasHosting) {
       await createHosting.mutateAsync({
         clientId: c.id,
         websiteId,
@@ -133,7 +159,7 @@ export function useClientForm(client: Client | undefined, onDone: (saved?: Clien
     await createExtras(saved, v)
     onDone(saved)
   })
-  return { form, submit, submitting, reset: (c?: Client) => form.reset(c ? toValues(c) : empty) }
+  return { form, submit, submitting, extraValues, reset: (c?: Client) => form.reset(c ? toValues(c, extraValues) : empty) }
 }
 
 export function ClientFormFields({ form }: { form: UseFormReturn<ClientValues> }) {
@@ -199,11 +225,11 @@ export function ClientFormFields({ form }: { form: UseFormReturn<ClientValues> }
 }
 
 export function ClientFormDialog({ open, onOpenChange, client }: { open: boolean; onOpenChange: (o: boolean) => void; client?: Client }) {
-  const { form, submit, submitting, reset } = useClientForm(client, () => onOpenChange(false))
+  const { form, submit, submitting, reset, extraValues } = useClientForm(client, () => onOpenChange(false))
   useEffect(() => {
     if (open) reset(client)
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [open, client?.id])
+  }, [open, client?.id, extraValues])
   return (
     <FormDialog open={open} onOpenChange={onOpenChange} title={client ? 'Editar cliente' : 'Nuevo cliente'} description={client ? client.company : 'Datos generales y servicios contratados.'} onSubmit={submit} submitting={submitting} submitLabel={client ? 'Guardar cambios' : 'Crear cliente'} wide>
       <ClientFormFields form={form} />
