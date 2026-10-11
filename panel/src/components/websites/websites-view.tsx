@@ -25,15 +25,15 @@ import { TECHNOLOGIES, type Technology, type Website, type WebsiteStatus } from 
 import { routes } from '@/lib/routes'
 
 const VIEWS: Record<string, { label: string; status: WebsiteStatus | null }> = {
+  todas: { label: 'Todas las webs', status: null },
   produccion: { label: 'Producción', status: 'PRODUCTION' },
   desarrollo: { label: 'Desarrollo', status: 'DEVELOPMENT' },
   pausadas: { label: 'Pausadas', status: 'PAUSED' },
   archivadas: { label: 'Archivadas', status: 'ARCHIVED' },
-  todas: { label: 'Todas', status: null },
 }
 
 export function WebsitesView({ estado }: { estado: string }) {
-  const view = VIEWS[estado] ?? VIEWS.produccion
+  const view = VIEWS[estado] ?? VIEWS.todas
   const router = useRouter()
   const { data: websites, isLoading } = websitesApi.useList()
   const { data: clients } = clientsApi.useList()

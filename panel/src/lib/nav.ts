@@ -4,6 +4,8 @@ export interface NavItem {
   label: string
   href: string
   icon: LucideIcon
+  /** Destino al pulsar, si es distinto de `href` (que sirve para marcar la sección como activa). */
+  to?: string
   children?: { label: string; href: string }[]
 }
 
@@ -13,20 +15,13 @@ export const NAV: NavItem[] = [
     label: 'Clientes',
     href: '/clientes',
     icon: Users,
-    children: [
-      { label: 'Listado de clientes', href: '/clientes' },
-      { label: 'Nuevo cliente', href: '/clientes/nuevo' },
-    ],
   },
   {
     label: 'Webs',
     href: '/webs',
     icon: Globe,
-    children: [
-      { label: 'Producción', href: '/webs/produccion' },
-      { label: 'Desarrollo', href: '/webs/desarrollo' },
-      { label: 'Archivadas', href: '/webs/archivadas' },
-    ],
+    // Al pulsar «Webs» se abre la pestaña «Todas»; desde ahí se cambia a Producción, Desarrollo, etc.
+    to: '/webs/todas',
   },
   { label: 'Dominios', href: '/dominios', icon: Building2 },
   { label: 'Hosting', href: '/hosting', icon: Server },

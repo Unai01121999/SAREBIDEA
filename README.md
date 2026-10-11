@@ -73,4 +73,8 @@ El formulario pregunta «¿Qué pack te interesa?» en un menú desplegable (Sta
 
 ## Alta de cliente: web, dominio y hosting
 
-En la ficha del cliente solo se piden la URL de la web, el dominio y el proveedor de hosting. Si se rellenan, se crean en Webs, Dominios y Hosting (la web se llama como el negocio). El resto de datos (tecnología, registrador, renovación, costes…) se completan después en cada sección.
+En la ficha del cliente solo se piden la URL de la web, el dominio y el proveedor de hosting. Si se rellenan, se crean en Webs, Dominios y Hosting (la web se llama como el negocio). Al reabrir la ficha esos datos aparecen rellenos y, si se cambian, se actualizan los registros existentes (no se duplican); vacío = no se toca nada. El resto de datos (tecnología, registrador, renovación, costes…) se completan después en cada sección.
+
+## Menú del panel
+
+«Clientes» abre el listado (con el botón «Nuevo cliente» encima) y «Webs» abre la pestaña «Todas las webs», la primera; desde ahí se cambia a Producción, Desarrollo, Pausadas o Archivadas.

@@ -43,7 +43,7 @@ export default function WebsiteDetailPage() {
       <div className="py-24 text-center">
         <p className="text-lg font-medium">Web no encontrada</p>
         <Button asChild variant="outline" className="mt-4">
-          <Link href="/webs/produccion">Volver a webs</Link>
+          <Link href="/webs/todas">Volver a webs</Link>
         </Button>
       </div>
     )
@@ -51,7 +51,7 @@ export default function WebsiteDetailPage() {
   return (
     <div className="animate-fade-up">
       <PageHeader
-        crumbs={[{ label: 'Webs', href: '/webs/produccion' }, { label: web.name }]}
+        crumbs={[{ label: 'Webs', href: '/webs/todas' }, { label: web.name }]}
         title={web.name}
         description={
           <span className="flex flex-wrap items-center gap-2">
@@ -223,7 +223,7 @@ export default function WebsiteDetailPage() {
       <HostingFormDialog open={dialog === 'hosting'} onOpenChange={(o) => !o && setDialog(null)} clientId={web.clientId} websiteId={web.id} />
       <InvoiceFormDialog open={dialog === 'invoice'} onOpenChange={(o) => !o && setDialog(null)} clientId={web.clientId} serviceKey={`website:${web.id}`} />
       <WebsiteFormDialog open={dialog === 'edit'} onOpenChange={(o) => !o && setDialog(null)} website={web} />
-      <ConfirmDialog open={dialog === 'delete'} onOpenChange={(o) => !o && setDialog(null)} title={`Eliminar ${web.name}`} description="La web se eliminará. Sus dominios y hosting quedarán sin web asociada." loading={remove.isPending} onConfirm={() => remove.mutate(web.id, { onSuccess: () => router.push('/webs/produccion') })} />
+      <ConfirmDialog open={dialog === 'delete'} onOpenChange={(o) => !o && setDialog(null)} title={`Eliminar ${web.name}`} description="La web se eliminará. Sus dominios y hosting quedarán sin web asociada." loading={remove.isPending} onConfirm={() => remove.mutate(web.id, { onSuccess: () => router.push('/webs/todas') })} />
     </div>
   )
 }

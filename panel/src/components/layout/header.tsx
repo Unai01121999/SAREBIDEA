@@ -15,7 +15,7 @@ import { useUiStore } from '@/store/ui-store'
 
 const QUICK: { label: string; href: string; icon: typeof Users; module: Module }[] = [
   { label: 'Nuevo cliente', href: '/clientes/nuevo', icon: Users, module: 'clients' },
-  { label: 'Nueva web', href: '/webs/produccion?nuevo=1', icon: Globe, module: 'clients' },
+  { label: 'Nueva web', href: '/webs/todas?nuevo=1', icon: Globe, module: 'clients' },
   { label: 'Nuevo dominio', href: '/dominios?nuevo=1', icon: Building2, module: 'clients' },
   { label: 'Nuevo hosting', href: '/hosting?nuevo=1', icon: Server, module: 'clients' },
   { label: 'Nueva factura', href: '/facturacion?nuevo=1', icon: CreditCard, module: 'billing' },

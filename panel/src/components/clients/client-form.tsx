@@ -46,7 +46,6 @@ const inOneYear = () => {
   d.setFullYear(d.getFullYear() + 1)
   return d.toISOString()
 }
-const num = (v: string, fallback: number) => (v.trim() === '' ? fallback : Number(v.replace(',', '.')))
 const hostOf = (url: string) => {
   try {
     return new URL(/^https?:\/\//i.test(url) ? url : `https://${url}`).hostname.replace(/^www\./, '')
@@ -55,85 +54,125 @@ const hostOf = (url: string) => {
   }
 }
 
+const byCreated = <T extends { createdAt: string }>(list: T[]) => [...list].sort((x, y) => x.createdAt.localeCompare(y.createdAt))
+
 export function useClientForm(client: Client | undefined, onDone: (saved?: Client) => void) {
   const create = clientsApi.useCreate()
   const update = clientsApi.useUpdate()
   const createWeb = websitesApi.useCreate()
   const createDomain = domainsApi.useCreate()
   const createHosting = hostingsApi.useCreate()
+  const updateWeb = websitesApi.useUpdate(true)
+  const updateDomain = domainsApi.useUpdate(true)
+  const updateHosting = hostingsApi.useUpdate(true)
   const { data: settings } = useSettings()
+  const { data: websites } = websitesApi.useList()
+  const { data: domains } = domainsApi.useList()
+  const { data: hostings } = hostingsApi.useList()
   const form = useForm<ClientValues>({ resolver: zodResolver(clientSchema), defaultValues: client ? toValues(client) : empty })
-  const submitting = create.isPending || update.isPending || createWeb.isPending || createDomain.isPending || createHosting.isPending
+  const submitting = create.isPending || update.isPending || createWeb.isPending || createDomain.isPending || createHosting.isPending || updateWeb.isPending || updateDomain.isPending || updateHosting.isPending
 
-  /** Crea web, dominio y hosting solo si su apartado se ha rellenado; domino y hosting quedan enlazados a la web. */
-  const createExtras = async (c: Client, v: ClientValues) => {
+  /** Web, dominio y hosting que el cliente ya tiene (los primeros que se dieron de alta): el formulario los muestra y los modifica en vez de duplicarlos. */
+  const existing = (clientId?: string) => ({
+    web: clientId ? byCreated((websites ?? []).filter((w) => w.clientId === clientId))[0] : undefined,
+    domain: clientId ? byCreated((domains ?? []).filter((d) => d.clientId === clientId))[0] : undefined,
+    hosting: clientId ? byCreated((hostings ?? []).filter((h) => h.clientId === clientId))[0] : undefined,
+  })
+  const valuesFor = (c?: Client): ClientValues => {
+    if (!c) return empty
+    const { web, domain, hosting } = existing(c.id)
+    return { ...toValues(c), webUrl: web?.productionUrl ?? '', domainName: domain?.name ?? '', hostProvider: hosting?.provider ?? '' }
+  }
+
+  // Si las listas llegan después de abrir la ficha, se rellenan los campos (salvo que ya se haya empezado a escribir).
+  useEffect(() => {
+    if (client && !form.formState.isDirty) form.reset(valuesFor(client))
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [websites, domains, hostings, client?.id])
+
+  /** Crea web, dominio y hosting solo si su apartado se ha rellenado y todavía no existe; si ya existe, lo actualiza. Vacío = no se toca nada. */
+  const syncExtras = async (c: Client, v: ClientValues) => {
     const url = v.webUrl.trim()
     const hasWeb = !!url
-    const hasDomain = !!v.domainName
+    const hasDomain = !!v.domainName.trim()
     const hasHosting = !!v.hostProvider
     if (!hasWeb && !hasDomain && !hasHosting) return
-    const domainName = v.domainName.replace(/^https?:\/\//i, '').replace(/\/.*$/, '').toLowerCase() || hostOf(url)
-    let websiteId: string | null = null
+    const { web: oldWeb, domain: oldDomain, hosting: oldHosting } = existing(c.id)
+    const domainName = v.domainName.trim().replace(/^https?:\/\//i, '').replace(/\/.*$/, '').toLowerCase() || hostOf(url)
+    let websiteId: string | null = oldWeb?.id ?? null
     if (hasWeb) {
       const host = hostOf(url) || domainName || guessDomain(c)
-      const web = await createWeb.mutateAsync({
-        clientId: c.id,
-        name: c.company,
-        status: 'DEVELOPMENT',
-        technology: 'WORDPRESS',
-        description: c.formData?.description ? `Solicitud original: ${c.formData.description}` : '',
-        domainName: host,
-        productionUrl: url ? (/^https?:\/\//i.test(url) ? url : `https://${url}`) : `https://${host}`,
-        stagingUrl: `https://staging.${host}`,
-        repoUrl: '',
-        mainBranch: 'main',
-        hostingProvider: v.hostProvider,
-        startDate: new Date().toISOString(),
-        publishDate: null,
-      })
-      websiteId = web.id
+      const productionUrl = /^https?:\/\//i.test(url) ? url : `https://${url}`
+      if (oldWeb) {
+        if (oldWeb.productionUrl !== productionUrl || oldWeb.hostingProvider !== v.hostProvider) await updateWeb.mutateAsync({ id: oldWeb.id, patch: { productionUrl, domainName: host, hostingProvider: v.hostProvider || oldWeb.hostingProvider } })
+      } else {
+        const web = await createWeb.mutateAsync({
+          clientId: c.id,
+          name: c.company,
+          status: 'DEVELOPMENT',
+          technology: 'WORDPRESS',
+          description: c.formData?.description ? `Solicitud original: ${c.formData.description}` : '',
+          domainName: host,
+          productionUrl,
+          stagingUrl: `https://staging.${host}`,
+          repoUrl: '',
+          mainBranch: 'main',
+          hostingProvider: v.hostProvider,
+          startDate: new Date().toISOString(),
+          publishDate: null,
+        })
+        websiteId = web.id
+      }
     }
     if (hasDomain) {
-      await createDomain.mutateAsync({
-        clientId: c.id,
-        websiteId,
-        name: domainName,
-        registrar: settings?.domainRegistrars[0] || '',
-        registeredAt: new Date().toISOString(),
-        renewsAt: inOneYear(),
-        annualCost: 15,
-        autoRenew: true,
-        dns: '',
-        nameservers: [],
-        notes: '',
-      })
+      if (oldDomain) {
+        if (oldDomain.name !== domainName) await updateDomain.mutateAsync({ id: oldDomain.id, patch: { name: domainName } })
+      } else {
+        await createDomain.mutateAsync({
+          clientId: c.id,
+          websiteId,
+          name: domainName,
+          registrar: settings?.domainRegistrars[0] || '',
+          registeredAt: new Date().toISOString(),
+          renewsAt: inOneYear(),
+          annualCost: 15,
+          autoRenew: true,
+          dns: '',
+          nameservers: [],
+          notes: '',
+        })
+      }
     }
     if (hasHosting) {
-      await createHosting.mutateAsync({
-        clientId: c.id,
-        websiteId,
-        provider: v.hostProvider,
-        plan: 'Básico',
-        annualCost: 60,
-        contractedAt: new Date().toISOString(),
-        renewsAt: inOneYear(),
-        active: true,
-        notes: '',
-      })
+      if (oldHosting) {
+        if (oldHosting.provider !== v.hostProvider) await updateHosting.mutateAsync({ id: oldHosting.id, patch: { provider: v.hostProvider } })
+      } else {
+        await createHosting.mutateAsync({
+          clientId: c.id,
+          websiteId,
+          provider: v.hostProvider,
+          plan: 'Básico',
+          annualCost: 60,
+          contractedAt: new Date().toISOString(),
+          renewsAt: inOneYear(),
+          active: true,
+          notes: '',
+        })
+      }
     }
   }
 
   const submit = form.handleSubmit(async (v) => {
     const { webUrl, domainName, hostProvider, packInterest, ...rest } = v
-    const data = { ...rest, packInterest: (packInterest || null) as PackInterest | null }
     void webUrl, void domainName, void hostProvider
+    const data = { ...rest, packInterest: (packInterest || null) as PackInterest | null }
     let saved: Client
     if (client) saved = await update.mutateAsync({ id: client.id, patch: data })
     else saved = await create.mutateAsync({ ...data, archived: false, origin: 'MANUAL', sourceId: null, formData: null })
-    await createExtras(saved, v)
+    await syncExtras(saved, v)
     onDone(saved)
   })
-  return { form, submit, submitting, reset: (c?: Client) => form.reset(c ? toValues(c) : empty) }
+  return { form, submit, submitting, reset: (c?: Client) => form.reset(valuesFor(c)) }
 }
 
 export function ClientFormFields({ form }: { form: UseFormReturn<ClientValues> }) {

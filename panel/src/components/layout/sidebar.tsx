@@ -72,7 +72,7 @@ function NavEntry({ item, pathname, collapsed, expanded, onToggle, onNavigate }:
   }
 
   const link = (
-    <Link href={item.children?.[0]?.href ?? item.href} onClick={onNavigate} aria-current={active ? 'page' : undefined} className={cn(row, state, collapsed && 'justify-center px-0')}>
+    <Link href={item.children?.[0]?.href ?? item.to ?? item.href} onClick={onNavigate} aria-current={active ? 'page' : undefined} className={cn(row, state, collapsed && 'justify-center px-0')}>
       {content}
     </Link>
   )
