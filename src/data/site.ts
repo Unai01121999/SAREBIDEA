@@ -201,6 +201,10 @@ export type Project = {
   nav: string[]
   /** Ruta a una captura real. Si existe, sustituye al placeholder. */
   image?: string
+  /** Capturas de la web real completa (escritorio y móvil): sustituyen a la mini-web ilustrada. */
+  screenshot?: { desktop: string; mobile: string }
+  /** Ruta de la web de ejemplo en este mismo sitio: al pinchar se abre una vista previa navegable. */
+  preview?: string
   result: string
   /** Estructura de la mini-web: cada sector con su propia composición. */
   layout: 'split' | 'centered' | 'booking' | 'poster' | 'service' | 'shop' | 'editorial'
@@ -216,15 +220,17 @@ export type Project = {
 
 export const projects: Project[] = [
   {
-    id: 'restaurante',
-    business: 'Brasa & Sal',
-    sector: 'Restaurante',
-    headline: 'Fuego lento, mesa larga.',
+    id: 'cafe-libreria',
+    business: 'Tinta & Grano',
+    sector: 'Café y librería',
+    headline: 'Hecho para tazas. Pensado para leer.',
     cta: 'Reservar mesa',
-    nav: ['Carta', 'Vinos', 'Reservas'],
-    result: 'Reservas online integradas',
-    layout: 'split',
-    theme: { bg: '#1b1512', fg: '#f3e7d9', accent: '#d9733c', accentFg: '#1b1512', soft: '#3a2c24', font: 'serif' },
+    nav: ['Café', 'Libros', 'Espacios'],
+    result: 'Reservas online y cinco espacios',
+    layout: 'editorial',
+    theme: { bg: '#100904', fg: '#ffedd7', accent: '#dc5000', accentFg: '#100904', soft: '#382416', font: 'sans' },
+    screenshot: { desktop: '/ejemplos/tinta-y-grano/preview-desktop.jpg', mobile: '/ejemplos/tinta-y-grano/preview-mobile.jpg' },
+    preview: '/ejemplos/tinta-y-grano/',
   },
   {
     id: 'peluqueria',

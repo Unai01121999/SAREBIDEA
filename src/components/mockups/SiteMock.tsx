@@ -398,6 +398,7 @@ const desktopLayouts: Record<Project['layout'], (props: { p: Project }) => React
 
 /** Mini-web de escritorio. Todo en cqw para escalar con el marco. */
 export function SiteDesktop({ p }: { p: Project }) {
+  if (p.screenshot) return <img src={p.screenshot.desktop} alt="" className="aspect-[16/10] w-full object-cover object-top" loading="lazy" width={1280} height={800} />
   const Layout = desktopLayouts[p.layout] ?? SplitDesktop
   return (
     <div className="aspect-[16/10] w-full overflow-hidden" style={{ background: p.theme.bg, color: p.theme.fg }}>
@@ -428,6 +429,7 @@ const MCta = ({ t, label, solid = true }: { t: T; label: string; solid?: boolean
 
 /** Mini-web móvil: cada estructura tiene su versión pensada para el móvil. */
 export function SiteMobile({ p }: { p: Project }) {
+  if (p.screenshot) return <img src={p.screenshot.mobile} alt="" className="aspect-[9/19.5] w-full object-cover object-top" loading="lazy" width={780} height={1688} />
   const t = p.theme
   const hSize = t.font === 'serif' ? 12.5 : t.font === 'display' ? 12 : 11
   let body: ReactNode
