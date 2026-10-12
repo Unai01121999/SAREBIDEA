@@ -91,4 +91,6 @@ Cada factura admite su archivo real (JPG, PNG, WEBP o PDF, máx. 10 MB) desde **
 
 ## Ficha de la factura
 
+Si una factura no tiene web y el cliente tiene una sola, se vincula a ella automáticamente al guardarla.
+
 Al hacer clic en una factura (en **Facturación** o en la pestaña Facturación de la ficha del cliente) se abre su **ficha** (`/facturacion/ficha?id=…`): datos de la factura, importes (pack, mantenimiento, IVA y total) y el apartado **Archivos adjuntos**, donde se pueden **adjuntar varios archivos** a la misma factura (también arrastrándolos), verlos con «Ver» en otra pestaña y quitarlos. En las tablas, «Ver» abre el archivo (o un menú si hay varios). Migración: `supabase/migrations/012_varios_archivos_por_factura.sql`.

@@ -9,7 +9,7 @@ import { ClientSelectField, Field, SelectField, SwitchField } from '@/components
 import { FormDialog } from '@/components/forms/form-dialog'
 import { ClientContext, usePrefillData } from '@/components/forms/prefill'
 import { Input, Textarea } from '@/components/ui/input'
-import { invoicesApi, useSettings } from '@/hooks/use-entities'
+import { invoicesApi, useSettings, websitesApi } from '@/hooks/use-entities'
 import { formatCurrency, fromDateInput, toDateInput } from '@/lib/format'
 import { conceptLabel, invoiceStatusLabel } from '@/lib/labels'
 import { invoiceTotal } from '@/lib/metrics'
@@ -43,6 +43,7 @@ export function InvoiceFormDialog({ open, onOpenChange, invoice, clientId, servi
   const update = invoicesApi.useUpdate()
   const { data: invoices } = invoicesApi.useList()
   const { data: settings } = useSettings()
+  const { data: websites } = websitesApi.useList()
   const prefill = usePrefillData()
 
   const nextNumber = useMemo(() => {
@@ -82,7 +83,10 @@ export function InvoiceFormDialog({ open, onOpenChange, invoice, clientId, servi
     if (!legacy && !v.pack) return setError('pack', { message: 'Elige el pack que se factura' })
     const { kind, pack: packKey, ...rest } = v
     void kind
-    const payload = { ...rest, pack: (packKey || null) as PackType | null, websiteId: v.websiteId || null, domainId: v.domainId || null, hostingId: v.hostingId || null, issuedAt: fromDateInput(v.issuedAt), dueAt: fromDateInput(v.dueAt) }
+    // Si la factura no tiene web y el cliente tiene una sola, se vincula a ella automáticamente.
+    const clientWebs = (websites ?? []).filter((w) => w.clientId === v.clientId)
+    const websiteId = v.websiteId || (clientWebs.length === 1 ? clientWebs[0].id : null)
+    const payload = { ...rest, pack: (packKey || null) as PackType | null, websiteId, domainId: v.domainId || null, hostingId: v.hostingId || null, issuedAt: fromDateInput(v.issuedAt), dueAt: fromDateInput(v.dueAt) }
     if (invoice) await update.mutateAsync({ id: invoice.id, patch: payload })
     else await create.mutateAsync(payload)
     onOpenChange(false)
