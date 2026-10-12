@@ -25,6 +25,8 @@ import { useCan } from '@/hooks/use-permissions'
 import { downloadCsv } from '@/lib/csv'
 import { formatCurrency, formatDate } from '@/lib/format'
 import { conceptLabel, invoiceStatusLabel } from '@/lib/labels'
+import { InvoiceFile } from '@/components/invoices/invoice-file'
+import { removeInvoiceFile } from '@/lib/invoice-files'
 import { packLabel } from '@/lib/packs'
 import { billingByClient, billingByConcept, billingStats, effectiveStatus, invoiceBase, invoiceTotal, revenueSeries } from '@/lib/metrics'
 import { INVOICE_CONCEPTS, INVOICE_STATUSES, type Invoice, type InvoiceConcept, type InvoiceStatus } from '@/types/domain'
@@ -56,6 +58,7 @@ export default function BillingPage() {
     { id: 'issuedAt', header: 'Emisión', accessorFn: (i) => i.issuedAt, cell: ({ row }) => <span className="whitespace-nowrap text-muted-foreground">{formatDate(row.original.issuedAt)}</span> },
     { id: 'dueAt', header: 'Vencimiento', accessorFn: (i) => i.dueAt, cell: ({ row }) => <span className="whitespace-nowrap text-muted-foreground">{formatDate(row.original.dueAt)}</span> },
     { id: 'amount', header: 'Importe', accessorFn: (i) => invoiceTotal(i), cell: ({ row }) => <div className="text-right"><p className="font-medium tabular">{formatCurrency(invoiceTotal(row.original), 'EUR')}</p><p className="text-xs text-muted-foreground tabular">base {formatCurrency(invoiceBase(row.original))}{row.original.maintenance ? ` (incl. mant. ${formatCurrency(row.original.maintenance)})` : ''}</p></div> },
+    { id: 'file', header: 'Factura', enableSorting: false, accessorFn: (i) => (i.attachmentPath ? 1 : 0), cell: ({ row }) => <InvoiceFile invoice={row.original} compact /> },
     { id: 'status', header: 'Estado', accessorFn: (i) => effectiveStatus(i), cell: ({ row }) => <InvoiceStatusBadge status={effectiveStatus(row.original)} /> },
     {
       id: 'actions',
@@ -167,7 +170,7 @@ export default function BillingPage() {
 
       <InvoiceFormDialog open={createOpen} onOpenChange={setCreateOpen} />
       <InvoiceFormDialog open={!!editing} onOpenChange={(o) => !o && setEditing(undefined)} invoice={editing} />
-      <ConfirmDialog open={!!toDelete} onOpenChange={(o) => !o && setToDelete(undefined)} title={`Eliminar factura ${toDelete?.number ?? ''}`} description="Se eliminará la factura. Si solo quieres anularla, usa «Cancelar factura» para conservar el registro." loading={remove.isPending} onConfirm={() => toDelete && remove.mutate(toDelete.id, { onSuccess: () => setToDelete(undefined) })} />
+      <ConfirmDialog open={!!toDelete} onOpenChange={(o) => !o && setToDelete(undefined)} title={`Eliminar factura ${toDelete?.number ?? ''}`} description="Se eliminará la factura. Si solo quieres anularla, usa «Cancelar factura» para conservar el registro." loading={remove.isPending} onConfirm={() => toDelete && remove.mutate(toDelete.id, { onSuccess: () => { void removeInvoiceFile(toDelete.attachmentPath); setToDelete(undefined) } })} />
     </div>
   )
 }

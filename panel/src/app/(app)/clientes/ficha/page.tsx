@@ -9,6 +9,7 @@ import { Can } from '@/components/shared/can'
 import { useCan } from '@/hooks/use-permissions'
 import { DomainFormDialog } from '@/components/domains/domain-form'
 import { HostingFormDialog } from '@/components/hosting/hosting-form'
+import { InvoiceFile } from '@/components/invoices/invoice-file'
 import { InvoiceFormDialog } from '@/components/invoices/invoice-form'
 import { PageHeader } from '@/components/layout/page-header'
 import { ClientStatusBadge, ExpiryBadge, InvoiceStatusBadge, ServiceChip, TechBadge, WebsiteStatusBadge } from '@/components/shared/badges'
@@ -258,6 +259,7 @@ export default function ClientDetailPage() {
                   <TableHead>Concepto</TableHead>
                   <TableHead>Emisión</TableHead>
                   <TableHead>Estado</TableHead>
+                  <TableHead>Factura</TableHead>
                   <TableHead className="text-right">Total</TableHead>
                 </TableRow>
               </TableHeader>
@@ -268,10 +270,11 @@ export default function ClientDetailPage() {
                     <TableCell>{conceptLabel[i.concept]}</TableCell>
                     <TableCell className="text-muted-foreground">{formatDate(i.issuedAt)}</TableCell>
                     <TableCell><InvoiceStatusBadge status={effectiveStatus(i)} /></TableCell>
+                    <TableCell><InvoiceFile invoice={i} /></TableCell>
                     <TableCell className="text-right tabular">{formatCurrency(invoiceTotal(i), 'EUR')}</TableCell>
                   </TableRow>
                 ))}
-                {!cInvoices.length && <EmptyRow cols={5} text="Sin facturas todavía." />}
+                {!cInvoices.length && <EmptyRow cols={6} text="Sin facturas todavía." />}
               </TableBody>
             </Table>
           </Card>

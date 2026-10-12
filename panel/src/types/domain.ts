@@ -143,6 +143,10 @@ export interface Invoice {
   maintenance?: number
   /** En las facturas mensuales solo de mantenimiento: id de la primera factura (pack + 1.er mes) de la que salen. */
   originId?: string | null
+  /** Archivo de la factura real (jpg, png, webp o pdf). En Supabase es la ruta dentro del bucket privado «facturas»; en modo demostración, el propio archivo como data URL. */
+  attachmentPath?: string | null
+  attachmentName?: string | null
+  attachmentType?: string | null
   /** IVA en porcentaje (21 = 21 %). */
   taxRate: number
   status: InvoiceStatus

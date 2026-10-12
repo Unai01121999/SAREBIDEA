@@ -1,5 +1,6 @@
 'use client'
 
+import { InvoiceFile } from '@/components/invoices/invoice-file'
 import { InvoiceStatusBadge } from '@/components/shared/badges'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { invoicesApi } from '@/hooks/use-entities'
@@ -36,6 +37,7 @@ export function RelatedInvoices({ match, action, className }: { match: (i: Invoi
                 </span>
                 <span className="w-24 shrink-0 text-right tabular">{formatCurrency(invoiceTotal(i), 'EUR')}</span>
                 <InvoiceStatusBadge status={effectiveStatus(i)} />
+                <InvoiceFile invoice={i} compact />
               </li>
             ))}
           </ul>
