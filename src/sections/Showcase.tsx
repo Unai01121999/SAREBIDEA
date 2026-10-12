@@ -66,7 +66,7 @@ function TiltProject({ p, className = '', big = false, onPreview }: { p: Project
       <ProjectLink p={p} onPreview={onPreview} className="block w-full rounded-[16px] text-left">
         <m.div className="relative" style={on ? { transform, boxShadow: shadow, borderRadius: 14 } : { borderRadius: 14 }}>
           <BrowserFrame url={slug(p)} className="shadow-[var(--shadow-soft)]">
-            <SiteDesktop p={p} />
+            <SiteDesktop p={p} live />
           </BrowserFrame>
           {/* Ficha que aparece en hover */}
           <div className="pointer-events-none absolute inset-x-3 bottom-3 flex translate-y-2 items-center justify-between gap-3 rounded-2xl bg-white/80 p-2 pl-4 opacity-0 shadow-[0_12px_30px_-10px_rgb(13_14_18/0.35)] ring-1 ring-black/5 backdrop-blur-xl transition-[opacity,transform] duration-300 ease-[var(--ease-out-strong)] group-hover:translate-y-0 group-hover:opacity-100 group-focus-within:translate-y-0 group-focus-within:opacity-100">
@@ -114,7 +114,7 @@ export function Showcase() {
             <li key={p.id} className="w-[min(64vw,250px)] shrink-0 snap-center">
               <ProjectLink p={p} onPreview={setPreview} className="block w-full text-left">
                 <PhoneFrame className="shadow-[0_24px_50px_-20px_rgb(13_14_18/0.45)]">
-                  <SiteMobile p={p} />
+                  <SiteMobile p={p} live />
                 </PhoneFrame>
                 {p.preview && <span className="mt-3 block text-center text-sm font-medium text-ink underline decoration-ink/30 underline-offset-4">Ver la web →</span>}
               </ProjectLink>
@@ -141,22 +141,22 @@ export function Showcase() {
             <TiltProject p={a} big onPreview={setPreview} />
           </Reveal>
           <Reveal delay={0.1} className="col-span-12 md:col-span-6 md:col-start-4 lg:col-span-5 lg:col-start-auto lg:self-end">
-            <TiltProject p={b} big />
+            <TiltProject p={b} big onPreview={setPreview} />
           </Reveal>
           <Reveal className="col-span-6 lg:col-span-4">
-            <TiltProject p={c} />
+            <TiltProject p={c} onPreview={setPreview} />
           </Reveal>
           <Reveal delay={0.08} className="col-span-6 lg:col-span-4 lg:translate-y-14">
-            <TiltProject p={d} />
+            <TiltProject p={d} onPreview={setPreview} />
           </Reveal>
           <Reveal delay={0.16} className="col-span-6 lg:col-span-4">
-            <TiltProject p={e} />
+            <TiltProject p={e} onPreview={setPreview} />
           </Reveal>
           <Reveal className="col-span-6 lg:col-span-5 lg:col-start-2 lg:mt-8">
-            <TiltProject p={f} />
+            <TiltProject p={f} onPreview={setPreview} />
           </Reveal>
           <Reveal delay={0.1} className="col-span-12 md:col-span-6 md:col-start-4 lg:col-span-5 lg:col-start-auto lg:mt-8">
-            <TiltProject p={g} />
+            <TiltProject p={g} onPreview={setPreview} />
           </Reveal>
         </div>
         <Reveal className="mt-20 flex flex-col items-center gap-4 text-center">

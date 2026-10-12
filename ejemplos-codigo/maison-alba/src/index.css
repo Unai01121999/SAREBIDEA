@@ -1,0 +1,181 @@
+@import "tailwindcss";
+
+/* Fuentes autoalojadas, solo subconjunto latino (cubre castellano) */
+@font-face {
+  font-family: "Cormorant Garamond Variable";
+  font-style: normal;
+  font-weight: 300 700;
+  font-display: swap;
+  src: url("./fonts/cormorant-garamond-latin-wght-normal.woff2") format("woff2-variations");
+  unicode-range: U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD;
+}
+@font-face {
+  font-family: "Cormorant Garamond Variable";
+  font-style: italic;
+  font-weight: 300 700;
+  font-display: swap;
+  src: url("./fonts/cormorant-garamond-latin-wght-italic.woff2") format("woff2-variations");
+  unicode-range: U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD;
+}
+@font-face {
+  font-family: "Geist Variable";
+  font-style: normal;
+  font-weight: 100 900;
+  font-display: swap;
+  src: url("./fonts/geist-latin-wght-normal.woff2") format("woff2-variations");
+  unicode-range: U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD;
+}
+
+@theme {
+  --color-ink: #171715;
+  --color-ivory: #f5f1e9;
+  --color-sand: #d8c8b4;
+  --color-stone: #88847d;
+  --color-gold: #aa9270;
+
+  --font-serif: "Cormorant Garamond Variable", "Cormorant Garamond", Georgia, serif;
+  --font-sans: "Geist Variable", "Geist", system-ui, sans-serif;
+
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+    scroll-padding-top: 5rem;
+    -webkit-text-size-adjust: 100%;
+  }
+  body {
+    background: var(--color-ivory);
+    color: var(--color-ink);
+    font-family: var(--font-sans);
+    font-size: 1rem;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+  h1, h2, h3 {
+    font-family: var(--font-serif);
+    font-weight: 400;
+    letter-spacing: -0.015em;
+  }
+  ::selection {
+    background: var(--color-sand);
+    color: var(--color-ink);
+  }
+  :focus-visible {
+    outline: 2px solid var(--color-gold);
+    outline-offset: 3px;
+  }
+  button { cursor: pointer; }
+  img { display: block; max-width: 100%; }
+}
+
+/* ---------- Reveal on scroll (opacity + translate, GPU friendly) ---------- */
+@media (prefers-reduced-motion: no-preference) {
+  [data-reveal] {
+    opacity: 0;
+    transform: translate3d(0, 28px, 0);
+    transition:
+      opacity 900ms var(--ease-out-expo),
+      transform 900ms var(--ease-out-expo);
+    transition-delay: var(--reveal-delay, 0ms);
+  }
+  [data-reveal="in"] {
+    opacity: 1;
+    transform: none;
+  }
+  .img-reveal > * {
+    clip-path: inset(0 0 100% 0);
+    transition: clip-path 1200ms var(--ease-out-expo);
+    transition-delay: var(--reveal-delay, 0ms);
+  }
+  .img-reveal[data-reveal="in"] > * {
+    clip-path: inset(0 0 0 0);
+  }
+  .img-reveal[data-reveal] {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* ---------- Buttons: fill sweeps from below, label shifts 1px ---------- */
+.btn {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  white-space: nowrap;
+  min-height: 3.25rem;
+  padding: 0 1.75rem;
+  border: 1px solid currentColor;
+  font-size: 0.75rem;
+  line-height: 1;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  font-weight: 500;
+  transition: color 450ms var(--ease-out-expo), border-color 450ms var(--ease-out-expo), transform 160ms ease-out;
+}
+.btn::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  transform: translateY(101%);
+  transition: transform 550ms var(--ease-out-expo);
+  background: var(--btn-fill);
+}
+.btn:hover::before,
+.btn:focus-visible::before { transform: translateY(0); }
+.btn:active { transform: scale(0.98); }
+
+.btn-ink   { --btn-fill: var(--color-ivory); background: var(--color-ink); color: var(--color-ivory); border-color: var(--color-ink); }
+.btn-ink:hover, .btn-ink:focus-visible { color: var(--color-ink); }
+.btn-line  { --btn-fill: var(--color-ink); color: var(--color-ink); }
+.btn-line:hover, .btn-line:focus-visible { color: var(--color-ivory); border-color: var(--color-ink); }
+.btn-light { --btn-fill: var(--color-ink); background: var(--color-ivory); color: var(--color-ink); border-color: var(--color-ivory); }
+.btn-light:hover, .btn-light:focus-visible { color: var(--color-ivory); }
+.btn-light-line { --btn-fill: var(--color-ivory); color: var(--color-ivory); }
+.btn-light-line:hover, .btn-light-line:focus-visible { color: var(--color-ink); border-color: var(--color-ivory); }
+
+/* ---------- Text link with animated underline ---------- */
+.link-line {
+  background-image: linear-gradient(currentColor, currentColor);
+  background-size: 100% 1px;
+  background-position: 0 100%;
+  background-repeat: no-repeat;
+  padding-bottom: 3px;
+  transition: background-size 450ms var(--ease-out-expo);
+}
+.link-line:hover { background-size: 0% 1px; background-position: 100% 100%; }
+
+/* ---------- Image hover ---------- */
+.zoom-img img { transition: transform 1400ms var(--ease-out-expo); }
+@media (hover: hover) {
+  .zoom-img:hover img { transform: scale(1.035); }
+}
+
+/* ---------- Mobile menu items ---------- */
+@media (prefers-reduced-motion: no-preference) {
+  .menu-item {
+    opacity: 0;
+    transform: translateY(16px);
+    transition: opacity 600ms var(--ease-out-expo), transform 600ms var(--ease-out-expo);
+  }
+  [data-open="true"] .menu-item {
+    opacity: 1;
+    transform: none;
+    transition-delay: calc(120ms + var(--i, 0) * 70ms);
+  }
+}
+
+dialog::backdrop { background: rgb(23 23 21 / 0.55); }
+dialog[open] { animation: dlg-in 500ms var(--ease-out-expo); }
+@keyframes dlg-in { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: none; } }
+@media (prefers-reduced-motion: reduce) { dialog[open] { animation: none; } html { scroll-behavior: auto; } }
+
+.no-scrollbar { scrollbar-width: none; }
+.no-scrollbar::-webkit-scrollbar { display: none; }

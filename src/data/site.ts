@@ -205,6 +205,8 @@ export type Project = {
   screenshot?: { desktop: string; mobile: string }
   /** Ruta de la web de ejemplo en este mismo sitio: al pinchar se abre una vista previa navegable. */
   preview?: string
+  /** La miniatura del portafolio es la propia web de ejemplo en vivo (reducida), en vez de una captura. */
+  livePreview?: boolean
   result: string
   /** Estructura de la mini-web: cada sector con su propia composición. */
   layout: 'split' | 'centered' | 'booking' | 'poster' | 'service' | 'shop' | 'editorial'
@@ -234,14 +236,16 @@ export const projects: Project[] = [
   },
   {
     id: 'peluqueria',
-    business: 'Estudio Nácar',
+    business: 'Maison Alba',
     sector: 'Peluquería',
-    headline: 'Tu pelo, en las mejores manos.',
-    cta: 'Pedir cita',
-    nav: ['Servicios', 'Equipo', 'Cita'],
-    result: 'Citas desde el móvil 24/7',
+    headline: 'El arte de sentirte tú.',
+    cta: 'Reservar cita',
+    nav: ['Servicios', 'El salón', 'Contacto'],
+    result: 'Reserva de cita en 4 pasos',
     layout: 'centered',
-    theme: { bg: '#f6ece6', fg: '#3b2a26', accent: '#b5654f', accentFg: '#fff', soft: '#ead7cd', font: 'serif' },
+    theme: { bg: '#171715', fg: '#f5f1e9', accent: '#aa9270', accentFg: '#171715', soft: '#2b2a27', font: 'serif' },
+    preview: '/ejemplos/maison-alba/',
+    livePreview: true,
   },
   {
     id: 'clinica',

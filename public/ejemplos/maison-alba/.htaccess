@@ -1,0 +1,4 @@
+# Maison Alba (web de ejemplo): igual que el resto de /ejemplos/ pero con permiso para cargar sus fotografías de Unsplash.
+<IfModule mod_headers.c>
+  Header always set Content-Security-Policy "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https://images.unsplash.com; font-src 'self'; connect-src 'none'; frame-ancestors 'self'; base-uri 'self'; form-action 'none'; object-src 'none'"
+</IfModule>

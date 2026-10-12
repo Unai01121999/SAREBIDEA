@@ -106,3 +106,11 @@ El ejemplo 1 del portafolio es la web real **Tinta & Grano** (café y librería)
 - La tipografía Geist está alojada en local (sin Google Fonts) y el script inline se movió a `js-flag.js`, para cumplir la política de seguridad (`public/ejemplos/.htaccess`: CSP propia, `noindex`, sin terceros).
 - `/ejemplos/` está en `robots.txt` como `Disallow` y con `X-Robots-Tag: noindex`: no compite con la web principal en Google.
 - Para añadir otra web de ejemplo: copia su carpeta a `public/ejemplos/<nombre>/`, haz sus capturas y rellena `screenshot` y `preview` en `projects` (`src/data/site.ts`).
+
+## Ejemplo «Maison Alba» (peluquería) con vista previa
+
+El ejemplo 2 del portafolio es **Maison Alba**, una web React/Vite. Su código fuente está en `ejemplos-codigo/maison-alba/` y la versión compilada en `public/ejemplos/maison-alba/` (se publica en `/ejemplos/maison-alba/`). Se abre en la misma vista previa que Tinta & Grano. Detalles:
+
+- **Miniatura en vivo**: en el portafolio se ve la propia web reducida (iframe no interactivo que solo se carga cuando la tarjeta está a punto de verse), no una captura.
+- **Fotografías**: la web carga sus fotos de Unsplash (`images.unsplash.com`); `public/ejemplos/maison-alba/.htaccess` permite solo ese origen para imágenes. Sustitúyelas por fotos propias en `src/data/site.ts` (`IMAGES`) si quieres que sean locales.
+- **Recompilar** tras cambiar algo: `cd ejemplos-codigo/maison-alba && npm install && npx vite build --base=./` y copiar `dist/*` a `public/ejemplos/maison-alba/` (conservando su `.htaccess` y añadiendo `<meta name="robots" content="noindex, nofollow">` al `index.html`).

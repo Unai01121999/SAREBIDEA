@@ -1,3 +1,4 @@
+import { LiveThumb } from './LiveThumb'
 import type { CSSProperties, ReactNode } from 'react'
 import type { Project } from '../../data/site'
 
@@ -397,7 +398,8 @@ const desktopLayouts: Record<Project['layout'], (props: { p: Project }) => React
 }
 
 /** Mini-web de escritorio. Todo en cqw para escalar con el marco. */
-export function SiteDesktop({ p }: { p: Project }) {
+export function SiteDesktop({ p, live = false }: { p: Project; live?: boolean }) {
+  if (live && p.livePreview && p.preview) return <LiveThumb src={p.preview} width={1280} height={800} bg={p.theme.bg} />
   if (p.screenshot) return <img src={p.screenshot.desktop} alt="" className="aspect-[16/10] w-full object-cover object-top" loading="lazy" width={1280} height={800} />
   const Layout = desktopLayouts[p.layout] ?? SplitDesktop
   return (
@@ -428,7 +430,8 @@ const MCta = ({ t, label, solid = true }: { t: T; label: string; solid?: boolean
 )
 
 /** Mini-web móvil: cada estructura tiene su versión pensada para el móvil. */
-export function SiteMobile({ p }: { p: Project }) {
+export function SiteMobile({ p, live = false }: { p: Project; live?: boolean }) {
+  if (live && p.livePreview && p.preview) return <LiveThumb src={p.preview} width={390} height={844} bg={p.theme.bg} />
   if (p.screenshot) return <img src={p.screenshot.mobile} alt="" className="aspect-[9/19.5] w-full object-cover object-top" loading="lazy" width={780} height={1688} />
   const t = p.theme
   const hSize = t.font === 'serif' ? 12.5 : t.font === 'display' ? 12 : 11
