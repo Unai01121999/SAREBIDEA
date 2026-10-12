@@ -1,6 +1,6 @@
 'use client'
 
-import { InvoiceFile } from '@/components/invoices/invoice-file'
+import { InvoiceFile, InvoiceLink } from '@/components/invoices/invoice-file'
 import { InvoiceStatusBadge } from '@/components/shared/badges'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { invoicesApi } from '@/hooks/use-entities'
@@ -31,13 +31,13 @@ export function RelatedInvoices({ match, action, className }: { match: (i: Invoi
           <ul className="-my-2 divide-y">
             {rows.slice(0, 8).map((i) => (
               <li key={i.id} className="flex items-center gap-3 py-2.5 text-sm">
-                <span className="w-28 shrink-0 font-medium tabular">{i.number}</span>
+                <span className="w-28 shrink-0"><InvoiceLink invoice={i} /></span>
                 <span className="min-w-0 flex-1 truncate text-muted-foreground">
                   {conceptLabel[i.concept]} · {formatDate(i.issuedAt)}
                 </span>
                 <span className="w-24 shrink-0 text-right tabular">{formatCurrency(invoiceTotal(i), 'EUR')}</span>
                 <InvoiceStatusBadge status={effectiveStatus(i)} />
-                <InvoiceFile invoice={i} compact />
+                <InvoiceFile invoice={i} />
               </li>
             ))}
           </ul>

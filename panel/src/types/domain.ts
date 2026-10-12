@@ -127,6 +127,15 @@ export interface Hosting {
   updatedAt: ISODate
 }
 
+/** Archivo adjunto a una factura. `path` es la ruta en el bucket privado «facturas» de Supabase (en modo demostración, el propio archivo como data URL). */
+export interface InvoiceFileItem {
+  path: string
+  name: string
+  type: string
+  size: number
+  addedAt: ISODate
+}
+
 export interface Invoice {
   id: string
   number: string
@@ -143,10 +152,8 @@ export interface Invoice {
   maintenance?: number
   /** En las facturas mensuales solo de mantenimiento: id de la primera factura (pack + 1.er mes) de la que salen. */
   originId?: string | null
-  /** Archivo de la factura real (jpg, png, webp o pdf). En Supabase es la ruta dentro del bucket privado «facturas»; en modo demostración, el propio archivo como data URL. */
-  attachmentPath?: string | null
-  attachmentName?: string | null
-  attachmentType?: string | null
+  /** Archivos de la factura real (jpg, png, webp o pdf); puede haber varios. */
+  files?: InvoiceFileItem[]
   /** IVA en porcentaje (21 = 21 %). */
   taxRate: number
   status: InvoiceStatus

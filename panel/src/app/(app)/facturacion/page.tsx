@@ -1,7 +1,7 @@
 'use client'
 
 import { AlertTriangle, CheckCircle2, CircleDollarSign, Clock, Pencil, Plus, Repeat, Trash2, TrendingUp, XCircle } from 'lucide-react'
-import { useSearchParams } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 import { useMemo, useState } from 'react'
 import { Donut } from '@/components/charts/donut'
 import { HorizontalBars } from '@/components/charts/horizontal-bars'
@@ -25,15 +25,17 @@ import { useCan } from '@/hooks/use-permissions'
 import { downloadCsv } from '@/lib/csv'
 import { formatCurrency, formatDate } from '@/lib/format'
 import { conceptLabel, invoiceStatusLabel } from '@/lib/labels'
-import { InvoiceFile } from '@/components/invoices/invoice-file'
+import { InvoiceFile, InvoiceLink } from '@/components/invoices/invoice-file'
 import { removeInvoiceFile } from '@/lib/invoice-files'
 import { packLabel } from '@/lib/packs'
+import { routes } from '@/lib/routes'
 import { billingByClient, billingByConcept, billingStats, effectiveStatus, invoiceBase, invoiceTotal, revenueSeries } from '@/lib/metrics'
 import { INVOICE_CONCEPTS, INVOICE_STATUSES, type Invoice, type InvoiceConcept, type InvoiceStatus } from '@/types/domain'
 
 export default function BillingPage() {
   const canWrite = useCan()('billing', 'write')
   const params = useSearchParams()
+  const router = useRouter()
   const { data: invoices, isLoading } = invoicesApi.useList()
   const { data: clients } = clientsApi.useList()
   const update = invoicesApi.useUpdate()
@@ -52,13 +54,13 @@ export default function BillingPage() {
   const rows = useMemo(() => (invoices ?? []).filter((i) => (status === 'ALL' || effectiveStatus(i) === status) && (concept === 'ALL' || i.concept === concept)), [invoices, status, concept])
 
   const columns: Col<Invoice>[] = [
-    { id: 'number', header: 'Número', accessorFn: (i) => i.number, cell: ({ row }) => <span className="font-medium tabular">{row.original.number}</span> },
+    { id: 'number', header: 'Número', accessorFn: (i) => i.number, cell: ({ row }) => <InvoiceLink invoice={row.original} /> },
     { id: 'client', header: 'Cliente', accessorFn: (i) => clientName.get(i.clientId) ?? '', cell: ({ row }) => <span className="whitespace-nowrap">{clientName.get(row.original.clientId) ?? '—'}</span> },
     { id: 'concept', header: 'Concepto', accessorFn: (i) => conceptLabel[i.concept], cell: ({ row }) => <div className="max-w-[240px]"><p className="truncate">{conceptLabel[row.original.concept]}</p><p className="truncate text-xs text-muted-foreground">{row.original.description}</p></div> },
     { id: 'issuedAt', header: 'Emisión', accessorFn: (i) => i.issuedAt, cell: ({ row }) => <span className="whitespace-nowrap text-muted-foreground">{formatDate(row.original.issuedAt)}</span> },
     { id: 'dueAt', header: 'Vencimiento', accessorFn: (i) => i.dueAt, cell: ({ row }) => <span className="whitespace-nowrap text-muted-foreground">{formatDate(row.original.dueAt)}</span> },
     { id: 'amount', header: 'Importe', accessorFn: (i) => invoiceTotal(i), cell: ({ row }) => <div className="text-right"><p className="font-medium tabular">{formatCurrency(invoiceTotal(row.original), 'EUR')}</p><p className="text-xs text-muted-foreground tabular">base {formatCurrency(invoiceBase(row.original))}{row.original.maintenance ? ` (incl. mant. ${formatCurrency(row.original.maintenance)})` : ''}</p></div> },
-    { id: 'file', header: 'Factura', enableSorting: false, accessorFn: (i) => (i.attachmentPath ? 1 : 0), cell: ({ row }) => <InvoiceFile invoice={row.original} compact /> },
+    { id: 'file', header: 'Factura', enableSorting: false, accessorFn: (i) => i.files?.length ?? 0, cell: ({ row }) => <InvoiceFile invoice={row.original} /> },
     { id: 'status', header: 'Estado', accessorFn: (i) => effectiveStatus(i), cell: ({ row }) => <InvoiceStatusBadge status={effectiveStatus(row.original)} /> },
     {
       id: 'actions',
@@ -148,7 +150,7 @@ export default function BillingPage() {
         initialSearch={params.get('q') ?? ''}
         searchText={(i) => `${i.number} ${clientName.get(i.clientId) ?? ''} ${conceptLabel[i.concept]} ${i.description}`}
         initialSort={[{ id: 'issuedAt', desc: true }]}
-        onRowClick={(i) => canWrite && setEditing(i)}
+        onRowClick={(i) => router.push(routes.invoice(i.id))}
         onExport={(list) => downloadCsv('facturas.csv', list.map((i) => ({ Numero: i.number, Cliente: clientName.get(i.clientId) ?? '', Concepto: conceptLabel[i.concept], Descripcion: i.description, Emision: formatDate(i.issuedAt), Vencimiento: formatDate(i.dueAt), Pack: i.pack ? packLabel(i.pack) : '', 'Base imponible (pack)': i.subtotal, Mantenimiento: i.maintenance ?? 0, IVA: i.taxRate, Total: invoiceTotal(i), Estado: invoiceStatusLabel[effectiveStatus(i)] })))}
         toolbar={
           <Select value={concept} onValueChange={(v) => setConcept(v as typeof concept)}>
@@ -170,7 +172,7 @@ export default function BillingPage() {
 
       <InvoiceFormDialog open={createOpen} onOpenChange={setCreateOpen} />
       <InvoiceFormDialog open={!!editing} onOpenChange={(o) => !o && setEditing(undefined)} invoice={editing} />
-      <ConfirmDialog open={!!toDelete} onOpenChange={(o) => !o && setToDelete(undefined)} title={`Eliminar factura ${toDelete?.number ?? ''}`} description="Se eliminará la factura. Si solo quieres anularla, usa «Cancelar factura» para conservar el registro." loading={remove.isPending} onConfirm={() => toDelete && remove.mutate(toDelete.id, { onSuccess: () => { void removeInvoiceFile(toDelete.attachmentPath); setToDelete(undefined) } })} />
+      <ConfirmDialog open={!!toDelete} onOpenChange={(o) => !o && setToDelete(undefined)} title={`Eliminar factura ${toDelete?.number ?? ''}`} description="Se eliminará la factura. Si solo quieres anularla, usa «Cancelar factura» para conservar el registro." loading={remove.isPending} onConfirm={() => toDelete && remove.mutate(toDelete.id, { onSuccess: () => { for (const f of toDelete.files ?? []) void removeInvoiceFile(f.path); setToDelete(undefined) } })} />
     </div>
   )
 }

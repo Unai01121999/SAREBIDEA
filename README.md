@@ -88,3 +88,7 @@ El hosting ya no es una sección del menú: se gestiona desde la ficha de cada c
 ## Archivo de cada factura
 
 Cada factura admite su archivo real (JPG, PNG, WEBP o PDF, máx. 10 MB) desde **Facturación** y desde la pestaña **Facturación** de la ficha del cliente: «Adjuntar» / «Cambiar» / «Quitar» (con permiso de edición) y «Ver» (cualquiera con acceso a facturación). «Ver» lo abre en otra pestaña del navegador, sin descargarlo; si el navegador tiene Adobe Acrobat como visor de PDF, se abre ahí. El archivo se guarda en un bucket privado de Supabase Storage (`facturas`) y se abre con una URL firmada que caduca a los 5 minutos. Migración: `supabase/migrations/011_archivo_de_factura.sql`.
+
+## Ficha de la factura
+
+Al hacer clic en una factura (en **Facturación** o en la pestaña Facturación de la ficha del cliente) se abre su **ficha** (`/facturacion/ficha?id=…`): datos de la factura, importes (pack, mantenimiento, IVA y total) y el apartado **Archivos adjuntos**, donde se pueden **adjuntar varios archivos** a la misma factura (también arrastrándolos), verlos con «Ver» en otra pestaña y quitarlos. En las tablas, «Ver» abre el archivo (o un menú si hay varios). Migración: `supabase/migrations/012_varios_archivos_por_factura.sql`.

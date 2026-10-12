@@ -9,7 +9,7 @@ import { Can } from '@/components/shared/can'
 import { useCan } from '@/hooks/use-permissions'
 import { DomainFormDialog } from '@/components/domains/domain-form'
 import { HostingFormDialog } from '@/components/hosting/hosting-form'
-import { InvoiceFile } from '@/components/invoices/invoice-file'
+import { InvoiceFile, InvoiceLink } from '@/components/invoices/invoice-file'
 import { InvoiceFormDialog } from '@/components/invoices/invoice-form'
 import { PageHeader } from '@/components/layout/page-header'
 import { ClientStatusBadge, ExpiryBadge, InvoiceStatusBadge, ServiceChip, TechBadge, WebsiteStatusBadge } from '@/components/shared/badges'
@@ -265,8 +265,8 @@ export default function ClientDetailPage() {
               </TableHeader>
               <TableBody>
                 {cInvoices.map((i) => (
-                  <TableRow key={i.id}>
-                    <TableCell className="font-medium tabular">{i.number}</TableCell>
+                  <TableRow key={i.id} className="cursor-pointer" onClick={() => router.push(routes.invoice(i.id))}>
+                    <TableCell><InvoiceLink invoice={i} /></TableCell>
                     <TableCell>{conceptLabel[i.concept]}</TableCell>
                     <TableCell className="text-muted-foreground">{formatDate(i.issuedAt)}</TableCell>
                     <TableCell><InvoiceStatusBadge status={effectiveStatus(i)} /></TableCell>
