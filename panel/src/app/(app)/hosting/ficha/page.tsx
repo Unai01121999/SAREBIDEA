@@ -42,8 +42,8 @@ export default function HostingDetailPage() {
   return (
     <div className="animate-fade-up">
       <PageHeader
-        crumbs={[{ label: 'Clientes', href: '/clientes' }, { label: `${h.provider} · ${h.plan}` }]}
-        title={`${h.provider} · ${h.plan}`}
+        crumbs={[{ label: 'Clientes', href: '/clientes' }, { label: h.provider }]}
+        title={h.provider}
         description={
           <span className="flex flex-wrap items-center gap-2">
             <Badge tone={h.active ? 'success' : 'neutral'}>{h.active ? 'Activo' : 'Inactivo'}</Badge>
@@ -77,9 +77,6 @@ export default function HostingDetailPage() {
             <Row label="Cliente">{client ? <Link href={routes.client(client.id)} className="hover:text-brand hover:underline">{client.company}</Link> : '—'}</Row>
             <Row label="Web">{web ? <Link href={routes.website(web.id)} className="hover:text-brand hover:underline">{web.name}</Link> : 'Sin web asociada'}</Row>
             <Row label="Proveedor">{h.provider}</Row>
-            <Row label="Plan">{h.plan}</Row>
-            <Row label="Coste anual">{formatCurrency(h.annualCost)}</Row>
-            <Row label="Coste mensual equivalente">{formatCurrency(h.annualCost / 12)}</Row>
             <Row label="Fecha de contratación">{formatDate(h.contractedAt)}</Row>
             <Row label="Fecha de renovación">{formatDate(h.renewsAt)}</Row>
             <Row label="Notas" className="sm:col-span-2">

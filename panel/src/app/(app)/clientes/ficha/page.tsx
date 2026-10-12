@@ -170,7 +170,7 @@ export default function ClientDetailPage() {
                   cHostings.map((h) => (
                     <Link key={h.id} href={routes.hosting(h.id)} className="flex items-center justify-between gap-2 rounded-lg border px-3 py-2 text-sm transition-colors hover:bg-muted/50">
                       <span className="truncate">
-                        {h.provider} · {h.plan}
+                        {h.provider}
                       </span>
                       <ExpiryBadge renewsAt={h.renewsAt} />
                     </Link>

@@ -79,8 +79,7 @@ export function domainDefaults(client: Client, web: Website | undefined, ctx: Pr
 export function hostingDefaults(client: Client, web: Website | undefined, ctx: PrefillContext) {
   const mine = ctx.hostings.filter((h) => h.clientId === client.id)
   const provider = web?.hostingProvider || mostCommon(mine.map((h) => h.provider))
-  const same = mine.find((h) => h.provider === provider)
-  return { websiteId: web?.id, provider, plan: same?.plan, annualCost: same?.annualCost }
+  return { websiteId: web?.id, provider }
 }
 
 /** Si el cliente tiene una sola web, se propone esa (para domino, hosting y tareas). */

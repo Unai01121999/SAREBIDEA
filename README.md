@@ -94,3 +94,7 @@ Cada factura admite su archivo real (JPG, PNG, WEBP o PDF, máx. 10 MB) desde **
 Si una factura no tiene web y el cliente tiene una sola, se vincula a ella automáticamente al guardarla.
 
 Al hacer clic en una factura (en **Facturación** o en la pestaña Facturación de la ficha del cliente) se abre su **ficha** (`/facturacion/ficha?id=…`): datos de la factura, importes (pack, mantenimiento, IVA y total) y el apartado **Archivos adjuntos**, donde se pueden **adjuntar varios archivos** a la misma factura (también arrastrándolos), verlos con «Ver» en otra pestaña y quitarlos. En las tablas, «Ver» abre el archivo (o un menú si hay varios). Migración: `supabase/migrations/012_varios_archivos_por_factura.sql`.
+
+## Hosting sin plan ni coste
+
+La ficha y el formulario de hosting solo muestran proveedor, web asociada, fechas de contratación y renovación, estado y notas; ya no hay plan ni coste anual/mensual. Las columnas `plan` y `coste_anual` de `alojamientos` quedan sin usar (migración `013`).

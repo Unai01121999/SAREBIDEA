@@ -80,7 +80,7 @@ export function upcomingRenewals<T extends Domain | Hosting>(rows: T[], kind: 'd
     .map((r) => ({
       id: r.id,
       kind,
-      label: kind === 'domain' ? (r as Domain).name : `${(r as Hosting).provider} · ${(r as Hosting).plan}`,
+      label: kind === 'domain' ? (r as Domain).name : (r as Hosting).provider,
       clientId: r.clientId,
       renewsAt: r.renewsAt,
       days: daysUntil(r.renewsAt) ?? 9999,
