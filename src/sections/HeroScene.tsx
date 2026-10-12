@@ -79,7 +79,7 @@ export function HeroScene() {
           {/* Capa principal: web de escritorio */}
           <div className="absolute top-[16%] left-[2%] w-[84%]" style={{ transform: 'translateZ(0px)' }}>
             <div className="relative">
-              <BrowserFrame url="brasaysal.com" className="shadow-[0_2px_4px_rgb(13_14_18/0.08),0_30px_60px_-20px_rgb(13_14_18/0.35),0_80px_120px_-40px_rgb(42_46_196/0.3)]">
+              <BrowserFrame url="tintagrano.es" className="shadow-[0_2px_4px_rgb(13_14_18/0.08),0_30px_60px_-20px_rgb(13_14_18/0.35),0_80px_120px_-40px_rgb(42_46_196/0.3)]">
                 <SiteDesktop p={main} />
               </BrowserFrame>
               {/* Reflejo especular que se desplaza con la luz */}
@@ -127,7 +127,7 @@ export function HeroScene() {
               </span>
               <span className="text-[13px] leading-tight text-ink">
                 <span className="font-semibold">1.º en Google</span>
-                <span className="text-mute"> · "asador cerca de mí"</span>
+                <span className="text-mute"> · "café y libros cerca de mí"</span>
               </span>
             </div>
           </div>
