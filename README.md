@@ -101,9 +101,9 @@ La ficha y el formulario de hosting solo muestran proveedor, web asociada, fecha
 
 ## Ejemplo «Tinta & Grano» con vista previa
 
-El ejemplo 1 del portafolio es la web real **Tinta & Grano** (café y librería), alojada en `public/ejemplos/tinta-y-grano/` (se publica en `/ejemplos/tinta-y-grano/`). Al pinchar en el ejemplo se abre una **vista previa** sobre la página (iframe) con selector Escritorio/Móvil, «Abrir en pestaña nueva» y cierre con Esc. Las miniaturas son capturas reales de esa web (`preview-desktop.jpg` / `preview-mobile.jpg`). Detalles:
+El ejemplo 1 del portafolio es la web real **Tinta & Grano** (café de especialidad y librería; segunda versión, con Cormorant Garamond e Inter alojadas en local), alojada en `public/ejemplos/tinta-y-grano/` (se publica en `/ejemplos/tinta-y-grano/`). Al pinchar en el ejemplo se abre una **vista previa** sobre la página (iframe) con selector Escritorio/Móvil, «Abrir en pestaña nueva» y cierre con Esc. Las miniaturas son capturas reales de esa web (`preview-desktop.jpg` / `preview-mobile.jpg`). Detalles:
 
-- La tipografía Geist está alojada en local (sin Google Fonts) y el script inline se movió a `js-flag.js`, para cumplir la política de seguridad (`public/ejemplos/.htaccess`: CSP propia, `noindex`, sin terceros).
+- Las tipografías están alojadas en local (sin Google Fonts) y el script inline se movió a `js-flag.js`, para cumplir la política de seguridad (`public/ejemplos/.htaccess`: CSP propia, `noindex`, sin terceros).
 - `/ejemplos/` está en `robots.txt` como `Disallow` y con `X-Robots-Tag: noindex`: no compite con la web principal en Google.
 - Para añadir otra web de ejemplo: copia su carpeta a `public/ejemplos/<nombre>/`, haz sus capturas y rellena `screenshot` y `preview` en `projects` (`src/data/site.ts`).
 
