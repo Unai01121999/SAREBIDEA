@@ -94,7 +94,7 @@ export function Showcase() {
   const wide = useMediaQuery('(min-width: 768px)')
   const [preview, setPreview] = useState<Project | null>(null)
   return (
-    <section id="ejemplos" className="relative overflow-hidden bg-tone-showcase py-24 sm:py-32 lg:py-40" aria-labelledby="showcase-title">
+    <section id="ejemplos" className="relative overflow-hidden bg-tone-showcase section-y" aria-labelledby="showcase-title">
       <div className="container-x">
         <div className="grid gap-6 lg:grid-cols-[1.3fr_1fr] lg:items-end">
           <TextReveal id="showcase-title" as="h2" text="Así podría verse tu negocio." className="h-section max-w-[720px]" accent={[4]} />

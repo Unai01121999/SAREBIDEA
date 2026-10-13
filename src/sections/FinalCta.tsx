@@ -8,7 +8,7 @@ import { Reveal } from '../components/ui/Reveal'
 import { TextReveal } from '../components/ui/TextReveal'
 
 const field =
-  'h-13 w-full rounded-2xl bg-white/[0.06] px-4 text-[1rem] text-paper ring-1 ring-white/12 transition-[box-shadow,background-color] duration-200 placeholder:text-white/40 hover:bg-white/[0.08] focus:bg-white/[0.09] focus:ring-2 focus:ring-lilac focus:outline-none'
+  'h-13 w-full rounded-2xl bg-white/[0.06] px-4 text-[1rem] text-paper ring-1 ring-white/16 transition-[box-shadow,background-color] duration-200 placeholder:text-white/45 hover:bg-white/[0.08] focus:bg-white/[0.09] focus:ring-2 focus:ring-lilac focus:outline-none'
 
 export function FinalCta() {
   const [sent, setSent] = useState(false)
@@ -61,7 +61,7 @@ export function FinalCta() {
   const aria = (k: keyof LeadFormErrors) => ({ 'aria-invalid': !!errors[k], 'aria-describedby': errors[k] ? `${k}-error` : undefined })
 
   return (
-    <section id="contacto" className="on-dark relative isolate overflow-hidden bg-night py-24 text-paper sm:py-32 lg:py-40" aria-labelledby="cta-title">
+    <section id="contacto" className="on-dark relative isolate overflow-hidden bg-night section-y text-paper" aria-labelledby="cta-title">
       {/* Glow animado: dos luces que derivan muy despacio (CSS, fuera del hilo principal) */}
       <div aria-hidden="true" className="pointer-events-none absolute inset-0 -z-10">
         <div className="anim-drift absolute top-[-30%] left-[-10%] h-[90%] w-[70%] rounded-full bg-[radial-gradient(closest-side,rgb(58_63_242/0.55),transparent)]" />
@@ -123,35 +123,35 @@ export function FinalCta() {
                   aria-label="Solicitar propuesta"
                 >
                   <div>
-                    <label htmlFor="company" className="mb-2 block text-sm text-white/70">
+                    <label htmlFor="company" className="mb-2 block text-[0.875rem] font-medium text-white/80">
                       Nombre de la empresa
                     </label>
                     <input id="company" name="company" autoComplete="organization" placeholder="Panadería Urrutia" className={field} {...aria('company')} />
                     {err('company')}
                   </div>
                   <div>
-                    <label htmlFor="name" className="mb-2 block text-sm text-white/70">
+                    <label htmlFor="name" className="mb-2 block text-[0.875rem] font-medium text-white/80">
                       Persona de contacto
                     </label>
                     <input id="name" name="name" autoComplete="name" placeholder="Ane Etxeberria Goñi" className={field} {...aria('name')} />
                     {err('name')}
                   </div>
                   <div>
-                    <label htmlFor="phone" className="mb-2 block text-sm text-white/70">
+                    <label htmlFor="phone" className="mb-2 block text-[0.875rem] font-medium text-white/80">
                       Teléfono
                     </label>
                     <input id="phone" name="phone" type="tel" inputMode="tel" autoComplete="tel" placeholder="600 000 000" className={field} {...aria('phone')} />
                     {err('phone')}
                   </div>
                   <div>
-                    <label htmlFor="email" className="mb-2 block text-sm text-white/70">
+                    <label htmlFor="email" className="mb-2 block text-[0.875rem] font-medium text-white/80">
                       Correo electrónico
                     </label>
                     <input id="email" name="email" type="email" inputMode="email" autoComplete="email" placeholder="tu@negocio.com" className={field} {...aria('email')} />
                     {err('email')}
                   </div>
                   <div className="sm:col-span-2">
-                    <label htmlFor="businessType" className="mb-2 block text-sm text-white/70">
+                    <label htmlFor="businessType" className="mb-2 block text-[0.875rem] font-medium text-white/80">
                       Tipo de negocio
                     </label>
                     <div className="relative">
@@ -170,7 +170,7 @@ export function FinalCta() {
                     {err('businessType')}
                   </div>
                   <div className="sm:col-span-2">
-                    <label htmlFor="pack" className="mb-2 block text-sm text-white/70">
+                    <label htmlFor="pack" className="mb-2 block text-[0.875rem] font-medium text-white/80">
                       ¿Qué pack te interesa?
                     </label>
                     <div className="relative">
@@ -192,7 +192,7 @@ export function FinalCta() {
                     {err('pack')}
                   </div>
                   <div className="sm:col-span-2">
-                    <label htmlFor="description" className="mb-2 block text-sm text-white/70">
+                    <label htmlFor="description" className="mb-2 block text-[0.875rem] font-medium text-white/80">
                       Breve descripción
                     </label>
                     <textarea

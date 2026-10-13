@@ -27,14 +27,14 @@ export function Footer() {
   return (
     <footer className="on-dark relative overflow-hidden bg-night text-paper">
       <div className="container-x border-t border-white/10 pt-16 pb-10">
-        <div className="grid gap-12 md:grid-cols-[1.4fr_1fr_1fr_1fr]">
-          <div>
+        <div className="grid grid-cols-2 gap-x-6 gap-y-10 md:grid-cols-[1.4fr_1fr_1fr_1fr] md:gap-12">
+          <div className="col-span-2 md:col-span-1">
             <Logo tone="paper" size={30} tagline />
             <p className="mt-6 max-w-[20rem] text-white/55">Webs profesionales para comercios y pequeños negocios que quieren más clientes.</p>
           </div>
           {cols.map((c) => (
             <nav key={c.title} aria-label={c.title}>
-              <h2 className="text-sm text-white/40">{c.title}</h2>
+              <h2 className="text-sm text-white/50">{c.title}</h2>
               <ul className="mt-3 md:space-y-0.5">
                 {c.links.map(([l, h]) => (
                   <li key={l}>
@@ -53,8 +53,8 @@ export function Footer() {
               </ul>
             </nav>
           ))}
-          <div>
-            <h2 className="text-sm text-white/40">Contacto</h2>
+          <div className="col-span-2 md:col-span-1">
+            <h2 className="text-sm text-white/50">Contacto</h2>
             <ul className="mt-3 text-white/80">
               <li>
                 <a href={`mailto:${brand.email}`} className="inline-block py-2.5 hover:text-white md:py-1.5">

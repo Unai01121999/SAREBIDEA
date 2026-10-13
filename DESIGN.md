@@ -59,3 +59,5 @@ Sustituir ejemplos por capturas reales: cada proyecto en `site.ts` acepta `image
 
 > 2026-10-05: eliminadas a petición de Unai las secciones de Precios y "Más que una web bonita" (Diferenciación).
 > 2026-10-05: eliminada a petición de Unai la sección de testimonios de ejemplo.
+
+> 2026-10-13 · Rediseño visual (solo presentación, contenido idéntico): ritmo vertical común (`.section-y`, `.section-gap`), titulares algo más contenidos, servicios en composición editorial (2 tarjetas anchas + 3 iguales), packs con las tres tarjetas al mismo nivel (sin plan «destacado»), hero con tipografía escalada por anchura (3 líneas en 1024 px), tarjetas con elevación mínima (`.card-lift`), sin movimiento continuo en las tarjetas flotantes del hero y rótulo de sectores más lento y con pausa al pasar el cursor, pie en dos columnas en móvil.

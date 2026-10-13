@@ -46,7 +46,7 @@ const pins = [
 export function Problem() {
   const reduced = useReducedMotion()
   return (
-    <section className="relative bg-tone-problem py-24 sm:py-32 lg:py-40" aria-labelledby="problem-title">
+    <section className="relative bg-tone-problem section-y" aria-labelledby="problem-title">
       <div className="container-x">
         <div className="max-w-[860px]">
           <TextReveal
@@ -62,7 +62,7 @@ export function Problem() {
           </Reveal>
         </div>
 
-        <div className="mt-14 grid gap-12 lg:mt-20 lg:grid-cols-[1.1fr_1fr] lg:items-center lg:gap-16">
+        <div className="section-gap grid gap-12 lg:grid-cols-[1.1fr_1fr] lg:items-center lg:gap-16">
           <Reveal className="relative lg:sticky lg:top-28">
             <div className="relative">
               <OldSite />

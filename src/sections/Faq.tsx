@@ -33,7 +33,7 @@ function Item({ q, a, open, onToggle }: { q: string; a: string; open: boolean; o
         className={`grid transition-[grid-template-rows,opacity] duration-300 ease-[var(--ease-out-strong)] ${open ? 'grid-rows-[1fr] opacity-100' : 'grid-rows-[0fr] opacity-0'}`}
       >
         <div className="overflow-hidden" inert={!open}>
-          <p className="max-w-[40rem] pr-12 pb-7 text-[1rem] leading-relaxed text-mute">{a}</p>
+          <p className="max-w-[40rem] pr-12 pb-7 text-[1.0625rem] leading-relaxed text-ink-2/90">{a}</p>
         </div>
       </div>
     </li>
@@ -43,7 +43,7 @@ function Item({ q, a, open, onToggle }: { q: string; a: string; open: boolean; o
 export function Faq() {
   const [open, setOpen] = useState<number | null>(0)
   return (
-    <section id="faq" className="relative bg-tone-faq py-24 sm:py-32 lg:py-40" aria-labelledby="faq-title">
+    <section id="faq" className="relative bg-tone-faq section-y" aria-labelledby="faq-title">
       <div className="container-x grid gap-12 lg:grid-cols-[1fr_1.4fr] lg:gap-20">
         <div className="lg:sticky lg:top-32 lg:self-start">
           <TextReveal id="faq-title" as="h2" text="Preguntas frecuentes" className="h-section" accent={[1]} />

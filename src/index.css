@@ -30,8 +30,8 @@
   --ease-out-strong: cubic-bezier(0.23, 1, 0.32, 1);
   --ease-in-out-strong: cubic-bezier(0.77, 0, 0.175, 1);
 
-  --shadow-float: 0 1px 2px rgb(13 14 18 / 0.06), 0 12px 32px -8px rgb(13 14 18 / 0.14),
-    0 40px 80px -24px rgb(13 14 18 / 0.18);
+  --shadow-float: 0 1px 2px rgb(13 14 18 / 0.05), 0 10px 28px -10px rgb(13 14 18 / 0.14),
+    0 32px 64px -28px rgb(13 14 18 / 0.16);
   --shadow-soft: 0 1px 2px rgb(13 14 18 / 0.05), 0 8px 24px -10px rgb(13 14 18 / 0.12);
 }
 
@@ -96,12 +96,36 @@
     letter-spacing: -0.032em;
     line-height: 1.02;
     font-weight: 600;
-    font-size: clamp(2.25rem, 1.4rem + 3.6vw, 4.25rem);
+    font-size: clamp(2.125rem, 1.45rem + 3vw, 3.875rem);
   }
   .lede {
-    font-size: clamp(1.0625rem, 0.98rem + 0.35vw, 1.25rem);
-    line-height: 1.55;
+    font-size: clamp(1.0625rem, 0.98rem + 0.3vw, 1.1875rem);
+    line-height: 1.6;
     color: var(--color-mute);
+  }
+  /* Ritmo vertical común a todas las secciones y separación cabecera → contenido */
+  .section-y {
+    padding-block: clamp(4.5rem, 3rem + 5.5vw, 8rem);
+  }
+  .section-gap {
+    margin-top: clamp(2.5rem, 1.8rem + 2.6vw, 4.25rem);
+  }
+  /* Etiqueta pequeña y discreta (eyebrow) */
+  .eyebrow {
+    font-size: 0.8125rem;
+    font-weight: 500;
+    letter-spacing: 0.01em;
+    color: var(--color-mute);
+  }
+  /* Tarjeta con hover discreto: elevación mínima y borde algo más marcado */
+  .card-lift {
+    transition: transform 0.35s var(--ease-out-strong), box-shadow 0.35s var(--ease-out-strong), border-color 0.2s;
+  }
+  @media (hover: hover) and (pointer: fine) {
+    .card-lift:hover {
+      transform: translate3d(0, -3px, 0);
+      box-shadow: var(--shadow-soft);
+    }
   }
   .container-x {
     width: 100%;
@@ -180,11 +204,10 @@
     transform: translate3d(-50%, 0, 0);
   }
 }
-.anim-float-a {
-  animation: float-a 7s ease-in-out infinite;
-}
+/* Sin vaivenes constantes: las tarjetas flotantes de la portada se quedan quietas (el movimiento lo pone el ratón). */
+.anim-float-a,
 .anim-float-b {
-  animation: float-b 8s ease-in-out infinite;
+  animation: none;
 }
 .anim-drift {
   animation: drift 26s linear infinite;
@@ -193,7 +216,10 @@
   animation: ping-soft 2.2s cubic-bezier(0.23, 1, 0.32, 1) infinite;
 }
 .anim-marquee {
-  animation: marquee 40s linear infinite;
+  animation: marquee 60s linear infinite;
+}
+.anim-marquee:hover {
+  animation-play-state: paused;
 }
 
 @media (prefers-reduced-motion: reduce) {

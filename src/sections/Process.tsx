@@ -12,7 +12,7 @@ export function Process() {
   const line = useTransform(progress, (v) => `scaleY(${v})`)
 
   return (
-    <section id="como-funciona" className="relative bg-tone-process py-24 sm:py-32 lg:py-40" aria-labelledby="process-title">
+    <section id="como-funciona" className="relative bg-tone-process section-y" aria-labelledby="process-title">
       <div className="container-x grid gap-14 lg:grid-cols-[1fr_1.15fr] lg:gap-20">
         <div className="lg:sticky lg:top-32 lg:self-start">
           <TextReveal id="process-title" as="h2" text="Tú a lo tuyo. Nosotros, a lo demás." className="h-section max-w-[560px]" accent={[4, 5]} />

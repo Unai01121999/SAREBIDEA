@@ -23,7 +23,7 @@ export function Hero() {
         <div className="absolute inset-0 [background-image:linear-gradient(rgb(13_14_18/0.05)_1px,transparent_1px),linear-gradient(90deg,rgb(13_14_18/0.05)_1px,transparent_1px)] [background-size:72px_72px] [mask-image:radial-gradient(70%_60%_at_60%_30%,#000_10%,transparent_75%)]" />
       </div>
 
-      <div className="container-x grid items-center gap-y-10 lg:grid-cols-[1.02fr_1fr] lg:gap-x-8">
+      <div className="container-x grid items-center gap-y-10 lg:grid-cols-[1.05fr_1fr] lg:gap-x-10">
         <div className="relative z-10 max-w-[640px]">
           <TextReveal
             as="h1"
@@ -32,7 +32,7 @@ export function Hero() {
             delay={0.1}
             accent={[5]}
             text="La web que tu negocio necesita."
-            className="display text-[clamp(2.9rem,1.2rem+6.6vw,6rem)]"
+            className="display text-[clamp(2.75rem,1rem+5.4vw,5.25rem)]"
           />
           <m.p {...fade(0.55)} className="lede mt-6 max-w-[34rem] sm:mt-8">
             Creamos páginas web modernas para comercios que quieren atraer más clientes, generar confianza y destacar frente a su competencia.
@@ -57,7 +57,7 @@ export function Hero() {
           </m.ul>
         </div>
 
-        <div className="relative mx-auto w-full max-w-[560px] lg:max-w-none lg:translate-x-[4%]">
+        <div className="relative mx-auto w-full max-w-[560px] lg:max-w-none xl:translate-x-[3%]">
           <HeroScene />
         </div>
       </div>

@@ -130,3 +130,7 @@ El ejemplo 4 del portafolio es la web real **Clínica Lur**: web estática de va
 ## Caché de las webs de ejemplo
 
 `public/ejemplos/.htaccess` hace que el navegador **revalide siempre** HTML, CSS, JS e imágenes (los nombres no cambian al actualizar una demo); solo las tipografías se guardan 30 días. Las capturas de las miniaturas llevan versión en el nombre (`preview-v2-*.jpg`): al cambiar una captura, súbele la versión al nombre y actualiza `screenshot` en `src/data/site.ts`.
+
+## Rediseño visual (2026-10-13)
+
+Mejora de la presentación sin tocar el contenido: el texto (485 fragmentos), los 33 enlaces, el `<head>` de SEO (título, metas, canonical, JSON-LD), las rutas, el formulario y el panel son idénticos a la versión anterior (comprobado automáticamente antes y después). Cambios principales: `src/index.css` (utilidades de ritmo `.section-y` / `.section-gap`, `.card-lift`, escala de titulares y `lede`, sombras más contenidas, sin vaivenes continuos), `Hero.tsx` (tipografía y columnas por anchura), `Services.tsx` (composición editorial), `Packs.tsx` (tres tarjetas iguales), `Faq.tsx`, `About.tsx`, `FinalCta.tsx` (contraste de etiquetas) y `Footer.tsx` (dos columnas en móvil).

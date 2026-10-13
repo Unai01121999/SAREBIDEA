@@ -183,7 +183,7 @@ const icons: Record<ServiceKey, IconName> = {
 
 export function Services() {
   return (
-    <section id="servicios" className="relative bg-tone-services py-24 sm:py-32 lg:py-40" aria-labelledby="services-title">
+    <section id="servicios" className="relative bg-tone-services section-y" aria-labelledby="services-title">
       <div className="container-x">
         <div className="grid gap-6 lg:grid-cols-[1.3fr_1fr] lg:items-end">
           <TextReveal id="services-title" as="h2" text="Todo lo que tu web necesita. Nada de lo que preocuparte." className="h-section max-w-[780px]" accent={[6, 7, 8]} />
@@ -194,24 +194,25 @@ export function Services() {
           </Reveal>
         </div>
 
-        <ol className="mt-14 grid gap-4 sm:grid-cols-2 lg:mt-20 lg:grid-cols-3 lg:gap-5">
+        <ol className="section-gap grid gap-4 sm:grid-cols-2 lg:grid-cols-12 lg:gap-5">
           {services.map((s, i) => {
             const dark = s.key === 'conversion'
+            // Composición editorial: dos tarjetas anchas (horizontales), una estrecha y tres iguales; evita seis tarjetas idénticas.
+            const wide = s.key === 'design' || s.key === 'care'
+            const span = { design: 'lg:col-span-7', mobile: 'lg:col-span-5', seo: 'lg:col-span-4', conversion: 'lg:col-span-4', speed: 'lg:col-span-4', care: 'lg:col-span-12' }[s.key]
             return (
-              <Reveal as="li" key={s.key} delay={(i % 3) * 0.08} className="group flex flex-col rounded-[28px] bg-[#faf7f1] p-2.5 ring-1 ring-line">
+              <Reveal as="li" key={s.key} delay={(i % 3) * 0.08} className={`group card-lift flex flex-col rounded-[24px] bg-[#faf7f1] p-2 ring-1 ring-line ${span} ${wide ? 'lg:flex-row' : ''}`}>
                 <div
-                  className={`relative h-[220px] overflow-hidden rounded-[20px] p-4 sm:p-5 ${dark ? 'on-dark flex flex-col justify-center bg-ink' : 'bg-[#efe7da]'} ${s.key === 'seo' || s.key === 'care' ? 'flex flex-col justify-center' : ''}`}
+                  className={`relative h-[220px] overflow-hidden rounded-[18px] p-4 sm:p-5 ${wide ? 'lg:h-auto lg:min-h-[280px] lg:w-[44%] lg:shrink-0' : ''} ${dark ? 'on-dark flex flex-col justify-center bg-ink' : 'bg-[#efe7da]'} ${s.key === 'seo' || s.key === 'care' ? 'flex flex-col justify-center' : ''}`}
                 >
                   {visuals[s.key]}
                 </div>
 
-                <div className="flex flex-1 flex-col px-3.5 pt-5 pb-4 sm:px-4">
+                <div className={`flex flex-1 flex-col px-4 pt-5 pb-4 sm:px-5 ${wide ? 'lg:justify-center lg:px-8 lg:py-6' : ''}`}>
                   <div className="flex items-center justify-between">
-                    <span className="flex items-center gap-2.5">
-                      <span className="flex size-9 items-center justify-center rounded-xl bg-ink text-paper">
-                        <Icon name={icons[s.key]} size={17} />
-                      </span>
-                      <span className="rounded-full bg-cobalt/[0.08] px-2.5 py-1 text-[12px] font-medium text-cobalt">{s.tag}</span>
+                    <span className="inline-flex items-center gap-1.5 rounded-full bg-cobalt/[0.08] py-1 pr-3 pl-2.5 text-[12px] font-medium text-cobalt">
+                      <Icon name={icons[s.key]} size={14} strokeWidth={1.8} />
+                      {s.tag}
                     </span>
                     <span className="text-[13px] text-mute tabular" aria-hidden="true">
                       {String(i + 1).padStart(2, '0')}
@@ -224,9 +225,7 @@ export function Services() {
                   <ul className="mt-5 space-y-2.5 border-t border-line pt-5" aria-label={`Qué incluye: ${s.title}`}>
                     {s.includes.map((item) => (
                       <li key={item} className="flex items-start gap-2.5 text-[0.95rem] leading-snug text-ink-2">
-                        <span className="mt-px flex size-5 shrink-0 items-center justify-center rounded-full bg-emerald-600/10 text-emerald-700">
-                          <Icon name="check" size={13} strokeWidth={2.4} />
-                        </span>
+                        <Icon name="check" size={16} strokeWidth={2.2} className="mt-0.5 shrink-0 text-cobalt" />
                         {item}
                       </li>
                     ))}
@@ -237,7 +236,7 @@ export function Services() {
           })}
         </ol>
 
-        <Reveal delay={0.1} className="mt-5 rounded-[28px] bg-[#f3ece1] p-6 ring-1 ring-line sm:p-8">
+        <Reveal delay={0.1} className="mt-5 rounded-[24px] bg-[#f3ece1] p-6 ring-1 ring-line sm:p-8">
           <div className="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
             <p className="font-display text-[1.35rem] leading-tight font-semibold tracking-[-0.02em] text-ink">Y además, siempre incluido</p>
             <ul className="grid gap-x-8 gap-y-4 sm:grid-cols-2 lg:flex lg:gap-8">
