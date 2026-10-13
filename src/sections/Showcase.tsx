@@ -89,7 +89,7 @@ function TiltProject({ p, className = '', big = false, onPreview }: { p: Project
 }
 
 export function Showcase() {
-  const [a, b, c, d, e, f, g] = projects
+  const [a, b, c, d, g] = projects
   // Solo se pinta una de las dos composiciones (no las dos con una oculta): así el HTML no repite cada proyecto.
   const wide = useMediaQuery('(min-width: 768px)')
   const [preview, setPreview] = useState<Project | null>(null)
@@ -149,17 +149,11 @@ export function Showcase() {
           <Reveal delay={0.08} className="col-span-6 lg:col-span-4 lg:translate-y-14">
             <TiltProject p={d} onPreview={setPreview} />
           </Reveal>
-          <Reveal delay={0.16} className="col-span-6 lg:col-span-4">
-            <TiltProject p={e} onPreview={setPreview} />
-          </Reveal>
-          <Reveal className="col-span-6 lg:col-span-5 lg:col-start-2 lg:mt-8">
-            <TiltProject p={f} onPreview={setPreview} />
-          </Reveal>
-          <Reveal delay={0.1} className="col-span-12 md:col-span-6 md:col-start-4 lg:col-span-5 lg:col-start-auto lg:mt-8">
+          <Reveal delay={0.16} className="col-span-12 md:col-span-6 md:col-start-4 lg:col-span-4 lg:col-start-auto">
             <TiltProject p={g} onPreview={setPreview} />
           </Reveal>
         </div>
-        <Reveal className="mt-20 flex flex-col items-center gap-4 text-center">
+        <Reveal className="mt-20 flex flex-col items-center gap-4 text-center lg:mt-32">
           <p className="text-mute">¿Tu sector no está aquí? Lo diseñamos igual de bien.</p>
           <Button href="#contacto">Quiero ver cómo quedaría la mía</Button>
         </Reveal>
