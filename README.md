@@ -114,3 +114,7 @@ El ejemplo 2 del portafolio es **Maison Alba**, una web React/Vite. Su código f
 - **Miniatura en vivo**: en el portafolio se ve la propia web reducida (iframe no interactivo que solo se carga cuando la tarjeta está a punto de verse), no una captura.
 - **Fotografías**: la web carga sus fotos de Unsplash (`images.unsplash.com`); `public/ejemplos/maison-alba/.htaccess` permite solo ese origen para imágenes. Sustitúyelas por fotos propias en `src/data/site.ts` (`IMAGES`) si quieres que sean locales.
 - **Recompilar** tras cambiar algo: `cd ejemplos-codigo/maison-alba && npm install && npx vite build --base=./` y copiar `dist/*` a `public/ejemplos/maison-alba/` (conservando su `.htaccess` y añadiendo `<meta name="robots" content="noindex, nofollow">` al `index.html`).
+
+## Ejemplo «Taller Ibarra» (taller mecánico) con vista previa
+
+El ejemplo 3 del portafolio es la web real **Taller Ibarra**, alojada en `public/ejemplos/taller-ibarra/` (se publica en `/ejemplos/taller-ibarra/`). Se abre en la misma vista previa que los otros dos ejemplos y su miniatura es una captura real (`preview-desktop.jpg` / `preview-mobile.jpg`). Las tipografías (Cormorant Garamond e Inter) están alojadas en local, sin Google Fonts. Los datos de contacto (`config.js`) están vacíos a propósito: la demo muestra «pendiente» y su formulario no envía nada. Sus datos reales irían en `config.js`.

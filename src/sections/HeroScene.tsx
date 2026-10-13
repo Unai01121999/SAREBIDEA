@@ -71,7 +71,7 @@ export function HeroScene() {
             style={{ transform: 'translateZ(-180px)' }}
             aria-hidden="true"
           >
-            <BrowserFrame url="clinicalur.es" className="shadow-[var(--shadow-float)]">
+            <BrowserFrame url="talleribarra.es" className="shadow-[var(--shadow-float)]">
               <SiteDesktop p={back} />
             </BrowserFrame>
           </div>
