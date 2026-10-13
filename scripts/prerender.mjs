@@ -21,11 +21,23 @@ if (existsSync(sitemap)) writeFileSync(sitemap, readFileSync(sitemap, 'utf8')
   .replace(/<lastmod>[^<]*<\/lastmod>/g, `<lastmod>${new Date().toISOString().slice(0, 10)}</lastmod>`))
 writeFileSync(join(dist, 'version.txt'), `SAREBIDEA · compilación ${new Date().toISOString()}${commit ? ` · ${commit}` : ''}\n`)
 const chrome = process.env.CHROMIUM_PATH || '/opt/pw-browsers/chromium'
+// Si no hay navegador para prerenderizar, las páginas legales se publican igualmente: se copia la portada (la propia web resuelve la ruta
+// y pinta la página que toca). Así /aviso-legal/ etc. nunca dan 404 aunque se compile en un equipo sin Chromium.
+function legalFallback() {
+  for (const r of ['aviso-legal', 'politica-de-privacidad', 'politica-de-cookies']) {
+    const f = join(dist, r, 'index.html')
+    if (existsSync(f)) continue
+    mkdirSync(dirname(f), { recursive: true })
+    writeFileSync(f, readFileSync(join(dist, 'index.html'), 'utf8'))
+    console.log(`Aviso: ${r}/ copiado de la portada (sin prerender).`)
+  }
+}
 let chromium
 try {
   ;({ chromium } = await import('playwright-core'))
 } catch {
   console.log('Prerender omitido: playwright-core no está instalado.')
+  legalFallback()
   process.exit(0)
 }
 const template = readFileSync(join(dist, 'index.html'), 'utf8')
@@ -97,6 +109,7 @@ try {
   }
 } catch (e) {
   console.log('Prerender omitido:', e.message)
+  legalFallback()
 } finally {
   await browser?.close()
   server.close()

@@ -1,0 +1,26 @@
+SAREBIDEA · CÓDIGO COMPLETO
+===========================
+
+Qué es: el proyecto completo (web pública + panel privado + migraciones de Supabase + webs de ejemplo).
+
+Requisitos: Node.js 20 o superior y npm.
+
+1) Instalar (solo la primera vez)
+     npm install
+
+2) Probar en tu ordenador (web)
+     npm run dev            → http://localhost:5173
+   Panel (en otra terminal):
+     cd panel && npm install && npm run dev   → http://localhost:3000/panel/
+
+3) Generar los archivos para publicar
+     npm run build:all
+   Deja todo en la carpeta  dist/  (la web en la raíz y el panel en dist/panel/).
+   Sube el CONTENIDO de dist/ a public_html de Hostinger (incluidos los archivos ocultos, como .htaccess).
+
+Notas
+- Los archivos .env (raíz y panel/) ya traen la conexión pública a Supabase; si no existen, el formulario solo guardaría en el navegador
+  y el panel entraría en «Modo demostración». Detalle en README.md.
+- Para que las páginas legales se generen con su propio título y descripción hace falta Chromium (variable CHROMIUM_PATH). Sin él, la compilación
+  sigue funcionando y las publica igualmente.
+- No abras dist/index.html con doble clic: la web necesita un servidor (Hostinger, `npm run preview`, etc.).
