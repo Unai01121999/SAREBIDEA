@@ -231,7 +231,7 @@ export const projects: Project[] = [
     result: 'Reserva de mesa y agenda de eventos',
     layout: 'editorial',
     theme: { bg: '#30251f', fg: '#f5f0e7', accent: '#74785b', accentFg: '#fcfaf6', soft: '#5b3a29', font: 'serif' },
-    screenshot: { desktop: '/ejemplos/tinta-y-grano/preview-desktop.jpg', mobile: '/ejemplos/tinta-y-grano/preview-mobile.jpg' },
+    screenshot: { desktop: '/ejemplos/tinta-y-grano/preview-v2-desktop.jpg', mobile: '/ejemplos/tinta-y-grano/preview-v2-mobile.jpg' },
     preview: '/ejemplos/tinta-y-grano/',
   },
   {

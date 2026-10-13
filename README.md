@@ -126,3 +126,7 @@ El ejemplo 4 del portafolio es la web real **Clínica Lur**: web estática de va
 - **Regenerar**: `cd ejemplos-codigo/clinica-lur && node build-demo.mjs`. Ejecuta `build.mjs` y adapta el resultado: rutas bajo `/ejemplos/clinica-lur/`, tipografías (Cormorant Garamond y Manrope) e iconos (Lucide) alojados en local (antes Google Fonts y unpkg), sin scripts ni `onerror` en línea (política de seguridad de `/ejemplos/`) y `noindex`.
 - `draftNotice` está en `false` en `site.config.mjs` para que no salga la franja de «Borrador» en la demo.
 - Faltan las fotos del equipo (`equipo-1..3.jpg`): la web muestra un hueco etiquetado, como estaba diseñada.
+
+## Caché de las webs de ejemplo
+
+`public/ejemplos/.htaccess` hace que el navegador **revalide siempre** HTML, CSS, JS e imágenes (los nombres no cambian al actualizar una demo); solo las tipografías se guardan 30 días. Las capturas de las miniaturas llevan versión en el nombre (`preview-v2-*.jpg`): al cambiar una captura, súbele la versión al nombre y actualiza `screenshot` en `src/data/site.ts`.
