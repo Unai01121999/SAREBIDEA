@@ -25,7 +25,7 @@ export function TextReveal({ text, className = '', as = 'h2', delay = 0, immedia
   return (
     <Tag id={id} className={className} initial="hidden" {...trigger} aria-label={eyebrow ? `${eyebrow}: ${text}` : text}>
       {eyebrow && (
-        <span className="mb-5 flex items-center gap-2.5 font-sans text-[0.95rem] leading-none font-medium tracking-normal text-cobalt">
+        <span className="mb-5 flex items-center gap-2.5 eyebrow !text-cobalt">
           <span aria-hidden="true" className="size-1.5 rounded-full bg-cobalt" />
           {eyebrow}
         </span>
@@ -34,7 +34,7 @@ export function TextReveal({ text, className = '', as = 'h2', delay = 0, immedia
       {words.map((w, i) => (
         <span key={i} aria-hidden="true" className="inline-block overflow-hidden pb-[0.12em] -mb-[0.12em] align-bottom">
           <m.span
-            className={`inline-block ${accent.includes(i) ? 'font-serif font-normal italic tracking-[-0.01em]' : ''}`}
+            className={`inline-block ${accent.includes(i) ? 'accent-word' : ''}`}
             variants={{
               hidden: reduced ? { opacity: 0 } : { transform: 'translate3d(0, 105%, 0) rotate(4deg)' },
               show: reduced ? { opacity: 1 } : { transform: 'translate3d(0, 0%, 0) rotate(0deg)' },

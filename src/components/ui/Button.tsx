@@ -7,8 +7,8 @@ type Variant = 'primary' | 'ghost' | 'light' | 'outline-light'
 
 const styles: Record<Variant, string> = {
   primary:
-    'bg-ink text-paper shadow-[0_1px_0_rgb(255_255_255/0.12)_inset,0_10px_24px_-10px_rgb(13_14_18/0.55)] hover:bg-[#1c1e26]',
-  ghost: 'bg-white/60 text-ink ring-1 ring-line backdrop-blur-sm hover:bg-white',
+    'bg-cobalt text-white shadow-[0_1px_0_rgb(255_255_255/0.18)_inset,0_10px_24px_-12px_rgb(58_63_242/0.7)] hover:bg-cobalt-deep',
+  ghost: 'bg-transparent text-ink ring-1 ring-ink/20 hover:bg-ink hover:text-paper hover:ring-ink',
   light: 'bg-paper text-ink shadow-[0_10px_30px_-10px_rgb(0_0_0/0.5)] hover:bg-white',
   'outline-light': 'text-paper ring-1 ring-white/20 hover:bg-white/8',
 }
@@ -55,12 +55,12 @@ export function Button({ href, children, variant = 'primary', size = 'md', icon 
       onPointerMove={onMove}
       onPointerLeave={reset}
       style={magnetic ? { transform } : undefined}
-      className={`group relative inline-flex select-none items-center justify-center gap-2 rounded-full font-medium tracking-[-0.01em] transition-[background-color,box-shadow,scale] duration-200 ease-[var(--ease-out-strong)] active:scale-[0.97] ${pad} ${styles[variant]} ${className}`}
+      className={`group relative inline-flex select-none items-center justify-center gap-2 rounded-[10px] font-medium tracking-[-0.01em] transition-[background-color,box-shadow,scale] duration-200 ease-[var(--ease-out-strong)] active:scale-[0.97] ${pad} ${styles[variant]} ${className}`}
     >
       <m.span className="inline-flex items-center gap-2" style={magnetic ? { transform: innerTransform } : undefined}>
         {children}
         {icon && (
-          <span className="relative -mr-1 inline-flex size-6 items-center justify-center overflow-hidden rounded-full">
+          <span className="relative -mr-1 inline-flex size-6 items-center justify-center overflow-hidden rounded-[6px]">
             <Icon
               name="arrow"
               size={18}

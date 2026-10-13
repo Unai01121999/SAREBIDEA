@@ -69,20 +69,20 @@ function TiltProject({ p, className = '', big = false, onPreview }: { p: Project
             <SiteDesktop p={p} live />
           </BrowserFrame>
           {/* Ficha que aparece en hover */}
-          <div className="pointer-events-none absolute inset-x-3 bottom-3 flex translate-y-2 items-center justify-between gap-3 rounded-2xl bg-white/80 p-2 pl-4 opacity-0 shadow-[0_12px_30px_-10px_rgb(13_14_18/0.35)] ring-1 ring-black/5 backdrop-blur-xl transition-[opacity,transform] duration-300 ease-[var(--ease-out-strong)] group-hover:translate-y-0 group-hover:opacity-100 group-focus-within:translate-y-0 group-focus-within:opacity-100">
+          <div className="pointer-events-none absolute inset-x-3 bottom-3 flex translate-y-2 items-center justify-between gap-3 rounded-[10px] bg-white/85 p-2 pl-4 opacity-0 shadow-[0_12px_30px_-10px_rgb(13_14_18/0.35)] ring-1 ring-black/5 backdrop-blur-xl transition-[opacity,transform] duration-300 ease-[var(--ease-out-strong)] group-hover:translate-y-0 group-hover:opacity-100 group-focus-within:translate-y-0 group-focus-within:opacity-100">
             <span className="min-w-0 text-[13px] leading-tight">
               <span className="block font-semibold text-ink">{p.result}</span>
               <span className="block truncate text-mute">{p.preview ? 'Web de ejemplo navegable' : 'Incluido en esta propuesta'}</span>
             </span>
-            <span className="flex shrink-0 items-center gap-1.5 rounded-full bg-ink px-3.5 py-2 text-[13px] font-medium text-paper">
+            <span className="flex shrink-0 items-center gap-1.5 rounded-[8px] bg-cobalt px-3.5 py-2 text-[13px] font-medium text-paper">
               {p.preview ? 'Ver la web' : 'Quiero una así'} <Icon name="arrowUpRight" size={14} />
             </span>
           </div>
         </m.div>
       </ProjectLink>
       <div className="mt-4 flex items-baseline justify-between gap-4 px-1">
-        <h3 className={`font-display font-semibold tracking-[-0.02em] ${big ? 'text-[1.5rem]' : 'text-[1.2rem]'}`}>{p.business}</h3>
-        <span className="text-sm text-mute">{p.sector}</span>
+        <h3 className={`font-head ${big ? 'text-[2.1rem]' : 'text-[1.75rem]'} leading-none`}>{p.business}</h3>
+        <span className="eyebrow">{p.sector}</span>
       </div>
     </article>
   )
@@ -119,7 +119,7 @@ export function Showcase() {
                 {p.preview && <span className="mt-3 block text-center text-sm font-medium text-ink underline decoration-ink/30 underline-offset-4">Ver la web →</span>}
               </ProjectLink>
               <div className="mt-4 text-center">
-                <h3 className="font-display text-[1.15rem] font-semibold tracking-[-0.02em]">{p.business}</h3>
+                <h3 className="font-head text-[1.6rem] leading-none">{p.business}</h3>
                 <p className="text-sm text-mute">
                   {p.sector} · {p.result}
                 </p>

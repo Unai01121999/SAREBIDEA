@@ -34,7 +34,7 @@ export function Footer() {
           </div>
           {cols.map((c) => (
             <nav key={c.title} aria-label={c.title}>
-              <h2 className="text-sm text-white/50">{c.title}</h2>
+              <h2 className="eyebrow !text-white/50">{c.title}</h2>
               <ul className="mt-3 md:space-y-0.5">
                 {c.links.map(([l, h]) => (
                   <li key={l}>
@@ -54,7 +54,7 @@ export function Footer() {
             </nav>
           ))}
           <div className="col-span-2 md:col-span-1">
-            <h2 className="text-sm text-white/50">Contacto</h2>
+            <h2 className="eyebrow !text-white/50">Contacto</h2>
             <ul className="mt-3 text-white/80">
               <li>
                 <a href={`mailto:${brand.email}`} className="inline-block py-2.5 hover:text-white md:py-1.5">
@@ -68,7 +68,7 @@ export function Footer() {
                   key={n}
                   href="#"
                   aria-label={n === 'instagram' ? 'Instagram' : 'LinkedIn'}
-                  className="flex size-10 items-center justify-center rounded-full ring-1 ring-white/15 transition-colors hover:bg-white/10"
+                  className="flex size-10 items-center justify-center rounded-[10px] ring-1 ring-white/15 transition-colors hover:bg-white/10"
                 >
                   <Icon name={n} size={18} />
                 </a>

@@ -8,7 +8,7 @@ import { Reveal } from '../components/ui/Reveal'
 import { TextReveal } from '../components/ui/TextReveal'
 
 const field =
-  'h-13 w-full rounded-2xl bg-white/[0.06] px-4 text-[1rem] text-paper ring-1 ring-white/16 transition-[box-shadow,background-color] duration-200 placeholder:text-white/45 hover:bg-white/[0.08] focus:bg-white/[0.09] focus:ring-2 focus:ring-lilac focus:outline-none'
+  'h-13 w-full rounded-[10px] bg-white/[0.06] px-4 text-[1rem] text-paper ring-1 ring-white/16 transition-[box-shadow,background-color] duration-200 placeholder:text-white/45 hover:bg-white/[0.08] focus:bg-white/[0.09] focus:ring-2 focus:ring-lilac focus:outline-none'
 
 export function FinalCta() {
   const [sent, setSent] = useState(false)
@@ -74,7 +74,7 @@ export function FinalCta() {
           <TextReveal
             as="h2"
             text="Tu próxima web empieza aquí."
-            className="display text-[clamp(2.75rem,1.4rem+5.4vw,5.6rem)] text-paper"
+            className="display text-[clamp(3rem,1.4rem+5.6vw,6rem)] text-paper"
             accent={[3]}
           />
           <Reveal delay={0.15}>
@@ -95,7 +95,7 @@ export function FinalCta() {
         </div>
 
         <Reveal delay={0.1}>
-          <div className="relative rounded-[30px] bg-white/[0.04] p-6 shadow-[0_1px_0_rgb(255_255_255/0.08)_inset,0_40px_80px_-30px_rgb(0_0_0/0.6)] ring-1 ring-white/10 backdrop-blur-xl sm:p-9">
+          <div className="relative rounded-[14px] bg-white/[0.04] p-6 ring-1 ring-white/12 backdrop-blur-xl sm:p-9">
             <AnimatePresence mode="wait" initial={false}>
               {sent ? (
                 <m.div
@@ -106,10 +106,10 @@ export function FinalCta() {
                   transition={{ duration: 0.5, ease: easeOut }}
                   role="status"
                 >
-                  <span className="flex size-16 items-center justify-center rounded-full bg-lilac text-night">
+                  <span className="flex size-16 items-center justify-center rounded-[12px] bg-lilac text-night">
                     <Icon name="check" size={30} strokeWidth={2.2} />
                   </span>
-                  <h3 className="mt-6 font-display text-[1.9rem] font-semibold tracking-[-0.03em]">¡Recibido!</h3>
+                  <h3 className="font-head mt-6 text-[2.5rem] leading-none">¡Recibido!</h3>
                   <p className="mt-3 max-w-[22rem] text-white/65">Te escribimos muy pronto para conocer tu negocio y preparar tu propuesta.</p>
                 </m.div>
               ) : (
@@ -214,10 +214,10 @@ export function FinalCta() {
                   <button
                     type="submit"
                     disabled={loading}
-                    className="group mt-2 inline-flex h-14 w-full items-center justify-center gap-2 rounded-full bg-paper text-[1.0625rem] font-medium text-ink shadow-[0_10px_30px_-10px_rgb(185_180_255/0.6)] transition-[background-color,scale,opacity] duration-200 ease-[var(--ease-out-strong)] hover:bg-white active:scale-[0.98] disabled:opacity-70 sm:col-span-2"
+                    className="group mt-2 inline-flex h-14 w-full items-center justify-center gap-2 rounded-[10px] bg-cobalt text-[1.0625rem] font-medium text-white shadow-[0_10px_30px_-12px_rgb(58_63_242/0.8)] transition-[background-color,scale,opacity] duration-200 ease-[var(--ease-out-strong)] hover:bg-[#5257ff] active:scale-[0.98] disabled:opacity-70 sm:col-span-2"
                   >
                     {loading ? (
-                      <span className="size-5 animate-spin rounded-full border-2 border-ink/20 border-t-ink" aria-label="Enviando" />
+                      <span className="size-5 animate-spin rounded-full border-2 border-white/30 border-t-white" aria-label="Enviando" />
                     ) : (
                       <>
                         Quiero mi web

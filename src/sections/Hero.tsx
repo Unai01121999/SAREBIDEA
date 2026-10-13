@@ -19,11 +19,11 @@ export function Hero() {
     <section id="top" className="grain relative isolate overflow-hidden bg-tone-hero pt-28 pb-10 sm:pt-32 lg:pt-36">
       {/* Fondo: luz suave + retícula que se desvanece */}
       <div aria-hidden="true" className="pointer-events-none absolute inset-0 -z-10">
-        <div className="absolute inset-0 bg-[radial-gradient(80%_60%_at_75%_10%,#efe6d8_0%,transparent_60%),radial-gradient(60%_50%_at_0%_100%,#fbe4d6_0%,transparent_60%)]" />
-        <div className="absolute inset-0 [background-image:linear-gradient(rgb(13_14_18/0.05)_1px,transparent_1px),linear-gradient(90deg,rgb(13_14_18/0.05)_1px,transparent_1px)] [background-size:72px_72px] [mask-image:radial-gradient(70%_60%_at_60%_30%,#000_10%,transparent_75%)]" />
+        <div className="absolute inset-0 bg-[radial-gradient(70%_60%_at_80%_20%,#e4e6fb_0%,transparent_65%),radial-gradient(50%_40%_at_0%_100%,#eef0f6_0%,transparent_70%)]" />
+        <div className="absolute inset-0 [background-image:linear-gradient(rgb(11_12_17/0.045)_1px,transparent_1px),linear-gradient(90deg,rgb(11_12_17/0.045)_1px,transparent_1px)] [background-size:72px_72px] [mask-image:radial-gradient(70%_60%_at_60%_30%,#000_10%,transparent_75%)]" />
       </div>
 
-      <div className="container-x grid items-center gap-y-10 lg:grid-cols-[1.05fr_1fr] lg:gap-x-10">
+      <div className="container-x grid items-center gap-y-10 lg:grid-cols-[1.1fr_1fr] lg:gap-x-12">
         <div className="relative z-10 max-w-[640px]">
           <TextReveal
             as="h1"
@@ -32,7 +32,7 @@ export function Hero() {
             delay={0.1}
             accent={[5]}
             text="La web que tu negocio necesita."
-            className="display text-[clamp(2.75rem,1rem+5.4vw,5.25rem)]"
+            className="display text-[clamp(3.25rem,1.2rem+6.2vw,6.5rem)]"
           />
           <m.p {...fade(0.55)} className="lede mt-6 max-w-[34rem] sm:mt-8">
             Creamos páginas web modernas para comercios que quieren atraer más clientes, generar confianza y destacar frente a su competencia.
@@ -48,7 +48,7 @@ export function Hero() {
           <m.ul {...fade(0.85)} className="mt-8 flex flex-wrap gap-x-5 gap-y-2 text-[0.92rem] text-ink-2" aria-label="Qué incluye">
             {['Web profesional', 'Optimizada para móvil', 'Lista para vender'].map((t) => (
               <li key={t} className="flex items-center gap-1.5">
-                <span className="flex size-[18px] items-center justify-center rounded-full bg-cobalt/10 text-cobalt">
+                <span className="flex size-[18px] items-center justify-center rounded-[5px] bg-cobalt text-white">
                   <Icon name="check" size={12} strokeWidth={2.4} />
                 </span>
                 {t}
@@ -65,11 +65,11 @@ export function Hero() {
       {/* Sectores: ¿me sirve a mí? → sí. */}
       <m.div {...fade(1.1)} className="mt-14 border-y border-line py-5 lg:mt-20">
         <div className="container-x flex items-center gap-8">
-          <p className="hidden shrink-0 text-sm text-mute md:block">Webs para</p>
+          <p className="eyebrow hidden shrink-0 md:block">Webs para</p>
           <div className="relative min-w-0 flex-1 overflow-hidden [mask-image:linear-gradient(90deg,transparent,#000_10%,#000_90%,transparent)]">
             <div className="anim-marquee flex w-max gap-10">
               {[...sectors, ...sectors].map((s, i) => (
-                <span key={i} aria-hidden={i >= sectors.length} className="font-display text-[1.35rem] font-medium tracking-[-0.02em] whitespace-nowrap text-ink/70">
+                <span key={i} aria-hidden={i >= sectors.length} className="font-head text-[1.75rem] whitespace-nowrap text-ink/70">
                   {s}
                   <span className="ml-10 text-ink/20">/</span>
                 </span>

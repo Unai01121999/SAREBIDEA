@@ -3,8 +3,8 @@ import { closePreferences, saveConsent, useConsentState, type Category } from '.
 
 // Aceptar y rechazar tienen exactamente el mismo estilo, tamaño y nivel (primera capa).
 const btn =
-  'inline-flex h-12 flex-1 items-center justify-center rounded-full px-5 text-[0.95rem] font-medium tracking-[-0.01em] transition-[background-color,scale] duration-200 active:scale-[0.97] sm:flex-none sm:min-w-[9.5rem]'
-const same = `${btn} bg-ink text-paper hover:bg-[#1c1e26]`
+  'inline-flex h-12 flex-1 items-center justify-center rounded-[10px] px-5 text-[0.95rem] font-medium tracking-[-0.01em] transition-[background-color,scale] duration-200 active:scale-[0.97] sm:flex-none sm:min-w-[9.5rem]'
+const same = `${btn} bg-cobalt text-white hover:bg-cobalt-deep`
 const outline = `${btn} bg-white text-ink ring-1 ring-line hover:bg-ink/[0.04]`
 
 const categories: { key: Category; title: string; body: string }[] = [
@@ -40,9 +40,9 @@ export function CookieBanner() {
     <section
       role="region"
       aria-label="Aviso de cookies"
-      className="on-light fixed inset-x-3 bottom-3 z-[80] mx-auto max-w-[56rem] rounded-[24px] bg-paper p-5 shadow-float ring-1 ring-line sm:inset-x-6 sm:bottom-6 sm:p-6"
+      className="on-light fixed inset-x-3 bottom-3 z-[80] mx-auto max-w-[56rem] rounded-[14px] bg-paper p-5 shadow-float ring-1 ring-line sm:inset-x-6 sm:bottom-6 sm:p-6"
     >
-      <h2 className="font-display text-[1.15rem] font-semibold tracking-[-0.02em]">Tu privacidad, tu decisión</h2>
+      <h2 className="font-head text-[1.6rem] leading-none">Tu privacidad, tu decisión</h2>
       <p className="mt-2 text-[0.95rem] leading-relaxed text-ink-2">
         Esta web solo usa el almacenamiento técnico imprescindible para funcionar. Las cookies opcionales (analítica y marketing) están{' '}
         <strong className="font-semibold">desactivadas</strong> y no se cargará nada de eso salvo que lo aceptes. Puedes cambiarlo cuando quieras desde «Configurar cookies» en el pie. Más información en la{' '}
@@ -103,9 +103,9 @@ function Preferences({ initial, onClose }: { initial: ReturnType<typeof useConse
         role="dialog"
         aria-modal="true"
         aria-labelledby="cookie-title"
-        className="on-light max-h-[92dvh] w-full max-w-[40rem] overflow-y-auto rounded-[24px] bg-paper p-6 shadow-float sm:p-8"
+        className="on-light max-h-[92dvh] w-full max-w-[40rem] overflow-y-auto rounded-[14px] bg-paper p-6 shadow-float sm:p-8"
       >
-        <h2 id="cookie-title" className="font-display text-[1.5rem] font-semibold tracking-[-0.03em]">
+        <h2 id="cookie-title" className="font-head text-[2rem] leading-none">
           Configurar cookies
         </h2>
         <p className="mt-2 text-[0.95rem] leading-relaxed text-ink-2">
@@ -117,7 +117,7 @@ function Preferences({ initial, onClose }: { initial: ReturnType<typeof useConse
         </p>
 
         <ul className="mt-6 space-y-3">
-          <li className="rounded-2xl bg-white p-4 ring-1 ring-line">
+          <li className="rounded-[10px] bg-white p-4 ring-1 ring-line">
             <div className="flex items-center justify-between gap-4">
               <span className="font-medium">Técnicas (necesarias)</span>
               <span className="text-[13px] font-medium text-mute">Siempre activas</span>
@@ -127,7 +127,7 @@ function Preferences({ initial, onClose }: { initial: ReturnType<typeof useConse
             </p>
           </li>
           {categories.map((c) => (
-            <li key={c.key} className="rounded-2xl bg-white p-4 ring-1 ring-line">
+            <li key={c.key} className="rounded-[10px] bg-white p-4 ring-1 ring-line">
               <label htmlFor={`ck-${c.key}`} className="flex cursor-pointer items-center justify-between gap-4">
                 <span className="font-medium">{c.title}</span>
                 <input

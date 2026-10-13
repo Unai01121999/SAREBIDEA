@@ -61,3 +61,12 @@ Sustituir ejemplos por capturas reales: cada proyecto en `site.ts` acepta `image
 > 2026-10-05: eliminada a petición de Unai la sección de testimonios de ejemplo.
 
 > 2026-10-13 · Rediseño visual (solo presentación, contenido idéntico): ritmo vertical común (`.section-y`, `.section-gap`), titulares algo más contenidos, servicios en composición editorial (2 tarjetas anchas + 3 iguales), packs con las tres tarjetas al mismo nivel (sin plan «destacado»), hero con tipografía escalada por anchura (3 líneas en 1024 px), tarjetas con elevación mínima (`.card-lift`), sin movimiento continuo en las tarjetas flotantes del hero y rótulo de sectores más lento y con pausa al pasar el cursor, pie en dos columnas en móvil.
+
+## Rediseño v2 (identidad editorial)
+
+- **Tipografía**: titulares en Instrument Serif (`.display`, `.h-section`, `.font-head`, palabra destacada `.accent-word` en cursiva); UI, etiquetas (`.eyebrow`) y cifras en Funnel Display; texto en Geist.
+- **Paleta**: neutros fríos (`--color-paper #f5f6f9`, `--color-paper-2`), tinta `#0b0c11`, cobalto de marca `#3a3ff2` (botón principal), lila solo sobre fondos oscuros.
+- **Formas**: radios contenidos (6–14 px), filetes de 1 px en lugar de sombras; tarjetas solo donde hacen falta.
+- **Composición**: cabecera fija a ancho completo con filete; servicios en filas editoriales alternas; packs como tabla de precios de tres columnas iguales (sin plan destacado); proceso y formulario sobre fondo oscuro.
+- **Movimiento**: sutil, y neutralizado con `prefers-reduced-motion`.
+- El contenido (textos, precios, enlaces, formulario, SEO, rutas) no se ha tocado: solo presentación.

@@ -6,7 +6,7 @@ import { TextReveal } from '../components/ui/TextReveal'
 /** Web "antigua" anotada como en una revisión de diseño: el comerciante se reconoce. */
 function OldSite() {
   return (
-    <div className="relative overflow-hidden rounded-[14px] bg-[#e9e6df] ring-1 ring-black/[0.08] [container-type:inline-size]" aria-hidden="true">
+    <div className="relative overflow-hidden rounded-[10px] bg-[#e9e6df] ring-1 ring-black/[0.08] [container-type:inline-size]" aria-hidden="true">
       <div className="flex h-7 items-center gap-1.5 border-b border-black/[0.08] px-3">
         {[0, 1, 2].map((i) => (
           <span key={i} className="size-[7px] rounded-full bg-black/15" />
@@ -91,7 +91,7 @@ export function Problem() {
                   {i + 1}
                 </span>
                 <div>
-                  <h3 className="font-display text-[1.3rem] font-semibold tracking-[-0.02em]">{p.title}</h3>
+                  <h3 className="font-head text-[1.65rem] leading-tight">{p.title}</h3>
                   <p className="mt-1.5 text-[0.98rem] leading-relaxed text-mute">{p.body}</p>
                 </div>
               </Reveal>

@@ -10,14 +10,14 @@ const A = 'font-medium text-ink underline underline-offset-2 hover:text-cobalt'
 function Section({ title, children }: { title: string; children: ReactNode }) {
   return (
     <section className="mt-10">
-      <h2 className="font-display text-[1.35rem] font-semibold tracking-[-0.02em]">{title}</h2>
+      <h2 className="font-head text-[1.75rem] leading-tight">{title}</h2>
       <div className="mt-3 space-y-3 leading-relaxed text-ink-2">{children}</div>
     </section>
   )
 }
 
 const Dl = ({ rows }: { rows: [string, ReactNode][] }) => (
-  <dl className="divide-y divide-line rounded-2xl bg-white ring-1 ring-line">
+  <dl className="divide-y divide-line rounded-[10px] bg-white ring-1 ring-line">
     {rows.map(([k, v]) => (
       <div key={k} className="grid gap-1 px-4 py-3 sm:grid-cols-[11rem_1fr] sm:gap-4">
         <dt className="text-[0.9rem] text-mute">{k}</dt>
@@ -222,7 +222,7 @@ function Cookies() {
         <p>
           Al abrirse, esta web <strong className="font-semibold">no carga servicios de terceros ni crea cookies de analítica o publicidad</strong> (las tipografías se sirven desde nuestro propio sitio, sin contactar con otros servidores). Solo usa almacenamiento técnico imprescindible, que no requiere consentimiento:
         </p>
-        <div className="overflow-x-auto rounded-2xl bg-white ring-1 ring-line">
+        <div className="overflow-x-auto rounded-[10px] bg-white ring-1 ring-line">
           <table className="w-full min-w-[34rem] border-collapse">
             <thead className="border-b border-line">
               <tr>
@@ -250,7 +250,7 @@ function Cookies() {
         <p>
           Usamos <strong className="font-semibold">Google Analytics</strong> para conocer, de forma agregada, cómo se usa la web. Está <strong className="font-semibold">desactivado por defecto</strong>: no se carga nada de Google ni se crea ninguna cookie hasta que aceptas la categoría «Analítica». Si la rechazas, o la retiras después, se detiene y se borran sus cookies. Rechazar es tan fácil como aceptar: el banner ofrece los botones «Rechazar todo» y «Aceptar todo» al mismo nivel. No usamos cookies de marketing.
         </p>
-        <div className="overflow-x-auto rounded-2xl bg-white ring-1 ring-line">
+        <div className="overflow-x-auto rounded-[10px] bg-white ring-1 ring-line">
           <table className="w-full min-w-[34rem] border-collapse">
             <thead className="border-b border-line">
               <tr>
@@ -282,7 +282,7 @@ function Cookies() {
         <button
           type="button"
           onClick={openPreferences}
-          className="inline-flex h-12 items-center rounded-full bg-ink px-6 font-medium text-paper transition-[background-color,scale] hover:bg-[#1c1e26] active:scale-[0.97]"
+          className="inline-flex h-12 items-center rounded-[10px] bg-cobalt px-6 font-medium text-white transition-[background-color,scale] hover:bg-cobalt-deep active:scale-[0.97]"
         >
           Configurar cookies
         </button>
@@ -314,7 +314,7 @@ export function LegalPage({ page }: { page: LegalPageId }) {
       <header className="sticky top-0 z-20 border-b border-line bg-paper/85 backdrop-blur-xl">
         <div className="container-x flex h-16 items-center justify-between gap-3">
           <Logo />
-          <a href="/" className="inline-flex h-10 items-center gap-2 rounded-full px-4 text-[0.94rem] ring-1 ring-line transition-colors hover:bg-ink/[0.05]">
+          <a href="/" className="inline-flex h-10 items-center gap-2 rounded-[10px] px-4 text-[0.94rem] ring-1 ring-line transition-colors hover:bg-ink/[0.05]">
             <Icon name="arrow" size={16} className="rotate-180" /> <span className="hidden sm:inline">Volver a la web</span>
             <span className="sm:hidden">Volver</span>
           </a>
@@ -323,7 +323,7 @@ export function LegalPage({ page }: { page: LegalPageId }) {
 
       <main id="main" className="container-x pt-10 pb-24 sm:pt-14">
         <article className="mx-auto max-w-[46rem]">
-          <h1 className="font-display text-[clamp(2rem,1.4rem+2.4vw,3rem)] leading-[1.05] font-semibold tracking-[-0.035em]">{legalPages[page]}</h1>
+          <h1 className="font-head text-[clamp(2.75rem,1.8rem+3.4vw,4.5rem)] leading-[1]">{legalPages[page]}</h1>
           <p className="mt-3 text-[0.9rem] text-mute">Última actualización: {legal.updated}</p>
           <div className="mt-8">
             <Body />

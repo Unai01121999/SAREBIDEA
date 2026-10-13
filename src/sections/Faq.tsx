@@ -16,10 +16,10 @@ function Item({ q, a, open, onToggle }: { q: string; a: string; open: boolean; o
           onClick={onToggle}
           className="group flex w-full items-center justify-between gap-6 py-6 text-left"
         >
-          <span className="font-display text-[clamp(1.1rem,1rem+0.4vw,1.35rem)] font-medium tracking-[-0.015em] text-ink">{q}</span>
+          <span className="font-head text-[clamp(1.35rem,1.15rem+0.7vw,1.75rem)] leading-tight text-ink">{q}</span>
           <span
-            className={`flex size-9 shrink-0 items-center justify-center rounded-full ring-1 transition-[background-color,color,transform] duration-300 ease-[var(--ease-out-strong)] ${
-              open ? 'rotate-45 bg-ink text-paper ring-ink' : 'text-ink ring-line group-hover:bg-ink/[0.05]'
+            className={`flex size-9 shrink-0 items-center justify-center rounded-[8px] ring-1 transition-[background-color,color,transform] duration-300 ease-[var(--ease-out-strong)] ${
+              open ? 'rotate-45 bg-cobalt text-white ring-cobalt' : 'text-ink ring-line group-hover:bg-ink/[0.05]'
             }`}
           >
             <Icon name="plus" size={16} />

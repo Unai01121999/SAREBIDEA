@@ -50,7 +50,7 @@ export default function PreviewModal({ project, onClose }: { project: Project; o
   }
 
   const tab = (d: 'desktop' | 'mobile', label: string) => (
-    <button type="button" role="tab" aria-selected={device === d} onClick={() => (setDevice(d), setLoaded(false))} className={`h-9 rounded-full px-4 text-sm font-medium transition-colors ${device === d ? 'bg-ink text-paper' : 'text-mute hover:text-ink'}`}>
+    <button type="button" role="tab" aria-selected={device === d} onClick={() => (setDevice(d), setLoaded(false))} className={`h-9 rounded-[8px] px-4 text-sm font-medium transition-colors ${device === d ? 'bg-ink text-paper' : 'text-mute hover:text-ink'}`}>
       {label}
     </button>
   )
@@ -60,20 +60,20 @@ export default function PreviewModal({ project, onClose }: { project: Project; o
       <div ref={dialogRef} role="dialog" aria-modal="true" aria-label={`Vista previa de ${project.business}`} className="flex w-full max-w-[1400px] flex-col overflow-hidden bg-paper shadow-[var(--shadow-soft)] sm:rounded-3xl">
         <div className="flex flex-wrap items-center gap-x-4 gap-y-2 border-b border-ink/10 px-4 py-3 sm:px-6">
           <div className="min-w-0 flex-1">
-            <p className="font-display truncate text-[1.05rem] font-semibold tracking-[-0.02em]">{project.business}</p>
+            <p className="font-head truncate text-[1.5rem] leading-none">{project.business}</p>
             <p className="truncate text-sm text-mute">Vista previa · {project.sector}</p>
           </div>
-          <div role="tablist" aria-label="Tamaño de pantalla" className="hidden gap-1 rounded-full bg-ink/5 p-1 sm:flex">
+          <div role="tablist" aria-label="Tamaño de pantalla" className="hidden gap-1 rounded-[10px] bg-ink/5 p-1 sm:flex">
             {tab('desktop', 'Escritorio')}
             {tab('mobile', 'Móvil')}
           </div>
-          <a href={url} target="_blank" rel="noopener" className="inline-flex h-9 items-center gap-1.5 rounded-full px-3 text-sm font-medium text-ink ring-1 ring-ink/15 transition-colors hover:bg-ink/5">
+          <a href={url} target="_blank" rel="noopener" className="inline-flex h-9 items-center gap-1.5 rounded-[8px] px-3 text-sm font-medium text-ink ring-1 ring-ink/15 transition-colors hover:bg-ink/5">
             Abrir en pestaña nueva <Icon name="arrowUpRight" size={14} />
           </a>
-          <a href="#contacto" onClick={onClose} className="inline-flex h-9 items-center rounded-full bg-ink px-4 text-sm font-medium text-paper transition-colors hover:bg-ink/85">
+          <a href="#contacto" onClick={onClose} className="inline-flex h-9 items-center rounded-[8px] bg-cobalt px-4 text-sm font-medium text-white transition-colors hover:bg-cobalt-deep">
             Quiero una web así
           </a>
-          <button ref={closeRef} type="button" onClick={onClose} aria-label="Cerrar la vista previa" className="flex size-9 items-center justify-center rounded-full ring-1 ring-ink/15 transition-colors hover:bg-ink/5">
+          <button ref={closeRef} type="button" onClick={onClose} aria-label="Cerrar la vista previa" className="flex size-9 items-center justify-center rounded-[8px] ring-1 ring-ink/15 transition-colors hover:bg-ink/5">
             <Icon name="close" size={18} />
           </button>
         </div>

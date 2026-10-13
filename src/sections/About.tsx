@@ -9,8 +9,8 @@ export function About() {
         <TextReveal id="about-title" as="h2" text="Quién soy" className="h-section" accent={[1]} />
         <div>
           <Reveal delay={0.1}>
-            <p className="font-display text-[clamp(1.5rem,1.1rem+1.8vw,2.5rem)] max-w-[34ch] leading-[1.2] font-medium tracking-[-0.025em] text-ink sm:max-w-[40ch]">
-              Soy Unai, fundador de Sarebidea. Diseño páginas web que impulsan a los negocios locales a atraer más clientes. <span className="text-cobalt">Rápido, sencillo y sin rodeos.</span>
+            <p className="font-head text-[clamp(1.9rem,1.3rem+2.4vw,3.25rem)] max-w-[28ch] leading-[1.1] text-ink sm:max-w-[32ch]">
+              Soy Unai, fundador de Sarebidea. Diseño páginas web que impulsan a los negocios locales a atraer más clientes. <span className="accent-word">Rápido, sencillo y sin rodeos.</span>
             </p>
           </Reveal>
           <Reveal delay={0.2} className="mt-10">

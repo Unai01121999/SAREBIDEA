@@ -30,18 +30,13 @@ export function Navbar({ onPrivate }: { onPrivate: () => void }) {
   return (
     <>
       <header
-        className={`fixed inset-x-0 top-0 z-50 transition-transform duration-500 ease-[var(--ease-out-strong)] ${hidden && !open ? '-translate-y-full' : 'translate-y-0'}`}
+        className={`fixed inset-x-0 top-0 z-50 transition-[transform,background-color,border-color,backdrop-filter] duration-500 ease-[var(--ease-out-strong)] ${hidden && !open ? '-translate-y-full' : 'translate-y-0'} ${
+          scrolled || open ? 'border-b border-line bg-paper/80 backdrop-blur-xl backdrop-saturate-150' : 'border-b border-transparent bg-transparent'
+        }`}
       >
-        <div className="container-x pt-3">
-          <nav
-            aria-label="Principal"
-            className={`flex h-14 items-center justify-between rounded-full pr-2 pl-4 transition-[background-color,box-shadow,backdrop-filter] duration-300 ease-[var(--ease-out-strong)] md:h-[60px] ${
-              scrolled || open
-                ? 'bg-paper/70 shadow-[0_1px_0_rgb(255_255_255/0.6)_inset,0_8px_30px_-12px_rgb(13_14_18/0.18)] ring-1 ring-line backdrop-blur-xl backdrop-saturate-150'
-                : 'bg-transparent'
-            }`}
-          >
-            <a href="#top" aria-label="SAREBIDEA, volver al inicio" className="rounded-full">
+        <div className="container-x">
+          <nav aria-label="Principal" className="flex h-16 items-center justify-between md:h-[72px]">
+            <a href="#top" aria-label="SAREBIDEA, volver al inicio" className="rounded-[6px]">
               <Logo />
             </a>
             <ul className="hidden items-center gap-1 lg:flex">
@@ -49,9 +44,10 @@ export function Navbar({ onPrivate }: { onPrivate: () => void }) {
                 <li key={l.href}>
                   <a
                     href={l.href}
-                    className="relative rounded-full px-3.5 py-2 text-[0.94rem] text-ink-2 transition-colors duration-200 hover:bg-ink/[0.05] hover:text-ink"
+                    className="group relative px-3.5 py-2 text-[0.94rem] text-ink-2 transition-colors duration-200 hover:text-ink"
                   >
                     {l.label}
+                    <span aria-hidden="true" className="absolute inset-x-3.5 bottom-0.5 h-px origin-left scale-x-0 bg-cobalt transition-transform duration-300 ease-[var(--ease-out-strong)] group-hover:scale-x-100" />
                   </a>
                 </li>
               ))}
@@ -60,7 +56,7 @@ export function Navbar({ onPrivate }: { onPrivate: () => void }) {
               <button
                 type="button"
                 onClick={onPrivate}
-                className="hidden h-11 items-center gap-2 rounded-full px-4 text-[0.94rem] text-ink-2 ring-1 ring-line transition-colors duration-200 hover:bg-ink/[0.05] hover:text-ink sm:inline-flex"
+                className="hidden h-11 items-center gap-2 rounded-[10px] px-4 text-[0.94rem] text-ink-2 ring-1 ring-ink/15 transition-colors duration-200 hover:bg-ink hover:text-paper hover:ring-ink sm:inline-flex"
               >
                 <Icon name="lock" size={16} />
                 Área privada
@@ -70,7 +66,7 @@ export function Navbar({ onPrivate }: { onPrivate: () => void }) {
               </span>
               <button
                 type="button"
-                className="inline-flex size-11 items-center justify-center rounded-full bg-ink text-paper transition-transform duration-150 active:scale-[0.94] lg:hidden"
+                className="inline-flex size-11 items-center justify-center rounded-[10px] bg-ink text-paper transition-transform duration-150 active:scale-[0.94] lg:hidden"
                 aria-expanded={open}
                 aria-controls="mobile-menu"
                 aria-label={open ? 'Cerrar menú' : 'Abrir menú'}
@@ -87,10 +83,10 @@ export function Navbar({ onPrivate }: { onPrivate: () => void }) {
         {open && (
           <m.div
             id="mobile-menu"
-            className="fixed inset-0 z-40 flex flex-col bg-paper/95 px-6 pt-28 pb-10 backdrop-blur-2xl lg:hidden"
-            initial={{ clipPath: 'inset(0 0 100% 0 round 0 0 32px 32px)' }}
-            animate={{ clipPath: 'inset(0 0 0% 0 round 0 0 0px 0px)' }}
-            exit={{ clipPath: 'inset(0 0 100% 0 round 0 0 32px 32px)' }}
+            className="fixed inset-0 z-40 flex flex-col bg-paper px-6 pt-24 pb-10 lg:hidden"
+            initial={{ clipPath: 'inset(0 0 100% 0)' }}
+            animate={{ clipPath: 'inset(0 0 0% 0)' }}
+            exit={{ clipPath: 'inset(0 0 100% 0)' }}
             transition={{ duration: 0.5, ease: easeOut }}
           >
             <ul className="flex flex-col">
@@ -105,7 +101,7 @@ export function Navbar({ onPrivate }: { onPrivate: () => void }) {
                   <a
                     href={l.href}
                     onClick={() => setOpen(false)}
-                    className="flex items-center justify-between py-4 font-display text-[2.1rem] font-semibold tracking-[-0.03em]"
+                    className="font-head flex items-center justify-between py-3.5 text-[2.5rem] leading-none"
                   >
                     {l.label}
                     <Icon name="arrowUpRight" size={22} className="text-mute" />
@@ -128,7 +124,7 @@ export function Navbar({ onPrivate }: { onPrivate: () => void }) {
                   setOpen(false)
                   onPrivate()
                 }}
-                className="inline-flex h-14 items-center justify-center gap-2 rounded-full text-[1.0625rem] text-ink ring-1 ring-line"
+                className="inline-flex h-14 items-center justify-center gap-2 rounded-[10px] text-[1.0625rem] text-ink ring-1 ring-ink/20"
               >
                 <Icon name="lock" size={18} />
                 Área privada

@@ -194,35 +194,28 @@ export function Services() {
           </Reveal>
         </div>
 
-        <ol className="section-gap grid gap-4 sm:grid-cols-2 lg:grid-cols-12 lg:gap-5">
+        {/* Composición editorial: una fila por servicio, texto y pieza visual alternando lados, separadas por filetes */}
+        <ol className="section-gap border-b border-line">
           {services.map((s, i) => {
             const dark = s.key === 'conversion'
-            // Composición editorial: dos tarjetas anchas (horizontales), una estrecha y tres iguales; evita seis tarjetas idénticas.
-            const wide = s.key === 'design' || s.key === 'care'
-            const span = { design: 'lg:col-span-7', mobile: 'lg:col-span-5', seo: 'lg:col-span-4', conversion: 'lg:col-span-4', speed: 'lg:col-span-4', care: 'lg:col-span-12' }[s.key]
+            const flip = i % 2 === 1
             return (
-              <Reveal as="li" key={s.key} delay={(i % 3) * 0.08} className={`group card-lift flex flex-col rounded-[24px] bg-[#faf7f1] p-2 ring-1 ring-line ${span} ${wide ? 'lg:flex-row' : ''}`}>
-                <div
-                  className={`relative h-[220px] overflow-hidden rounded-[18px] p-4 sm:p-5 ${wide ? 'lg:h-auto lg:min-h-[280px] lg:w-[44%] lg:shrink-0' : ''} ${dark ? 'on-dark flex flex-col justify-center bg-ink' : 'bg-[#efe7da]'} ${s.key === 'seo' || s.key === 'care' ? 'flex flex-col justify-center' : ''}`}
-                >
-                  {visuals[s.key]}
-                </div>
-
-                <div className={`flex flex-1 flex-col px-4 pt-5 pb-4 sm:px-5 ${wide ? 'lg:justify-center lg:px-8 lg:py-6' : ''}`}>
-                  <div className="flex items-center justify-between">
-                    <span className="inline-flex items-center gap-1.5 rounded-full bg-cobalt/[0.08] py-1 pr-3 pl-2.5 text-[12px] font-medium text-cobalt">
+              <Reveal as="li" key={s.key} className="group grid gap-8 border-t border-ink/80 py-10 sm:py-12 lg:grid-cols-12 lg:items-center lg:gap-14">
+                <div className={`flex flex-col lg:col-span-6 ${flip ? 'lg:order-2' : ''}`}>
+                  <div className="flex items-center gap-4">
+                    <span className="font-head text-[2.5rem] leading-none text-cobalt tabular" aria-hidden="true">
+                      {String(i + 1).padStart(2, '0')}
+                    </span>
+                    <span className="inline-flex items-center gap-1.5 rounded-[6px] bg-cobalt-soft py-1 pr-2.5 pl-2 text-[12px] font-medium text-cobalt-deep">
                       <Icon name={icons[s.key]} size={14} strokeWidth={1.8} />
                       {s.tag}
                     </span>
-                    <span className="text-[13px] text-mute tabular" aria-hidden="true">
-                      {String(i + 1).padStart(2, '0')}
-                    </span>
                   </div>
 
-                  <h3 className="mt-4 font-display text-[1.5rem] leading-[1.1] font-semibold tracking-[-0.025em] text-ink">{s.title}</h3>
-                  <p className="mt-2 text-[0.98rem] leading-relaxed text-mute">{s.body}</p>
+                  <h3 className="font-head mt-5 text-[clamp(2rem,1.5rem+1.6vw,2.875rem)] leading-[1.04] text-ink">{s.title}</h3>
+                  <p className="mt-3 max-w-[34rem] text-[1.02rem] leading-relaxed text-mute">{s.body}</p>
 
-                  <ul className="mt-5 space-y-2.5 border-t border-line pt-5" aria-label={`Qué incluye: ${s.title}`}>
+                  <ul className="mt-6 grid max-w-[34rem] gap-x-6 gap-y-2.5 border-t border-line pt-5 sm:grid-cols-2" aria-label={`Qué incluye: ${s.title}`}>
                     {s.includes.map((item) => (
                       <li key={item} className="flex items-start gap-2.5 text-[0.95rem] leading-snug text-ink-2">
                         <Icon name="check" size={16} strokeWidth={2.2} className="mt-0.5 shrink-0 text-cobalt" />
@@ -231,18 +224,24 @@ export function Services() {
                     ))}
                   </ul>
                 </div>
+
+                <div
+                  className={`relative flex min-h-[240px] flex-col justify-center overflow-hidden rounded-[14px] p-5 ring-1 ring-line transition-transform duration-500 ease-[var(--ease-out-strong)] sm:p-8 lg:col-span-6 lg:min-h-[320px] ${flip ? 'lg:order-1' : ''} ${dark ? 'on-dark bg-ink' : 'bg-paper-2'}`}
+                >
+                  {visuals[s.key]}
+                </div>
               </Reveal>
             )
           })}
         </ol>
 
-        <Reveal delay={0.1} className="mt-5 rounded-[24px] bg-[#f3ece1] p-6 ring-1 ring-line sm:p-8">
+        <Reveal delay={0.1} className="mt-10 rounded-[14px] bg-paper-2 p-6 ring-1 ring-line sm:p-8">
           <div className="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
-            <p className="font-display text-[1.35rem] leading-tight font-semibold tracking-[-0.02em] text-ink">Y además, siempre incluido</p>
+            <p className="font-head text-[1.75rem] leading-tight text-ink">Y además, siempre incluido</p>
             <ul className="grid gap-x-8 gap-y-4 sm:grid-cols-2 lg:flex lg:gap-8">
               {serviceExtras.map((e) => (
                 <li key={e.label} className="flex items-center gap-3 text-[0.95rem] text-ink-2">
-                  <span className="flex size-9 shrink-0 items-center justify-center rounded-xl bg-white text-cobalt ring-1 ring-line">
+                  <span className="flex size-9 shrink-0 items-center justify-center rounded-[8px] bg-white text-cobalt ring-1 ring-line">
                     <Icon name={e.icon} size={17} />
                   </span>
                   {e.label}
