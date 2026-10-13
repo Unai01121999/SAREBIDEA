@@ -118,3 +118,11 @@ El ejemplo 2 del portafolio es **Maison Alba**, una web React/Vite. Su código f
 ## Ejemplo «Taller Ibarra» (taller mecánico) con vista previa
 
 El ejemplo 3 del portafolio es la web real **Taller Ibarra**, alojada en `public/ejemplos/taller-ibarra/` (se publica en `/ejemplos/taller-ibarra/`). Se abre en la misma vista previa que los otros dos ejemplos y su miniatura es una captura real (`preview-desktop.jpg` / `preview-mobile.jpg`). Las tipografías (Cormorant Garamond e Inter) están alojadas en local, sin Google Fonts. Los datos de contacto (`config.js`) están vacíos a propósito: la demo muestra «pendiente» y su formulario no envía nada. Sus datos reales irían en `config.js`.
+
+## Ejemplo «Clínica Lur» (clínica dental) con vista previa
+
+El ejemplo 4 del portafolio es la web real **Clínica Lur**: web estática de varias páginas (portada, aviso legal, privacidad y cookies). El código fuente está en `ejemplos-codigo/clinica-lur/` y la versión publicada en `public/ejemplos/clinica-lur/` (`/ejemplos/clinica-lur/`). Se abre en la misma vista previa que los demás ejemplos; la miniatura es una captura real (`preview-*.jpg`).
+
+- **Regenerar**: `cd ejemplos-codigo/clinica-lur && node build-demo.mjs`. Ejecuta `build.mjs` y adapta el resultado: rutas bajo `/ejemplos/clinica-lur/`, tipografías (Cormorant Garamond y Manrope) e iconos (Lucide) alojados en local (antes Google Fonts y unpkg), sin scripts ni `onerror` en línea (política de seguridad de `/ejemplos/`) y `noindex`.
+- `draftNotice` está en `false` en `site.config.mjs` para que no salga la franja de «Borrador» en la demo.
+- Faltan las fotos del equipo (`equipo-1..3.jpg`): la web muestra un hueco etiquetado, como estaba diseñada.
