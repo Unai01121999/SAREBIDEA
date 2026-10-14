@@ -54,7 +54,7 @@ export function HeroScene() {
     <div ref={ref} className="relative aspect-[1/0.92] w-full [perspective:2600px] sm:[perspective:1800px] sm:aspect-[1/0.8] lg:aspect-[1/0.95]">
       {/* Luz ambiental detrás de la escena */}
       <m.div aria-hidden="true" className="absolute inset-[-10%] -z-10" style={{ transform: glow }}>
-        <div className="absolute top-[18%] left-[20%] h-[60%] w-[70%] rounded-full bg-[radial-gradient(closest-side,rgb(58_63_242/0.28),transparent)]" />
+        <div className="absolute top-[18%] left-[20%] h-[60%] w-[70%] rounded-full bg-[radial-gradient(closest-side,rgb(212_69_31/0.22),transparent)]" />
         <div className="absolute top-[42%] left-[48%] h-[48%] w-[50%] rounded-full bg-[radial-gradient(closest-side,rgb(255_201_168/0.55),transparent)]" />
       </m.div>
 

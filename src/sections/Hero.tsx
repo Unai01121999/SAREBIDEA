@@ -19,7 +19,7 @@ export function Hero() {
     <section id="top" className="grain relative isolate overflow-hidden bg-tone-hero pt-28 pb-10 sm:pt-32 lg:pt-36">
       {/* Fondo: luz suave + retícula que se desvanece */}
       <div aria-hidden="true" className="pointer-events-none absolute inset-0 -z-10">
-        <div className="absolute inset-0 bg-[radial-gradient(70%_60%_at_80%_20%,#e4e6fb_0%,transparent_65%),radial-gradient(50%_40%_at_0%_100%,#eef0f6_0%,transparent_70%)]" />
+        <div className="absolute inset-0 bg-[radial-gradient(70%_60%_at_80%_20%,#fbe6dc_0%,transparent_65%),radial-gradient(50%_40%_at_0%_100%,#f0ece6_0%,transparent_70%)]" />
         <div className="absolute inset-0 [background-image:linear-gradient(rgb(11_12_17/0.045)_1px,transparent_1px),linear-gradient(90deg,rgb(11_12_17/0.045)_1px,transparent_1px)] [background-size:72px_72px] [mask-image:radial-gradient(70%_60%_at_60%_30%,#000_10%,transparent_75%)]" />
       </div>
 
