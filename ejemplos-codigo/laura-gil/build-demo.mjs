@@ -22,7 +22,14 @@ for (const [w, s] of [[400, 'normal'], [400, 'italic'], [500, 'normal'], [500, '
   faces.push(`@font-face{font-family:"Cormorant Garamond";font-style:${s};font-weight:${w};font-display:swap;src:url("fonts/cormorant-garamond-latin-${w}-${s}.woff2") format("woff2")}`)
 for (const w of [400, 500, 600])
   faces.push(`@font-face{font-family:"Manrope";font-style:normal;font-weight:${w};font-display:swap;src:url("fonts/manrope-latin-${w}-normal.woff2") format("woff2")}`)
-writeFileSync(join(out, 'styles.css'), faces.join('\n') + '\n' + readFileSync(join(here, 'src/styles.css'), 'utf8'))
+const touchFix = `
+/* Vista previa en móvil (iframe): el body no debe ser contenedor de scroll (overflow-x:hidden lo convierte en uno y en iOS impide desplazar la web dentro del iframe)
+   ni forzar el desplazamiento suave en pantallas táctiles. «clip» recorta igual sin crear contenedor de scroll. */
+html, body { overflow-x: visible !important; }
+@supports (overflow: clip) { html, body { overflow-x: clip !important; } }
+@media (hover: none) { html { scroll-behavior: auto !important; } }
+`
+writeFileSync(join(out, 'styles.css'), faces.join('\n') + '\n' + readFileSync(join(here, 'src/styles.css'), 'utf8') + touchFix)
 cpSync(join(here, 'src/main.js'), join(out, 'main.js'))
 
 const head = (html) =>

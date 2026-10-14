@@ -372,3 +372,9 @@ body{background:var(--cream);color:var(--ink);line-height:1.65}
 /* movimiento sutil */
 .js .reveal{transform:translateY(12px);transition-duration:.6s}
 .photo--about img{object-position:78% 50%}
+
+/* Vista previa en móvil (iframe): el body no debe ser contenedor de scroll (overflow-x:hidden lo convierte en uno y en iOS impide desplazar la web dentro del iframe)
+   ni forzar el desplazamiento suave en pantallas táctiles. «clip» recorta igual sin crear contenedor de scroll. */
+html, body { overflow-x: visible !important; }
+@supports (overflow: clip) { html, body { overflow-x: clip !important; } }
+@media (hover: none) { html { scroll-behavior: auto !important; } }

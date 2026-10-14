@@ -26,7 +26,14 @@ const faces = [
   ),
   ...[400, 500, 600].map((w) => `@font-face{font-family:"Inter";font-style:normal;font-weight:${w};font-display:swap;src:url("fonts/inter-latin-${w}-normal.woff2") format("woff2")}`),
 ].join('\n')
-const css = '/* Tipografías alojadas en local (sin Google Fonts: sin peticiones a terceros) */\n' + faces + '\n\n' + readFileSync(join(here, 'src/styles.css'), 'utf8')
+const touchFix = `
+/* Vista previa en móvil (iframe): el body no debe ser contenedor de scroll (overflow-x:hidden lo convierte en uno y en iOS impide desplazar la web dentro del iframe)
+   ni forzar el desplazamiento suave en pantallas táctiles. «clip» recorta igual sin crear contenedor de scroll. */
+html, body { overflow-x: visible !important; }
+@supports (overflow: clip) { html, body { overflow-x: clip !important; } }
+@media (hover: none) { html { scroll-behavior: auto !important; } }
+`
+const css = '/* Tipografías alojadas en local (sin Google Fonts: sin peticiones a terceros) */\n' + faces + '\n\n' + readFileSync(join(here, 'src/styles.css'), 'utf8') + touchFix
 const js = readFileSync(join(here, 'src/script.js'), 'utf8')
 const flag = "document.documentElement.classList.add('js');\n"
 const hash = (s) => createHash('sha256').update(s).digest('hex').slice(0, 10)

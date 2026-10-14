@@ -141,6 +141,8 @@ El ejemplo 5 del portafolio es la web real **Laura Gil** (asesoría fiscal): web
 
 ## Caché de las webs de ejemplo
 
+**Desplazamiento en móvil.** Los ejemplos se abren en la vista previa dentro de un iframe. Un `overflow-x: hidden` en el `body` lo convierte en contenedor de scroll y en iOS/Safari impide bajar la web con el dedo; por eso todos los ejemplos terminan su CSS con un bloque «Vista previa en móvil» (`overflow-x: clip` en `html`/`body`, sin desplazamiento suave global en pantallas táctiles), que los hace desplazarse igual que Maison Alba. Está en los `build-demo.mjs` de Tinta & Grano, Clínica Lur y Laura Gil y añadido a mano en Taller Ibarra; una web de ejemplo nueva debe evitar `overflow-x: hidden` en `html`/`body`.
+
 `public/ejemplos/.htaccess` hace que el navegador **revalide siempre** HTML, CSS, JS e imágenes (los nombres no cambian al actualizar una demo); solo las tipografías se guardan 30 días. Las capturas de las miniaturas llevan versión en el nombre (`preview-v3-*.jpg`): al cambiar una captura, súbele la versión al nombre y actualiza `screenshot` en `src/data/site.ts`.
 
 ## Rediseño visual (2026-10-13)

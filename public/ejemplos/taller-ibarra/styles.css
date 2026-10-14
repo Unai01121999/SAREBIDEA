@@ -259,3 +259,9 @@ textarea{resize:vertical;min-height:100px}
   .reveal,.hero-title .line span{opacity:1;transform:none}
   html{scroll-behavior:auto}
 }
+
+/* Vista previa en móvil (iframe): el body no debe ser contenedor de scroll (overflow-x:hidden lo convierte en uno y en iOS impide desplazar la web dentro del iframe)
+   ni forzar el desplazamiento suave en pantallas táctiles. `clip` recorta igual sin crear contenedor de scroll. */
+html, body { overflow-x: visible !important; }
+@supports (overflow: clip) { html, body { overflow-x: clip !important; } }
+@media (hover: none) { html { scroll-behavior: auto !important; } }

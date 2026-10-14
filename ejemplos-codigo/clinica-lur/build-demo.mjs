@@ -32,7 +32,14 @@ for (const w of [400, 500]) for (const s of ['normal', 'italic'])
 for (const w of [400, 500, 600])
   faces.push(`@font-face{font-family:"Manrope";font-style:normal;font-weight:${w};font-display:swap;src:url("fonts/manrope-latin-${w}-normal.woff2") format("woff2")}`)
 const cssPath = path.join(dest, 'assets/styles.css')
-fs.writeFileSync(cssPath, '/* Tipografías alojadas en local (sin Google Fonts) */\n' + faces.join('\n') + '\n' + fs.readFileSync(cssPath, 'utf8'))
+const touchFix = `
+/* Vista previa en móvil (iframe): el body no debe ser contenedor de scroll (overflow-x:hidden lo convierte en uno y en iOS impide desplazar la web dentro del iframe)
+   ni forzar el desplazamiento suave en pantallas táctiles. «clip» recorta igual sin crear contenedor de scroll. */
+html, body { overflow-x: visible !important; }
+@supports (overflow: clip) { html, body { overflow-x: clip !important; } }
+@media (hover: none) { html { scroll-behavior: auto !important; } }
+`
+fs.writeFileSync(cssPath, '/* Tipografías alojadas en local (sin Google Fonts) */\n' + faces.join('\n') + '\n' + fs.readFileSync(cssPath, 'utf8') + touchFix)
 
 // main.js: la "portada" pasa de "/" a la ruta base
 const jsPath = path.join(dest, 'assets/main.js')

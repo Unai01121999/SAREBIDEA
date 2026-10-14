@@ -394,3 +394,9 @@ button.tlink[aria-expanded="true"] i, button.tlink[aria-expanded="true"] svg { t
 .titem.open .tdetail { grid-template-rows: 1fr; opacity: 1; visibility: visible; transition-delay: 0s; }
 .titem { align-content: start; }
 .nav a.nl.is-active { color: var(--ink); }
+
+/* Vista previa en móvil (iframe): el body no debe ser contenedor de scroll (overflow-x:hidden lo convierte en uno y en iOS impide desplazar la web dentro del iframe)
+   ni forzar el desplazamiento suave en pantallas táctiles. `clip` recorta igual sin crear contenedor de scroll. */
+html, body { overflow-x: visible !important; }
+@supports (overflow: clip) { html, body { overflow-x: clip !important; } }
+@media (hover: none) { html { scroll-behavior: auto !important; } }
