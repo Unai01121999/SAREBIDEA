@@ -122,6 +122,8 @@ El ejemplo 2 del portafolio es **Maison Alba**, una web React/Vite. Su código f
 
 ## Ejemplo «Taller Ibarra» (taller mecánico) con vista previa
 
+El ejemplo 1 del portafolio es la web real **Tinta & Grano** (café y librería). El código fuente original está en `ejemplos-codigo/tinta-y-grano/src/` y la versión publicada en `public/ejemplos/tinta-y-grano/` (`/ejemplos/tinta-y-grano/`). **Regenerar**: `cd ejemplos-codigo/tinta-y-grano && node build-demo.mjs`: aloja las tipografías en local (antes Google Fonts), pasa el script en línea a un archivo, añade `noindex` y enlaza `styles.css`, `script.js` y `js-flag.js` con una huella de su contenido (`?v=…`), de modo que ningún servidor ni navegador puede mezclar un HTML nuevo con un CSS o JS antiguo del mismo nombre.
+
 El ejemplo 3 del portafolio es la web real **Taller Ibarra**, alojada en `public/ejemplos/taller-ibarra/` (se publica en `/ejemplos/taller-ibarra/`). Se abre en la misma vista previa que los otros dos ejemplos y su miniatura es una captura real (`preview-desktop.jpg` / `preview-mobile.jpg`). Las tipografías (Cormorant Garamond e Inter) están alojadas en local, sin Google Fonts. Los datos de contacto (`config.js`) están vacíos a propósito: la demo muestra «pendiente» y su formulario no envía nada. Sus datos reales irían en `config.js`.
 
 ## Ejemplo «Clínica Lur» (clínica dental) con vista previa
@@ -139,7 +141,7 @@ El ejemplo 5 del portafolio es la web real **Laura Gil** (asesoría fiscal): web
 
 ## Caché de las webs de ejemplo
 
-`public/ejemplos/.htaccess` hace que el navegador **revalide siempre** HTML, CSS, JS e imágenes (los nombres no cambian al actualizar una demo); solo las tipografías se guardan 30 días. Las capturas de las miniaturas llevan versión en el nombre (`preview-v2-*.jpg`): al cambiar una captura, súbele la versión al nombre y actualiza `screenshot` en `src/data/site.ts`.
+`public/ejemplos/.htaccess` hace que el navegador **revalide siempre** HTML, CSS, JS e imágenes (los nombres no cambian al actualizar una demo); solo las tipografías se guardan 30 días. Las capturas de las miniaturas llevan versión en el nombre (`preview-v3-*.jpg`): al cambiar una captura, súbele la versión al nombre y actualiza `screenshot` en `src/data/site.ts`.
 
 ## Rediseño visual (2026-10-13)
 

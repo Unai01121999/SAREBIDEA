@@ -1,0 +1,270 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Tinta &amp; Grano — Café de especialidad y librería independiente</title>
+  <meta name="description" content="Tinta &amp; Grano: un rincón para bajar el ritmo, descubrir nuevas historias y disfrutar del placer de no tener prisa. Café de especialidad, libros y cultura.">
+  <meta name="theme-color" content="#F5F0E7">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+  <script>document.documentElement.classList.add('js')</script>
+</head>
+<body>
+
+  <!-- ═════════ NAVEGACIÓN ═════════ -->
+  <header class="nav" id="nav">
+    <a class="logo" href="#inicio" aria-label="Tinta &amp; Grano, inicio">TINTA <i>&amp; GRANO</i></a>
+    <nav class="nav-links" aria-label="Principal">
+      <a href="#inicio" data-spy="inicio">Inicio</a>
+      <a href="#experiencia" data-spy="experiencia">La experiencia</a>
+      <a href="#cafe" data-spy="cafe">Café</a>
+      <a href="#libreria" data-spy="libreria">Librería</a>
+      <a href="#agenda" data-spy="agenda">Agenda</a>
+      <a href="#contacto" data-spy="contacto">Contacto</a>
+    </nav>
+    <a class="btn btn-solid nav-cta" href="#contacto">Ven a conocernos</a>
+    <button class="nav-toggle" id="navToggle" aria-label="Abrir menú" aria-expanded="false" aria-controls="menu"><span></span><span></span></button>
+  </header>
+
+  <div class="menu" id="menu" aria-hidden="true">
+    <nav aria-label="Menú móvil">
+      <a href="#inicio" style="--i:0">Inicio</a>
+      <a href="#experiencia" style="--i:1">La experiencia</a>
+      <a href="#cafe" style="--i:2">Café</a>
+      <a href="#libreria" style="--i:3">Librería</a>
+      <a href="#agenda" style="--i:4">Agenda</a>
+      <a href="#contacto" style="--i:5">Contacto</a>
+    </nav>
+    <a class="btn btn-solid" href="#contacto" style="--i:6">Ven a conocernos</a>
+  </div>
+
+  <main>
+    <!-- ═════════ HERO ═════════ -->
+    <section class="hero" id="inicio">
+      <div class="hero-media">
+        <img src="img/hero.jpg" alt="Interior de la cafetería librería: estantería de madera con libros, mesas largas y luz cálida" fetchpriority="high">
+      </div>
+      <div class="hero-shade" aria-hidden="true"></div>
+
+      <div class="hero-inner">
+        <p class="kicker hero-kicker" data-hero style="--i:0">Café de especialidad · Libros · Cultura</p>
+
+        <h1 class="hero-title" aria-label="Un buen café. Una buena historia. Todo lo demás puede esperar.">
+          <span class="line"><span class="w" style="--i:0">Un buen café.</span></span>
+          <span class="line"><span class="w" style="--i:1">Una buena historia.</span></span>
+          <span class="line"><span class="w soft" style="--i:2"><em>Todo lo demás puede esperar.</em></span></span>
+        </h1>
+
+        <p class="hero-lede" data-hero style="--i:5">Un rincón para bajar el ritmo, descubrir nuevas historias y disfrutar del placer de no tener prisa.</p>
+
+        <div class="hero-actions" data-hero style="--i:6">
+          <a class="btn btn-cream" href="#experiencia">Descubrir el espacio</a>
+          <a class="btn btn-line" href="#cafe">Explorar nuestra carta</a>
+        </div>
+      </div>
+
+      <div class="hero-foot" data-hero style="--i:8">
+        <span class="hero-meta">Nº 01 · Temporada de otoño</span>
+        <a class="scroll-cue" href="#experiencia" aria-label="Desplazarse hacia abajo"><span class="scroll-line"></span>Desliza</a>
+        <span class="hero-meta">Abierto hoy · 08:00 — 22:00</span>
+      </div>
+    </section>
+
+    <!-- ═════════ EDITORIAL ═════════ -->
+    <section class="editorial section" id="experiencia">
+      <div class="editorial-grid">
+        <div class="editorial-media">
+          <figure class="ph ph-main" data-reveal>
+            <img src="img/lectura.jpg" alt="Una persona lee un libro antiguo con una taza de café entre las manos" loading="lazy">
+          </figure>
+          <figure class="ph ph-small" data-reveal style="--i:2">
+            <img src="img/libros.jpg" alt="Pila de libros antiguos de lomos de piel frente a una estantería de madera" loading="lazy">
+          </figure>
+          <p class="caption" data-reveal style="--i:3">Fig. 01 — Una tarde cualquiera, sin prisa.</p>
+        </div>
+
+        <div class="editorial-copy">
+          <p class="kicker" data-reveal>Un lugar para quedarse</p>
+          <h2 class="display" data-reveal style="--i:1">Mucho más que <em>una cafetería.</em></h2>
+          <p class="lead" data-reveal style="--i:2">Tinta &amp; Grano nació de una idea sencilla: que un buen café y un buen libro se disfrutan mejor en el mismo sitio.</p>
+          <p data-reveal style="--i:3">Aquí se llega por una taza y se termina quedándose por una estantería. Hay mesas largas para trabajar en silencio, butacas junto a la ventana para perderse en una novela y una barra donde alguien siempre tiene una recomendación a punto, sea de grano o de papel.</p>
+          <blockquote class="pull" data-reveal style="--i:4">«Un lugar donde el café se disfruta despacio y cada libro abre una puerta.»</blockquote>
+        </div>
+      </div>
+
+      <!-- las tres experiencias -->
+      <div class="trio" data-reveal>
+        <article>
+          <span class="num">I</span>
+          <h3>Café de especialidad</h3>
+          <p>Granos de temporada tostados en pequeñas tandas, preparados al momento y acompañados de repostería artesanal.</p>
+        </article>
+        <article>
+          <span class="num">II</span>
+          <h3>Una librería con criterio</h3>
+          <p>Novela, poesía, ensayo y literatura contemporánea elegidos a mano. Menos títulos, más intención.</p>
+        </article>
+        <article>
+          <span class="num">III</span>
+          <h3>Tiempo para uno mismo</h3>
+          <p>Leer, trabajar, conversar o no hacer nada. Aquí nadie tiene prisa por que te vayas.</p>
+        </article>
+      </div>
+    </section>
+
+    <!-- ═════════ CAFÉ ═════════ -->
+    <section class="cafe section band" id="cafe">
+      <div class="cafe-grid">
+        <aside class="cafe-media">
+          <figure class="ph ph-tall" data-reveal>
+            <img src="img/cafe.jpg" alt="Una taza de cerámica con café humeante sobre una mesa de madera junto a la ventana" loading="lazy">
+          </figure>
+        </aside>
+
+        <div class="cafe-copy">
+          <p class="kicker" data-reveal>La carta</p>
+          <h2 class="display" data-reveal style="--i:1">Café, <em>sin atajos.</em></h2>
+          <p class="lead" data-reveal style="--i:2">Cuatro orígenes de temporada, un único tostador y baristas que prefieren preguntarte cómo te gusta antes que adivinarlo.</p>
+
+          <div class="tabs" id="coffeeTabs" role="tablist" aria-label="Tipo de café" data-reveal style="--i:3">
+            <button role="tab" aria-selected="true" data-filter="all">Todos</button>
+            <button role="tab" aria-selected="false" data-filter="caliente">Calientes</button>
+            <button role="tab" aria-selected="false" data-filter="frio">Fríos</button>
+            <button role="tab" aria-selected="false" data-filter="filtro">Filtrados</button>
+          </div>
+
+          <ul class="menu-list" id="coffeeList"></ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═════════ LIBRERÍA ═════════ -->
+    <section class="libreria section" id="libreria">
+      <div class="libreria-head">
+        <div class="libreria-copy">
+          <p class="kicker" data-reveal>La librería</p>
+          <h2 class="display" data-reveal style="--i:1">Pocos libros, <em>muy bien elegidos.</em></h2>
+          <p class="lead" data-reveal style="--i:2">Compramos poco y bien. Cada título ha pasado por las manos de alguien del equipo — y, a menudo, por su taza de café.</p>
+        </div>
+        <figure class="ph ph-wide" data-reveal style="--i:2">
+          <img src="img/libreria.jpg" alt="Pasillo de la librería con estanterías de madera, plantas y luz cálida" loading="lazy">
+        </figure>
+      </div>
+
+      <div class="tabs" id="bookTabs" role="tablist" aria-label="Género" data-reveal>
+        <button role="tab" aria-selected="true" data-filter="all">Todo</button>
+        <button role="tab" aria-selected="false" data-filter="novela">Novela</button>
+        <button role="tab" aria-selected="false" data-filter="poesia">Poesía</button>
+        <button role="tab" aria-selected="false" data-filter="ensayo">Ensayo</button>
+        <button role="tab" aria-selected="false" data-filter="ilustrado">Ilustrado</button>
+        <button role="tab" aria-selected="false" data-filter="viajes">Viajes</button>
+        <button role="tab" aria-selected="false" data-filter="comic">Cómic</button>
+      </div>
+      <div class="book-grid" id="bookGrid"></div>
+    </section>
+
+    <!-- ═════════ ESPACIOS ═════════ -->
+    <section class="espacios section band" id="espacios">
+      <header class="head-row" data-reveal>
+        <div>
+          <p class="kicker">Los rincones</p>
+          <h2 class="display">Cinco maneras <em>de quedarse.</em></h2>
+        </div>
+        <div class="flow-ctrl">
+          <span class="flow-count" id="flowCount">01 / 05</span>
+          <button class="round" id="flowPrev" aria-label="Rincón anterior"><svg viewBox="0 0 16 16" width="16" height="16"><path d="M10 3L5 8l5 5" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+          <button class="round" id="flowNext" aria-label="Rincón siguiente"><svg viewBox="0 0 16 16" width="16" height="16"><path d="M6 3l5 5-5 5" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+        </div>
+      </header>
+      <div class="flow" id="flow" tabindex="0" aria-label="Galería de rincones"></div>
+    </section>
+
+    <!-- ═════════ AGENDA ═════════ -->
+    <section class="agenda section" id="agenda">
+      <div class="agenda-grid">
+        <div class="agenda-copy">
+          <p class="kicker" data-reveal>Agenda</p>
+          <h2 class="display" data-reveal style="--i:1">La semana tiene <em>su propio ritmo.</em></h2>
+          <p class="lead" data-reveal style="--i:2">Pequeños encuentros alrededor de los libros y el café. Plazas limitadas, conversaciones largas.</p>
+        </div>
+        <ol class="agenda-list" id="agendaList"></ol>
+      </div>
+    </section>
+
+    <!-- ═════════ CONTACTO ═════════ -->
+    <section class="contacto section" id="contacto">
+      <div class="contacto-grid">
+        <div class="contacto-copy">
+          <p class="kicker light" data-reveal>Contacto</p>
+          <h2 class="display light" data-reveal style="--i:1">Te guardamos <em>una mesa.</em></h2>
+          <p class="lead light" data-reveal style="--i:2">Calle del Tintero, 14 · Casco Viejo<br>hola@tintaygrano.cafe · +34 600 000 000</p>
+
+          <dl class="hours" data-reveal style="--i:3">
+            <div><dt>Lunes a viernes</dt><dd>08:00 — 22:00</dd></div>
+            <div><dt>Sábado</dt><dd>09:00 — 23:30</dd></div>
+            <div><dt>Domingo</dt><dd>10:00 — 20:00</dd></div>
+          </dl>
+
+          <figure class="ph ph-contact" data-reveal style="--i:4">
+            <img src="img/barista.jpg" alt="Un barista prepara un café de filtro con luz cálida" loading="lazy">
+          </figure>
+        </div>
+
+        <form class="reserve" id="reserve" data-reveal style="--i:2" novalidate>
+          <h3>Reservar mesa</h3>
+          <label class="field"><span>Nombre</span><input name="name" type="text" placeholder="¿A nombre de quién?" autocomplete="name" required></label>
+          <div class="field-row">
+            <label class="field"><span>Día</span><input name="date" type="date" id="dateInput" required></label>
+            <label class="field"><span>Momento</span>
+              <select name="slot"><option>Mañana</option><option selected>Tarde</option><option>Noche</option></select>
+            </label>
+          </div>
+          <label class="field"><span>Rincón</span><select name="space" id="spaceSelect"></select></label>
+          <div class="field">
+            <span>Personas</span>
+            <div class="stepper">
+              <button type="button" id="minus" aria-label="Menos personas"><svg viewBox="0 0 16 16" width="14" height="14"><path d="M3 8h10" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg></button>
+              <output id="people">2</output>
+              <button type="button" id="plus" aria-label="Más personas"><svg viewBox="0 0 16 16" width="14" height="14"><path d="M3 8h10M8 3v10" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg></button>
+            </div>
+          </div>
+          <button class="btn btn-cream btn-block" type="submit">Reservar</button>
+          <p class="fine">Te escribimos en menos de una hora. Cancelación gratuita hasta 2 h antes.</p>
+        </form>
+      </div>
+
+      <div class="wordmark" aria-hidden="true">Tinta <em>&amp; Grano</em></div>
+      <footer class="foot">
+        <span>© 2026 Tinta &amp; Grano</span>
+        <span>Fotografías: <a href="https://unsplash.com" target="_blank" rel="noopener">Unsplash</a> · Hecho con calma, café y demasiados libros.</span>
+      </footer>
+    </section>
+  </main>
+
+  <!-- ═════════ CAJÓN DE LIBRO ═════════ -->
+  <div class="overlay" id="overlay"></div>
+  <aside class="drawer" id="drawer" role="dialog" aria-modal="true" aria-labelledby="dTitle" aria-hidden="true">
+    <button class="drawer-close round" id="dClose" aria-label="Cerrar"><svg viewBox="0 0 16 16" width="16" height="16"><path d="M4 4l8 8M12 4l-8 8" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg></button>
+    <div class="drawer-stage" id="dStage"></div>
+    <div class="drawer-body">
+      <p class="kicker" id="dGenre"></p>
+      <h3 id="dTitle"></h3>
+      <p class="d-author" id="dAuthor"></p>
+      <p class="d-text" id="dText"></p>
+      <dl class="d-meta">
+        <div><dt>Precio</dt><dd id="dPrice"></dd></div>
+        <div><dt>Páginas</dt><dd id="dPages"></dd></div>
+        <div><dt>Estantería</dt><dd id="dShelf"></dd></div>
+      </dl>
+      <button class="btn btn-solid btn-block" id="dReserve">Reservar ejemplar</button>
+    </div>
+  </aside>
+
+  <div class="travel" aria-hidden="true"><span class="travel-bar" id="travelBar"></span></div>
+  <div class="toasts" id="toasts" aria-live="polite"></div>
+  <script src="script.js"></script>
+</body>
+</html>
