@@ -1,4 +1,4 @@
-import { Building2, CheckSquare, CreditCard, Globe, LayoutDashboard, Settings, Users, type LucideIcon } from 'lucide-react'
+import { Building2, CalendarDays, CheckSquare, CreditCard, Globe, LayoutDashboard, Settings, Users, type LucideIcon } from 'lucide-react'
 
 export interface NavItem {
   label: string
@@ -25,6 +25,7 @@ export const NAV: NavItem[] = [
   },
   { label: 'Dominios', href: '/dominios', icon: Building2 },
   { label: 'Facturación', href: '/facturacion', icon: CreditCard },
+  { label: 'Calendario', href: '/calendario', icon: CalendarDays },
   { label: 'Tareas', href: '/tareas', icon: CheckSquare },
   { label: 'Configuración', href: '/configuracion', icon: Settings },
 ]
