@@ -4,7 +4,7 @@
 import { toDateInput } from '@/lib/format'
 import { conceptLabel } from '@/lib/labels'
 import { packOfClient, RENEWAL_PRICES } from '@/lib/packs'
-import type { Client, Domain, Hosting, Invoice, InvoiceConcept, Technology, Website } from '@/types/domain'
+import type { Client, Domain, Hosting, Invoice, InvoiceConcept, PackType, Technology, Website } from '@/types/domain'
 
 const FREE_MAIL = new Set(['gmail.com', 'googlemail.com', 'hotmail.com', 'hotmail.es', 'outlook.com', 'outlook.es', 'live.com', 'msn.com', 'yahoo.com', 'yahoo.es', 'icloud.com', 'me.com', 'proton.me', 'protonmail.com', 'telefonica.net'])
 
@@ -112,6 +112,34 @@ export function billableServices(clientId: string, ctx: PrefillContext): Billabl
   for (const w of ctx.websites.filter((x) => x.clientId === clientId && x.status !== 'ARCHIVED'))
     out.push({ kind: 'website', id: w.id, label: `Web ${w.domainName || w.name}`, concept: 'WEB_DEVELOPMENT', description: `Diseño y desarrollo de ${w.name}`, subtotal: 0, recurring: false, websiteId: w.id, domainId: null, hostingId: null, dueSuggest: '' })
   return out
+}
+
+export type InvoiceKind = 'FIRST' | 'MAINTENANCE' | 'RENEWAL'
+
+/**
+ * Datos que ya tiene el cliente para proponerlos en una factura nueva: el pack asignado (el ya facturado, el de su web o el que
+ * eligió en el formulario), el tipo de factura, la web, el IVA que se le aplicó y, si se factura desde un dominio, su renovación.
+ */
+export function invoiceDefaults(client: Client, ctx: PrefillContext, serviceKey?: string) {
+  const invoices = ctx.invoices ?? []
+  const [serviceType, serviceId] = (serviceKey ?? '').split(':')
+  const webs = ctx.websites.filter((w) => w.clientId === client.id && w.status !== 'ARCHIVED')
+  const domain = serviceType === 'domain' ? ctx.domains.find((d) => d.id === serviceId) : undefined
+  const serviceWeb = serviceType === 'website' ? ctx.websites.find((w) => w.id === serviceId) : domain?.websiteId ? ctx.websites.find((w) => w.id === domain.websiteId) : undefined
+  const web = serviceWeb ?? (webs.length === 1 ? webs[0] : undefined)
+
+  let pack: PackType | null = null
+  let source = ''
+  const billed = packOfClient(client.id, web?.id, invoices)
+  if (serviceType === 'website' && serviceWeb?.pack) [pack, source] = [serviceWeb.pack, 'el pack de esta web']
+  else if (billed) [pack, source] = [billed, 'el pack que ya se le ha facturado']
+  else if ((web ?? webs.find((w) => w.pack))?.pack) [pack, source] = [(web ?? webs.find((w) => w.pack))!.pack!, 'el pack de su web']
+  else if (client.packInterest && client.packInterest !== 'INDECISO') [pack, source] = [client.packInterest, 'el pack que eligió en el formulario']
+
+  const hasFirst = invoices.some((i) => i.clientId === client.id && i.pack && !i.originId && i.concept === 'WEB_DEVELOPMENT' && i.status !== 'CANCELLED')
+  const kind: InvoiceKind = domain ? 'RENEWAL' : hasFirst && serviceType !== 'website' ? 'MAINTENANCE' : 'FIRST'
+  const lastTax = [...invoices].filter((i) => i.clientId === client.id).sort((a, b) => b.issuedAt.localeCompare(a.issuedAt))[0]?.taxRate
+  return { pack, kind, source, websiteId: web?.id, domainId: domain?.id, taxRate: lastTax, dueAt: domain ? toDateInput(domain.renewsAt) : undefined, renewalName: domain?.name }
 }
 
 export const conceptDescription = (concept: InvoiceConcept) => conceptLabel[concept]
