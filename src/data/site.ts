@@ -47,7 +47,6 @@ export const packs = [
       'Dominio + hosting 1 año y SSL',
     ],
     care: [
-      'Renovación de dominio, hosting y SSL',
       'Actualizaciones y copias de seguridad',
       'Monitorización y corrección de pequeños errores',
       'Soporte por email/WhatsApp',
