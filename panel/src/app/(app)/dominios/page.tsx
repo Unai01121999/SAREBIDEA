@@ -15,6 +15,8 @@ import { StatStrip } from '@/components/shared/stat-strip'
 import { Button } from '@/components/ui/button'
 import { ConfirmDialog } from '@/components/ui/confirm-dialog'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import { usePrefillData } from '@/components/forms/prefill'
+import { domainAnnualCost } from '@/lib/prefill'
 import { clientsApi, domainsApi, useSettings } from '@/hooks/use-entities'
 import { useCreateParam } from '@/hooks/use-create-param'
 import { downloadCsv } from '@/lib/csv'
@@ -45,6 +47,8 @@ export default function DomainsPage() {
   const [editing, setEditing] = useState<Domain | undefined>()
   const [toDelete, setToDelete] = useState<Domain | undefined>()
 
+  const prefill = usePrefillData()
+  const costOf = (d: Domain) => domainAnnualCost(d, prefill.clientById(d.clientId), prefill.ctx)
   const clientName = useMemo(() => new Map((clients ?? []).map((c) => [c.id, c.company])), [clients])
   const counts = useMemo(() => {
     const c: Record<ExpiryLevel, number> = { expired: 0, d7: 0, d15: 0, d30: 0, ok: 0 }
@@ -61,7 +65,7 @@ export default function DomainsPage() {
     { id: 'registeredAt', header: 'Registro', accessorFn: (d) => d.registeredAt, cell: ({ row }) => <span className="whitespace-nowrap text-muted-foreground">{formatDate(row.original.registeredAt)}</span> },
     { id: 'renewsAt', header: 'Renovación', accessorFn: (d) => d.renewsAt, cell: ({ row }) => <span className="whitespace-nowrap">{formatDate(row.original.renewsAt)}</span> },
     { id: 'alert', header: 'Vencimiento', accessorFn: (d) => daysUntil(d.renewsAt) ?? 0, cell: ({ row }) => <ExpiryBadge renewsAt={row.original.renewsAt} /> },
-    { id: 'cost', header: 'Coste anual', accessorFn: (d) => d.annualCost, cell: ({ row }) => <span className="tabular">{formatCurrency(row.original.annualCost)}</span> },
+    { id: 'cost', header: 'Coste anual', accessorFn: (d) => costOf(d), cell: ({ row }) => <span className="tabular">{formatCurrency(costOf(row.original))}</span> },
     { id: 'auto', header: 'Auto renovación', accessorFn: (d) => (d.autoRenew ? 1 : 0), cell: ({ row }) => <Badge tone={row.original.autoRenew ? 'success' : 'neutral'}>{row.original.autoRenew ? 'Sí' : 'No'}</Badge> },
     {
       id: 'actions',
@@ -111,7 +115,7 @@ export default function DomainsPage() {
         initialSort={[{ id: 'renewsAt', desc: false }]}
         onRowClick={(d) => router.push(routes.domain(d.id))}
         rowClassName={(d) => cn('transition-colors', rowTint[levelOf(d)])}
-        onExport={(list) => downloadCsv('dominios.csv', list.map((d) => ({ Dominio: d.name, Cliente: clientName.get(d.clientId) ?? '', Registrador: d.registrar, Registro: formatDate(d.registeredAt), Renovacion: formatDate(d.renewsAt), Estado: expiryLabel[levelOf(d)], Coste: d.annualCost, AutoRenovacion: d.autoRenew ? 'Sí' : 'No' })))}
+        onExport={(list) => downloadCsv('dominios.csv', list.map((d) => ({ Dominio: d.name, Cliente: clientName.get(d.clientId) ?? '', Registrador: d.registrar, Registro: formatDate(d.registeredAt), Renovacion: formatDate(d.renewsAt), Estado: expiryLabel[levelOf(d)], Coste: costOf(d), AutoRenovacion: d.autoRenew ? 'Sí' : 'No' })))}
         toolbar={
           <>
             <Select value={level} onValueChange={(v) => setLevel(v as typeof level)}>

@@ -8,11 +8,11 @@ import { CheckboxGroupField, Field, SelectField } from '@/components/forms/field
 import { FormDialog } from '@/components/forms/form-dialog'
 import { Input, Textarea } from '@/components/ui/input'
 import { clientsApi, domainsApi, hostingsApi, useSettings, websitesApi } from '@/hooks/use-entities'
-import { packInterestLabel } from '@/lib/packs'
+import { packInterestLabel, RENEWAL_PRICES } from '@/lib/packs'
 import { fromDateInput } from '@/lib/format'
 import { clientStatusLabel, serviceLabel, technologyLabel } from '@/lib/labels'
 import { guessDomain } from '@/lib/prefill'
-import { CLIENT_STATUSES, PACK_INTERESTS, SERVICE_TYPES, TECHNOLOGIES, type Client, type PackInterest, type Technology } from '@/types/domain'
+import { CLIENT_STATUSES, PACK_INTERESTS, SERVICE_TYPES, TECHNOLOGIES, type Client, type PackInterest, type PackType, type Technology } from '@/types/domain'
 
 export const clientSchema = z.object({
   company: z.string().trim().min(2, 'Escribe el nombre de la empresa'),
@@ -124,9 +124,11 @@ export function useClientForm(client: Client | undefined, onDone: (saved?: Clien
         websiteId = web.id
       }
     }
+    // Coste anual del dominio = renovación de hosting + dominio según el pack elegido (90 / 120 / 180 €); sin pack, el que tuviera (o 0).
+    const domainCost = v.packInterest && v.packInterest !== 'INDECISO' ? RENEWAL_PRICES[v.packInterest as PackType] : (oldDomain?.annualCost ?? 0)
     if (hasDomain) {
       if (oldDomain) {
-        if (oldDomain.name !== domainName) await updateDomain.mutateAsync({ id: oldDomain.id, patch: { name: domainName } })
+        if (oldDomain.name !== domainName || oldDomain.annualCost !== domainCost) await updateDomain.mutateAsync({ id: oldDomain.id, patch: { name: domainName, annualCost: domainCost } })
       } else {
         await createDomain.mutateAsync({
           clientId: c.id,
@@ -135,7 +137,8 @@ export function useClientForm(client: Client | undefined, onDone: (saved?: Clien
           registrar: settings?.domainRegistrars[0] || '',
           registeredAt: new Date().toISOString(),
           renewsAt: inOneYear(),
-          annualCost: 15,
+          // Renovación de hosting + dominio según el pack elegido (90 / 120 / 180 €); sin pack, 0.
+          annualCost: domainCost,
           autoRenew: true,
           dns: '',
           nameservers: [],

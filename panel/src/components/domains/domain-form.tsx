@@ -35,7 +35,7 @@ const plusOneYear = (dateInput: string) => {
   const r = new Date(y + 1, m - 1, d)
   return `${r.getFullYear()}-${String(r.getMonth() + 1).padStart(2, '0')}-${String(r.getDate()).padStart(2, '0')}`
 }
-const empty = (clientId = '', websiteId = ''): Values => ({ clientId, websiteId, name: '', registrar: '', registeredAt: today(), renewsAt: plusOneYear(today()), annualCost: 12, autoRenew: true, nameservers: '', dns: '', notes: '' })
+const empty = (clientId = '', websiteId = ''): Values => ({ clientId, websiteId, name: '', registrar: '', registeredAt: today(), renewsAt: plusOneYear(today()), annualCost: 0, autoRenew: true, nameservers: '', dns: '', notes: '' })
 const toValues = (d: Domain): Values => ({ clientId: d.clientId, websiteId: d.websiteId ?? '', name: d.name, registrar: d.registrar, registeredAt: toDateInput(d.registeredAt), renewsAt: toDateInput(d.renewsAt), annualCost: d.annualCost, autoRenew: d.autoRenew, nameservers: d.nameservers.join('\n'), dns: d.dns, notes: d.notes })
 
 export function DomainFormDialog({ open, onOpenChange, domain, clientId, websiteId }: { open: boolean; onOpenChange: (o: boolean) => void; domain?: Domain; clientId?: string; websiteId?: string }) {
@@ -96,7 +96,7 @@ export function DomainFormDialog({ open, onOpenChange, domain, clientId, website
       <Field label="Fecha de renovación" required error={e.renewsAt?.message} htmlFor="d-ren">
         <Input id="d-ren" type="date" {...register('renewsAt')} aria-invalid={!!e.renewsAt} />
       </Field>
-      <Field label="Coste anual (€)" error={e.annualCost?.message} htmlFor="d-cost">
+      <Field label="Coste anual de hosting y dominio (€)" error={e.annualCost?.message} htmlFor="d-cost" hint="Según el pack del cliente: Starter 90 €, Professional 120 €, Premium 180 €.">
         <Input id="d-cost" type="number" step="0.01" min="0" inputMode="decimal" {...register('annualCost', { valueAsNumber: true })} aria-invalid={!!e.annualCost} />
       </Field>
       <div className="flex items-end">

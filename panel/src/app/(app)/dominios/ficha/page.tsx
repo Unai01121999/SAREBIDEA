@@ -15,6 +15,7 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { ConfirmDialog } from '@/components/ui/confirm-dialog'
 import { Skeleton } from '@/components/ui/skeleton'
+import { clientPack } from '@/lib/prefill'
 import { clientsApi, domainsApi, invoicesApi, websitesApi } from '@/hooks/use-entities'
 import { daysUntil, formatCurrency, formatDate } from '@/lib/format'
 import { packLabel, packOfClient, RENEWAL_LEAD_DAYS, RENEWAL_PRICES } from '@/lib/packs'
@@ -28,6 +29,7 @@ export default function DomainDetailPage() {
   const { data: web } = websitesApi.useOne(d?.websiteId ?? undefined)
   const remove = domainsApi.useRemove()
   const { data: invoices } = invoicesApi.useList()
+  const { data: websites } = websitesApi.useList()
   const [dialog, setDialog] = useState<'edit' | 'delete' | 'invoice' | null>(null)
 
   if (isLoading) return <Skeleton className="h-96 w-full" />
@@ -52,7 +54,7 @@ export default function DomainDetailPage() {
   })()
   const renewalKey = `${nextRenewal.getFullYear()}-${String(nextRenewal.getMonth() + 1).padStart(2, '0')}-${String(nextRenewal.getDate()).padStart(2, '0')}`
   const renewalInvoice = invoices?.find((i) => i.domainId === d.id && i.concept === 'DOMAIN' && i.renewalOf === renewalKey)
-  const renewalPack = invoices ? packOfClient(d.clientId, d.websiteId, invoices) : null
+  const renewalPack = client ? clientPack(client, { invoices: invoices ?? [], websites: websites ?? [], domains: [], hostings: [] }, d.websiteId) : invoices ? packOfClient(d.clientId, d.websiteId, invoices) : null
   const renewalAmount = renewalPack ? RENEWAL_PRICES[renewalPack] : d.annualCost
   const invoiceDate = new Date(nextRenewal.getTime() - RENEWAL_LEAD_DAYS * 864e5)
 
@@ -95,7 +97,10 @@ export default function DomainDetailPage() {
               <Row label="Cliente">{client ? <Link href={routes.client(client.id)} className="hover:text-brand hover:underline">{client.company}</Link> : '—'}</Row>
               <Row label="Proyecto web relacionado">{web ? <Link href={routes.website(web.id)} className="hover:text-brand hover:underline">{web.name}</Link> : 'Sin web asociada'}</Row>
               <Row label="Registrador">{d.registrar}</Row>
-              <Row label="Coste anual">{formatCurrency(d.annualCost)}</Row>
+              <Row label="Coste anual de hosting y dominio">
+                {formatCurrency(renewalAmount)}
+                {renewalPack && <span className="ml-2 font-normal text-muted-foreground">({packLabel(renewalPack)})</span>}
+              </Row>
               <Row label="Fecha de registro">{formatDate(d.registeredAt)}</Row>
               <Row label="Fecha de renovación">
                 {formatDate(d.renewsAt)}

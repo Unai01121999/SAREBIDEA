@@ -23,6 +23,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { WebsiteFormDialog } from '@/components/websites/website-form'
 import { clientsApi, domainsApi, hostingsApi, invoicesApi, useActivity, websitesApi } from '@/hooks/use-entities'
+import { domainAnnualCost } from '@/lib/prefill'
 import { formatCurrency, formatDate, formatDateTime, timeAgo } from '@/lib/format'
 import { conceptLabel, originLabel, originTone } from '@/lib/labels'
 import { packInterestLabel } from '@/lib/packs'
@@ -240,7 +241,7 @@ export default function ClientDetailPage() {
                     <TableCell>{d.registrar}</TableCell>
                     <TableCell className="text-muted-foreground">{formatDate(d.renewsAt)}</TableCell>
                     <TableCell><ExpiryBadge renewsAt={d.renewsAt} /></TableCell>
-                    <TableCell className="text-right tabular">{formatCurrency(d.annualCost)}</TableCell>
+                    <TableCell className="text-right tabular">{formatCurrency(client ? domainAnnualCost(d, client, { invoices: invoices.data ?? [], websites: websites.data ?? [], domains: domains.data ?? [], hostings: hostings.data ?? [] }) : d.annualCost)}</TableCell>
                   </TableRow>
                 ))}
                 {!cDomains.length && <EmptyRow cols={5} text="Este cliente no tiene dominios." />}

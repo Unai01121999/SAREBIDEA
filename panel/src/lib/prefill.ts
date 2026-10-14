@@ -65,6 +65,25 @@ const NAMESERVERS: Record<string, string[]> = {
   GoDaddy: ['ns55.domaincontrol.com', 'ns56.domaincontrol.com'],
 }
 
+/**
+ * Pack del cliente: el que ya se le ha facturado (de esa web o, si no, el primero), si no el de su web y, si no, el que eligió en el formulario.
+ * Coincide con el criterio de la base de datos (función pack_del_dominio).
+ */
+export function clientPack(client: Client, ctx: PrefillContext, websiteId?: string | null): PackType | null {
+  const billed = packOfClient(client.id, websiteId, ctx.invoices ?? [])
+  if (billed) return billed
+  const webs = ctx.websites.filter((w) => w.clientId === client.id && w.status !== 'ARCHIVED')
+  const web = (websiteId && webs.find((w) => w.id === websiteId)) || webs.find((w) => w.pack)
+  if (web?.pack) return web.pack
+  return client.packInterest && client.packInterest !== 'INDECISO' ? client.packInterest : null
+}
+
+/** Coste anual de un dominio = precio de la renovación de hosting + dominio de su pack (Starter 90 · Professional 120 · Premium 180 €). Sin pack, el valor guardado. */
+export function domainAnnualCost(d: Domain, client: Client | undefined, ctx: PrefillContext): number {
+  const pack = client ? clientPack(client, ctx, d.websiteId) : packOfClient(d.clientId, d.websiteId, ctx.invoices ?? [])
+  return pack ? RENEWAL_PRICES[pack] : d.annualCost
+}
+
 export function domainDefaults(client: Client, web: Website | undefined, ctx: PrefillContext) {
   const name = web?.domainName || guessDomain(client)
   const mine = ctx.domains.filter((d) => d.clientId === client.id)
@@ -74,8 +93,11 @@ export function domainDefaults(client: Client, web: Website | undefined, ctx: Pr
     websiteId: web?.id,
     registrar,
     nameservers: registrar && NAMESERVERS[registrar] ? NAMESERVERS[registrar].join('\n') : undefined,
-    // Si ya tiene otros dominios con el mismo registrador, se propone el mismo precio medio.
-    annualCost: mine.length ? Math.round((mine.reduce((a, d) => a + d.annualCost, 0) / mine.length) * 100) / 100 : undefined,
+    // Coste anual = renovación de hosting + dominio según su pack (90 / 120 / 180 €).
+    annualCost: (() => {
+      const pack = clientPack(client, ctx, web?.id)
+      return pack ? RENEWAL_PRICES[pack] : 0
+    })(),
   }
 }
 
