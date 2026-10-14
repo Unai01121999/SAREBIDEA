@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Cenas de fin de semana</title>
+<meta name="description" content="" id="metaDesc">
+<meta name="theme-color" content="#0d0b0a">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preconnect" href="https://images.unsplash.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+<!-- Todos los textos con data-t se rellenan desde js/content.js (editables en el área privada) -->
+
+<header class="nav" id="nav">
+  <div class="wrap">
+    <a href="#inicio" class="logo"><i></i><span data-bind="name"></span></a>
+    <nav class="links" id="links">
+      <a href="#nosotros" data-t="nav.1"></a>
+      <a href="#carta" data-t="nav.2"></a>
+      <a href="#cenas" data-t="nav.3"></a>
+      <a href="#galeria" data-t="nav.4"></a>
+      <a href="#contacto" data-t="nav.5"></a>
+      <a href="admin.html" class="btn btn-ghost btn-sm nav-admin" data-t="nav.admin"></a>
+      <a href="#reservas" class="btn btn-primary btn-sm" data-t="nav.cta"></a>
+    </nav>
+    <button class="burger" id="burger" aria-label="Abrir menú"><span></span><span></span></button>
+  </div>
+</header>
+
+<main>
+<!-- HERO -->
+<section class="hero" id="inicio">
+  <div class="hero-bg ph"><img data-img="hero" data-w="1800" alt="" fetchpriority="high"></div>
+  <div class="wrap">
+    <span class="eyebrow" data-t="hero.eyebrow"></span>
+    <h1><span data-bind="name"></span><em data-t="hero.sub"></em></h1>
+    <p data-t="hero.text"></p>
+    <div class="cta">
+      <a href="#reservas" class="btn btn-primary" data-t="hero.btn1"></a>
+      <a href="#carta" class="btn btn-ghost" data-t="hero.btn2"></a>
+    </div>
+  </div>
+  <div class="scroll-hint"></div>
+</section>
+
+<!-- SOBRE NOSOTROS -->
+<section class="about" id="nosotros">
+  <div class="wrap grid">
+    <div class="rv">
+      <span class="eyebrow" data-t="about.eyebrow"></span>
+      <h2 data-t="about.title"></h2>
+      <p data-t="about.p1"></p>
+      <p data-t="about.p2"></p>
+      <div class="pillars">
+        <div><b data-t="about.pil1t"></b><span data-t="about.pil1d"></span></div>
+        <div><b data-t="about.pil2t"></b><span data-t="about.pil2d"></span></div>
+        <div><b data-t="about.pil3t"></b><span data-t="about.pil3d"></span></div>
+      </div>
+    </div>
+    <div class="collage rv" style="--d:.15s">
+      <img class="a ph" data-img="about" data-w="900" alt="" loading="lazy">
+      <img class="b ph" data-img="about2" data-w="500" alt="" loading="lazy">
+      <span class="stamp" data-t="about.stamp"></span>
+    </div>
+  </div>
+</section>
+
+<!-- CARTA -->
+<section id="carta">
+  <div class="wrap">
+    <div class="menu-head rv">
+      <div>
+        <span class="eyebrow" data-t="menu.eyebrow"></span>
+        <h2 data-t="menu.title"></h2>
+      </div>
+      <p class="lead" data-t="menu.lead"></p>
+    </div>
+    <div class="tabs rv" id="tabs"></div>
+    <div class="cards" id="cards"></div>
+    <div class="menu-cta rv">
+      <a href="#carta" id="cartaLink" class="btn btn-ghost" data-t="menu.btn"></a>
+      <p class="note" data-t="menu.note"></p>
+    </div>
+  </div>
+</section>
+
+<!-- CENAS FIN DE SEMANA -->
+<section class="weekend" id="cenas">
+  <div class="wk">
+    <div class="bg ph"><img data-img="weekend" data-w="1600" alt="" loading="lazy"></div>
+    <div class="wrap">
+      <div class="rv">
+        <span class="eyebrow" data-t="wk.eyebrow"></span>
+        <h2 data-t="wk.title"></h2>
+        <p class="big" data-t="wk.big"></p>
+        <p class="lead" data-t="wk.lead"></p>
+      </div>
+      <div class="info-box rv" style="--d:.15s">
+        <h3 data-t="wk.box"></h3>
+        <ul>
+          <li><span data-t="wk.r1l"></span><b data-t="wk.r1v"></b></li>
+          <li><span data-t="wk.r2l"></span><b data-t="wk.r2v"></b></li>
+          <li><span data-t="wk.r3l"></span><b data-t="wk.r3v"></b></li>
+          <li><span data-t="wk.r4l"></span><b data-t="wk.r4v"></b></li>
+          <li><span data-t="wk.r5l"></span><b data-t="wk.r5v"></b></li>
+        </ul>
+        <a href="#reservas" class="btn btn-primary" data-t="wk.btn"></a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- GALERÍA -->
+<section class="gallery" id="galeria">
+  <div class="wrap">
+    <div class="rv">
+      <span class="eyebrow" data-t="gal.eyebrow"></span>
+      <h2 data-t="gal.title"></h2>
+    </div>
+    <div class="mosaic" id="mosaic"></div>
+  </div>
+</section>
+
+<!-- RESERVAS -->
+<section class="book" id="reservas">
+  <div class="wrap">
+    <div class="box rv">
+      <div class="side">
+        <span class="eyebrow" data-t="bk.eyebrow"></span>
+        <h2 data-t="bk.title"></h2>
+        <p data-t="bk.text"></p>
+        <ul class="perks">
+          <li data-t="bk.perk1"></li><li data-t="bk.perk2"></li><li data-t="bk.perk3"></li>
+        </ul>
+        <a id="waBtn" class="btn btn-wa" target="_blank" rel="noopener" data-t="bk.wa"></a>
+      </div>
+      <form id="form" novalidate>
+        <div class="f"><label for="nombre" data-t="form.nombre"></label><input id="nombre" name="nombre" autocomplete="name" required></div>
+        <div class="f"><label for="tel" data-t="form.tel"></label><input id="tel" name="tel" type="tel" autocomplete="tel" required></div>
+        <div class="f"><label for="personas" data-t="form.personas"></label><select id="personas" name="personas"></select></div>
+        <div class="f"><label for="fecha" data-t="form.fecha"></label><input id="fecha" name="fecha" type="date" required></div>
+        <div class="f full"><label for="hora" data-t="form.hora"></label><select id="hora" name="hora"></select></div>
+        <div class="f full"><label for="coment" data-t="form.coment"></label><textarea id="coment" name="coment" placeholder="Alergias, celebración, trona…"></textarea></div>
+        <label class="check"><input type="checkbox" id="priv" required><span><span data-t="form.priv"></span> <a href="#" data-legal="privacidad" data-t="form.privlink"></a>.</span></label>
+        <div class="msg" id="msg" role="status"></div>
+        <div class="actions"><button class="btn btn-primary" type="submit" data-t="bk.btn"></button></div>
+      </form>
+    </div>
+  </div>
+</section>
+
+<!-- CONTACTO -->
+<section class="contact" id="contacto">
+  <div class="wrap grid">
+    <div class="rv">
+      <span class="eyebrow" data-t="ct.eyebrow"></span>
+      <h2 data-t="ct.title"></h2>
+      <div class="clist">
+        <div class="ci"><div class="ic">⌖</div><div><small data-t="ct.l1"></small><span data-bind="address"></span></div></div>
+        <div class="ci"><div class="ic">✆</div><div><small data-t="ct.l2"></small><a data-bind="phone" data-href="tel"></a></div></div>
+        <div class="ci"><div class="ic">◷</div><div><small data-t="ct.l3"></small><div class="hrs" id="hours"></div></div></div>
+        <div class="ci"><div class="ic">◎</div><div><small data-t="ct.l4"></small><a data-bind="instagram" data-href="instagramUrl" target="_blank" rel="noopener"></a></div></div>
+      </div>
+      <a id="route" class="btn btn-primary" target="_blank" rel="noopener" data-t="ct.btn"></a>
+    </div>
+    <div class="map rv" style="--d:.15s"><iframe id="mapFrame" title="Mapa" loading="lazy"></iframe></div>
+  </div>
+</section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <div class="foot">
+      <div>
+        <a href="#inicio" class="logo"><i></i><span data-bind="name"></span></a>
+        <p data-t="foot.text"></p>
+      </div>
+      <div>
+        <h4 data-t="foot.h1"></h4>
+        <ul>
+          <li><a href="#inicio" data-t="foot.l1"></a></li><li><a href="#carta" data-t="foot.l2"></a></li>
+          <li><a href="#reservas" data-t="foot.l3"></a></li><li><a href="#contacto" data-t="foot.l4"></a></li>
+        </ul>
+      </div>
+      <div>
+        <h4 data-t="foot.h2"></h4>
+        <ul>
+          <li><a data-href="instagramUrl" target="_blank" rel="noopener" data-t="foot.s1"></a></li>
+          <li><a data-href="facebookUrl" target="_blank" rel="noopener" data-t="foot.s2"></a></li>
+          <li><a data-href="tiktokUrl" target="_blank" rel="noopener" data-t="foot.s3"></a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="bottom">
+      <span>© <span id="yr"></span> <span data-bind="name"></span>. <span data-t="foot.copy"></span></span>
+      <span><a href="#" data-legal="aviso" data-t="foot.lg1"></a><span class="sep">·</span><a href="#" data-legal="privacidad" data-t="foot.lg2"></a><span class="sep">·</span><a href="admin.html" data-t="nav.admin"></a></span>
+    </div>
+  </div>
+</footer>
+
+<div class="sticky" id="sticky">
+  <a href="#reservas" class="btn btn-primary" id="stickyBtn" data-t="nav.sticky"></a>
+  <a class="btn wa" id="waSticky" target="_blank" rel="noopener" aria-label="WhatsApp">💬</a>
+</div>
+
+<div class="modal" id="modal"><div class="in"><h3 id="mTitle"></h3><div id="mBody"></div><button class="btn btn-ghost btn-sm" id="mClose">Cerrar</button></div></div>
+
+<script src="js/config.js"></script>
+<script src="js/content.js"></script>
+<script src="js/store.js"></script>
+<script src="js/main.js"></script>
+</body>
+</html>

@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="robots" content="noindex, nofollow">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Área privada · Reservas</title>
+<link rel="stylesheet" href="css/styles.css">
+<style>
+body{min-height:100vh;background:var(--night)}
+.login{min-height:100vh;display:grid;place-items:center;padding:20px}
+.login form{display:block;width:min(420px,100%);background:var(--card);border:1px solid var(--line);border-radius:22px;padding:40px}
+.login h1{font-size:2.4rem;margin-bottom:6px}
+.login .f{margin-top:16px}
+.login .btn{width:100%;margin-top:24px}
+.login .back{display:block;text-align:center;margin-top:18px;font-size:.85rem;color:var(--muted)}
+.top{display:flex;justify-content:space-between;align-items:center;padding:20px 0;border-bottom:1px solid var(--line);gap:16px;flex-wrap:wrap}
+.top h1{font-size:1.9rem}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin:30px 0}
+.stat{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:20px}
+.stat b{display:block;font:500 2.4rem var(--serif);color:var(--gold);line-height:1}
+.stat span{font-size:.75rem;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+.bar{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:20px;align-items:center}
+.bar select,.bar input{width:auto;padding:10px 14px;font-size:.9rem}
+.bar .sp{flex:1}
+.list{display:grid;gap:12px;padding-bottom:60px}
+.res{display:grid;grid-template-columns:150px 1fr auto;gap:20px;align-items:center;background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:18px 22px}
+.res .when b{display:block;font:500 1.5rem var(--serif);color:var(--cream)}
+.res .when span{font-size:.85rem;color:var(--sand)}
+.res h3{font:600 1.05rem var(--sans);margin-bottom:2px}
+.res p{font-size:.88rem;color:var(--muted)}
+.res .cm{font-style:italic;margin-top:4px;color:var(--sand)}
+.res .act{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end;align-items:center}
+.badge{font-size:.7rem;letter-spacing:.14em;text-transform:uppercase;font-weight:600;padding:5px 12px;border-radius:999px}
+.b-pendiente{background:rgba(227,181,103,.15);color:var(--gold)}
+.b-confirmada{background:rgba(80,170,110,.16);color:#9fdcb0}
+.b-cancelada{background:rgba(200,80,60,.16);color:#f0a99a}
+.ok{background:#2f8f55;color:#fff}.ok:hover{background:#38a864;transform:translateY(-2px)}
+.dng{border-color:rgba(200,80,60,.5);color:#f0a99a}.dng:hover{background:#c8503c;color:#fff;transform:translateY(-2px)}
+.empty{text-align:center;color:var(--muted);padding:60px 20px;border:1px dashed var(--line);border-radius:var(--r)}
+.warn{background:rgba(227,181,103,.1);border:1px solid rgba(227,181,103,.35);color:var(--sand);border-radius:12px;padding:14px 18px;font-size:.85rem;margin-top:22px}
+.err{color:#f0a99a;font-size:.85rem;margin-top:12px;min-height:1em}
+.hidden{display:none!important}
+.wrap.wide{width:min(1640px,100% - 40px)}
+.sbtn{display:flex;gap:8px;flex-wrap:wrap}
+.cms{display:grid;grid-template-columns:230px minmax(0,1fr);gap:26px;margin-top:20px;align-items:start}
+.cms.showprev{grid-template-columns:230px minmax(0,1fr) 430px}
+.cms .side{position:sticky;top:78px;display:grid;gap:4px;max-height:calc(100vh - 100px);overflow:auto}
+.side button{display:flex;gap:10px;align-items:center;text-align:left;background:none;border:1px solid transparent;color:var(--sand);font:500 .92rem var(--sans);padding:11px 14px;border-radius:10px;cursor:pointer;transition:.25s}
+.side button:hover{background:rgba(255,255,255,.05);color:var(--cream)}
+.side button.on{background:var(--card);border-color:rgba(217,138,69,.5);color:var(--cream)}
+.side button .dot{margin-left:auto;width:8px;height:8px;border-radius:50%;background:var(--accent);opacity:0}
+.side button.mod .dot{opacity:1}
+.side button .off{margin-left:auto;font-size:.65rem;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+.sec{display:none;animation:fi .35s var(--ease)}
+.sec.on{display:block}
+@keyframes fi{from{opacity:0;transform:translateY(8px)}}
+.sec>header{margin-bottom:18px}
+.sec>header h2{font-size:2.2rem;margin:0 0 4px}
+.sec>header p{color:var(--muted);font-size:.9rem}
+.sec .body{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:24px;display:grid;grid-template-columns:1fr 1fr;gap:18px}
+.sec .f.wide{grid-column:1/-1}
+.sec .f label{display:flex;justify-content:space-between;align-items:center;gap:10px}
+.sec .f label .rs{background:none;border:0;color:var(--accent);cursor:pointer;font:600 .7rem var(--sans);letter-spacing:.08em;text-transform:uppercase;opacity:0;transition:.2s}
+.sec .f.chg label .rs{opacity:1}
+.sec .f.chg input:not([type=checkbox]),.sec .f.chg textarea{border-color:rgba(217,138,69,.55)}
+.hint{font-size:.76rem;color:var(--muted);margin-top:-2px}
+.cnt{font-size:.7rem;color:var(--muted);text-align:right}
+.sec textarea{min-height:96px}
+.tog{display:flex;align-items:center;gap:12px;padding:14px 16px;border:1px solid var(--line);border-radius:12px;background:rgba(255,255,255,.03);cursor:pointer;text-transform:none;letter-spacing:0;font-size:.95rem;color:var(--cream)}
+.tog input{width:auto;accent-color:var(--accent);transform:scale(1.25)}
+.days{display:flex;gap:8px;flex-wrap:wrap}
+.days label{display:inline-flex;gap:6px;align-items:center;padding:8px 14px;border:1px solid var(--line);border-radius:999px;text-transform:none;letter-spacing:0;font-size:.85rem;cursor:pointer;color:var(--cream)}
+.days input{width:auto;accent-color:var(--accent)}
+.subh{grid-column:1/-1;font:500 1.4rem var(--serif);color:var(--gold);margin-top:10px;padding-top:14px;border-top:1px solid var(--line)}
+.listh{display:flex;justify-content:space-between;align-items:center;margin:26px 0 12px;gap:10px;flex-wrap:wrap}
+.listh h3{font-size:1.7rem}
+.items{display:grid;gap:12px}
+.item{display:grid;grid-template-columns:1fr;gap:16px;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px;grid-column:auto}
+.item.off{opacity:.55}
+
+.item .fl{display:grid;grid-template-columns:1fr 1fr;gap:12px;min-width:0}
+.item .wide{grid-column:1/-1}
+.item .tools{grid-column:1/-1;display:flex;gap:8px;justify-content:space-between;flex-wrap:wrap;align-items:center}
+.item .tools>div{display:flex;gap:8px;flex-wrap:wrap}
+.item .tools label.tog{padding:8px 12px;font-size:.82rem}
+.prev{position:sticky;top:78px;height:calc(100vh - 100px);display:none;flex-direction:column;border:1px solid var(--line);border-radius:var(--r);overflow:hidden;background:var(--card)}
+.showprev .prev{display:flex}
+.phead{display:flex;justify-content:space-between;align-items:center;padding:10px 14px;border-bottom:1px solid var(--line)}
+.prev iframe{flex:1;width:100%;border:0;background:#0d0b0a}
+@media(max-width:1180px){.cms.showprev{grid-template-columns:230px minmax(0,1fr)}.showprev .prev{display:none}#cPrev{display:none}}
+@media(max-width:820px){.cms,.cms.showprev{grid-template-columns:1fr}.cms .side{position:static;display:flex;overflow-x:auto;max-height:none;padding-bottom:6px}.side button{white-space:nowrap}.side button .dot,.side button .off{display:none}.sec .body,.item .fl{grid-template-columns:1fr}.item{grid-template-columns:1fr}.item .th{width:100%;height:160px}}
+.ptabs{display:flex;gap:8px;margin:22px 0 0}
+.ptabs .tab{font-size:.9rem;padding:11px 24px}
+/* Editor de contenido */
+.savebar{position:sticky;top:0;z-index:20;display:flex;gap:10px;flex-wrap:wrap;align-items:center;justify-content:space-between;background:rgba(21,17,15,.94);backdrop-filter:blur(10px);border-bottom:1px solid var(--line);padding:14px 0;margin-top:20px}
+.savebar span{font-size:.85rem;color:var(--sand)}
+.imgf{display:grid;grid-template-columns:96px 1fr;gap:12px;align-items:center}
+.imgf img{width:96px;height:72px;object-fit:cover;border-radius:8px;background:#2a211a}
+.imgf .ctl{display:grid;gap:8px}
+.imgf .ctl div{display:flex;gap:8px}
+.imgf input[type=file]{display:none}
+.toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:#2f8f55;color:#fff;padding:12px 22px;border-radius:999px;font-size:.9rem;z-index:99;box-shadow:0 10px 30px rgba(0,0,0,.5)}
+.toast.bad{background:#c8503c}
+@media(max-width:820px){.stats{grid-template-columns:repeat(2,1fr)}.res{grid-template-columns:1fr}.res .act{justify-content:flex-start}}
+.ptabs{flex-wrap:wrap}.cms .side{scrollbar-width:none}.cms .side::-webkit-scrollbar{display:none}
+@media(max-width:820px){.savebar{gap:8px;padding:10px 0}.savebar span{width:100%;font-size:.78rem}.sbtn{width:100%;flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none}.sbtn::-webkit-scrollbar{display:none}.sbtn .btn{flex:0 0 auto;white-space:nowrap}#cSave{order:-1}.wrap{width:min(100% - 28px,1180px)}.top h1{font-size:1.5rem}.sec>header h2{font-size:1.8rem}.sec .body{padding:16px}.stats b{font-size:2rem}.bar select,.bar input{flex:1 1 140px}.toast{width:calc(100% - 32px);text-align:center;border-radius:14px}}
+@media(min-width:601px) and (max-width:1180px){.res{grid-template-columns:130px 1fr}.res .act{grid-column:1/-1;justify-content:flex-start}}
+</style>
+</head>
+<body>
+
+<div class="login" id="login">
+  <form id="lf">
+    <span class="eyebrow">Área privada</span>
+    <h1>Reservas</h1>
+    <p class="lead" style="font-size:.95rem">Acceso solo para el personal del bar.</p>
+    <div class="f"><label for="u">Usuario</label><input id="u" autocomplete="username" required></div>
+    <div class="f"><label for="p">Contraseña</label><input id="p" type="password" autocomplete="current-password" required></div>
+    <div class="err" id="err"></div>
+    <button class="btn btn-primary" type="submit">Entrar</button>
+    <a class="back" href="index.html">← Volver a la web</a>
+  </form>
+</div>
+
+<div id="app" class="hidden">
+  <div class="wrap" id="aw">
+    <div class="top">
+      <h1>Reservas · <span data-bind="name"></span></h1>
+      <div style="display:flex;gap:10px;flex-wrap:wrap">
+        <a class="btn btn-ghost btn-sm" href="index.html">Ver web</a>
+        <button class="btn btn-ghost btn-sm" id="csv">Exportar CSV</button>
+        <button class="btn btn-ghost btn-sm" id="out">Salir</button>
+      </div>
+    </div>
+    <div class="ptabs"><button class="tab active" data-p="pRes">Reservas</button><button class="tab" data-p="pCon">Editar contenido de la web</button></div>
+    <div id="pCon" class="hidden">
+      <div class="savebar"><span id="saveInfo">Elige una sección, edita y pulsa «Guardar cambios». Se aplica al instante en la web.</span>
+        <div class="sbtn">
+          <button class="btn btn-ghost btn-sm" id="cPrev">Vista previa</button>
+          <button class="btn btn-ghost btn-sm" id="cReset">Restaurar originales</button>
+          <button class="btn btn-ghost btn-sm" id="cExp">Exportar copia</button>
+          <button class="btn btn-ghost btn-sm" id="cImp">Importar copia</button>
+          <input type="file" id="cImpF" accept=".json" class="hidden">
+          <button class="btn btn-primary btn-sm" id="cSave">Guardar cambios</button></div></div>
+      <div class="cms" id="cms">
+        <aside class="side" id="side"></aside>
+        <div class="main" id="editor"></div>
+        <aside class="prev" id="prev"><div class="phead"><b>Vista previa</b><a id="prevOpen" target="_blank" class="btn btn-ghost btn-sm">Abrir ↗</a></div><iframe id="prevFrame" title="Vista previa"></iframe></aside>
+      </div>
+      <div style="height:60px"></div>
+    </div>
+    <div id="pRes">
+    <div class="stats" id="stats"></div>
+    <div class="bar">
+      <select id="fs"><option value="">Todos los estados</option><option value="pendiente">Pendientes</option><option value="confirmada">Confirmadas</option><option value="cancelada">Canceladas</option></select>
+      <input id="fd" type="date" title="Filtrar por fecha">
+      <input id="fq" type="search" placeholder="Buscar nombre o teléfono…">
+      <span class="sp"></span>
+      <button class="btn btn-ghost btn-sm" id="demo">Añadir reservas de prueba</button>
+    </div>
+    <div class="list" id="list"></div>
+    </div>
+    <div class="warn">⚠ Demo: reservas y contenido editado se guardan en el navegador de este dispositivo y la contraseña vive en el código. Para que los cambios los vean todos los visitantes y proteger el acceso de verdad hace falta un servidor (ver LEEME.md).</div>
+    <div style="height:60px"></div>
+  </div>
+</div>
+
+<script src="js/config.js"></script>
+<script src="js/content.js"></script>
+<script src="js/store.js"></script>
+<script src="js/editor.js"></script>
+<script src="js/img-fallback.js"></script>
+<script src="js/admin.js"></script>
+</body>
+</html>

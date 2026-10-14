@@ -1,0 +1,14 @@
+{
+  "name": "web-bar-cenas",
+  "version": "1.0.0",
+  "description": "Web de un bar con cenas de fin de semana, reservas y área privada (estática, sin dependencias).",
+  "private": true,
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js",
+    "build": "node -e \"console.log('No hay paso de compilación: la carpeta public/ ya es la web final.')\""
+  },
+  "engines": { "node": ">=16" },
+  "dependencies": {}
+}

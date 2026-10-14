@@ -285,6 +285,19 @@ export const projects: Project[] = [
     screenshot: { desktop: '/ejemplos/laura-gil/preview-desktop.jpg', mobile: '/ejemplos/laura-gil/preview-mobile.jpg' },
     preview: '/ejemplos/laura-gil/',
   },
+  {
+    id: 'bar',
+    business: 'Bar Costa',
+    sector: 'Bar de cenas',
+    headline: 'Cenas de fin de semana',
+    cta: 'Reservar mesa',
+    nav: ['Carta', 'Cenas', 'Contacto'],
+    result: 'Reservas online y área privada',
+    layout: 'booking',
+    theme: { bg: '#0d0b0a', fg: '#f3e9d8', accent: '#d98a45', accentFg: '#0d0b0a', soft: '#1c1713', font: 'serif' },
+    preview: '/ejemplos/bar-costa/',
+    livePreview: true,
+  },
 ]
 
 export const faqs = [

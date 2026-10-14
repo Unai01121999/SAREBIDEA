@@ -1,0 +1,4 @@
+# Bar Costa (web de ejemplo): igual que el resto de /ejemplos/ pero con permiso para sus fotografías de Unsplash y el mapa de OpenStreetMap.
+<IfModule mod_headers.c>
+  Header always set Content-Security-Policy "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https://images.unsplash.com; font-src 'self'; frame-src https://www.openstreetmap.org; connect-src 'none'; frame-ancestors 'self'; base-uri 'self'; form-action 'none'; object-src 'none'"
+</IfModule>

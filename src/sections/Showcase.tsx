@@ -89,7 +89,7 @@ function TiltProject({ p, className = '', big = false, onPreview }: { p: Project
 }
 
 export function Showcase() {
-  const [a, b, c, d, g] = projects
+  const [a, b, c, d, g, h] = projects
   // Solo se pinta una de las dos composiciones (no las dos con una oculta): así el HTML no repite cada proyecto.
   const wide = useMediaQuery('(min-width: 768px)')
   const [preview, setPreview] = useState<Project | null>(null)
@@ -151,6 +151,10 @@ export function Showcase() {
           </Reveal>
           <Reveal delay={0.16} className="col-span-12 md:col-span-6 md:col-start-4 lg:col-span-4 lg:col-start-auto">
             <TiltProject p={g} onPreview={setPreview} />
+          </Reveal>
+          {/* Ejemplo 6: grande y centrado, como pieza final de la composición */}
+          <Reveal delay={0.1} className="col-span-12 lg:col-span-8 lg:col-start-3 lg:mt-12">
+            <TiltProject p={h} big onPreview={setPreview} />
           </Reveal>
         </div>
         <Reveal className="mt-20 flex flex-col items-center gap-4 text-center lg:mt-32">
