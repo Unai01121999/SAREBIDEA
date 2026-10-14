@@ -16,3 +16,9 @@ PARA VERLA EN TU ORDENADOR (SIN SUBIRLA)
   Se abre http://localhost:8080
 
 El panel privado está en /panel/ (por ejemplo https://tudominio.com/panel/).
+
+¿SE SIGUE VIENDO LA VERSIÓN ANTIGUA?
+  1) Abre https://tudominio.com/version.txt  → debe mostrar la fecha de la última compilación y un nombre «css index-XXXX.css».
+     Si la fecha es anterior, los archivos nuevos no se han subido o se han descomprimido en otra carpeta.
+  2) Antes de subir, borra en public_html la carpeta  assets/  y los archivos index.html y version.txt antiguos; luego sube y descomprime el zip.
+  3) Si usas la caché de Hostinger (hPanel → Sitios web → Rendimiento / CDN) o Cloudflare: pulsa «Vaciar caché» y recarga con Ctrl+F5.

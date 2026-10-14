@@ -19,7 +19,9 @@ try {
 const sitemap = join(dist, 'sitemap.xml')
 if (existsSync(sitemap)) writeFileSync(sitemap, readFileSync(sitemap, 'utf8')
   .replace(/<lastmod>[^<]*<\/lastmod>/g, `<lastmod>${new Date().toISOString().slice(0, 10)}</lastmod>`))
-writeFileSync(join(dist, 'version.txt'), `SAREBIDEA · compilación ${new Date().toISOString()}${commit ? ` · ${commit}` : ''}\n`)
+// Además del commit se anota el CSS que enlaza la portada: si el servidor sirve otro, hay archivos antiguos o caché.
+const css = (readFileSync(join(dist, 'index.html'), 'utf8').match(/assets\/(index-[^"']+\.css)/) || [])[1] || ''
+writeFileSync(join(dist, 'version.txt'), `SAREBIDEA · compilación ${new Date().toISOString()}${commit ? ` · ${commit}` : ''}${css ? ` · css ${css}` : ''}\n`)
 const chrome = process.env.CHROMIUM_PATH || '/opt/pw-browsers/chromium'
 // Si no hay navegador para prerenderizar, las páginas legales se publican igualmente: se copia la portada (la propia web resuelve la ruta
 // y pinta la página que toca). Así /aviso-legal/ etc. nunca dan 404 aunque se compile en un equipo sin Chromium.
