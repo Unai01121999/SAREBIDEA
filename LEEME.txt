@@ -23,4 +23,4 @@ Notas
   y el panel entraría en «Modo demostración». Detalle en README.md.
 - Para que las páginas legales se generen con su propio título y descripción hace falta Chromium (variable CHROMIUM_PATH). Sin él, la compilación
   sigue funcionando y las publica igualmente.
-- No abras dist/index.html con doble clic: la web necesita un servidor (Hostinger, `npm run preview`, etc.).
+- No abras dist/index.html con doble clic: el navegador bloquea los estilos y la web sale rota. Usa un servidor (Hostinger, `npm run preview`).

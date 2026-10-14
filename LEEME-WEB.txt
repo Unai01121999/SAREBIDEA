@@ -1,0 +1,18 @@
+SAREBIDEA · WEB Y PANEL PARA PUBLICAR
+=====================================
+
+PARA PUBLICAR EN HOSTINGER
+  1) Entra en el Administrador de archivos → public_html.
+  2) Borra el contenido anterior (haz antes una copia si quieres).
+  3) Sube TODO el contenido de esta carpeta (incluidos los archivos ocultos que empiezan por punto, como .htaccess) y descomprímelo ahí.
+     Los archivos index.html, assets/, panel/, ejemplos/ deben quedar directamente dentro de public_html (no dentro de otra carpeta).
+  4) Abre tu dominio y pulsa Ctrl+F5 (Cmd+Mayús+R en Mac) para saltarte la caché del navegador.
+
+PARA VERLA EN TU ORDENADOR (SIN SUBIRLA)
+  NO abras index.html con doble clic: el navegador bloquea los estilos y la web se ve rota.
+  Usa en su lugar:
+    · Windows: doble clic en VER-EN-MI-ORDENADOR.bat   (necesita Python o Node.js instalado)
+    · Mac/Linux: ejecuta ver-en-mi-ordenador.command
+  Se abre http://localhost:8080
+
+El panel privado está en /panel/ (por ejemplo https://tudominio.com/panel/).
