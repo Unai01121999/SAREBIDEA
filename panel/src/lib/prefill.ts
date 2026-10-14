@@ -3,7 +3,8 @@
 // campos que la persona todavía no ha tocado.
 import { toDateInput } from '@/lib/format'
 import { conceptLabel } from '@/lib/labels'
-import type { Client, Domain, Hosting, InvoiceConcept, Technology, Website } from '@/types/domain'
+import { packOfClient, RENEWAL_PRICES } from '@/lib/packs'
+import type { Client, Domain, Hosting, Invoice, InvoiceConcept, Technology, Website } from '@/types/domain'
 
 const FREE_MAIL = new Set(['gmail.com', 'googlemail.com', 'hotmail.com', 'hotmail.es', 'outlook.com', 'outlook.es', 'live.com', 'msn.com', 'yahoo.com', 'yahoo.es', 'icloud.com', 'me.com', 'proton.me', 'protonmail.com', 'telefonica.net'])
 
@@ -33,6 +34,8 @@ export const fullAddress = (c: Pick<Client, 'address' | 'postalCode' | 'province
   [c.address, `${c.postalCode} ${c.province}`.trim(), c.country].filter(Boolean).join(', ')
 
 export interface PrefillContext {
+  /** Facturas existentes (opcional): permiten saber el pack del cliente y proponer el precio de renovación. */
+  invoices?: Invoice[]
   websites: Website[]
   domains: Domain[]
   hostings: Hosting[]
@@ -93,13 +96,19 @@ export type BillableService =
   | { kind: 'domain'; id: string; label: string; concept: InvoiceConcept; description: string; subtotal: number; recurring: true; websiteId: string | null; domainId: string; hostingId: null; dueSuggest: string }
   | { kind: 'website'; id: string; label: string; concept: InvoiceConcept; description: string; subtotal: number; recurring: false; websiteId: string; domainId: null; hostingId: null; dueSuggest: string }
 
+/** Renovación anual de hosting + dominio: importe según el pack del cliente (90 / 120 / 180 €); sin pack conocido, el coste anual del dominio. */
+const renewalAmount = (d: Domain, ctx: PrefillContext) => {
+  const pack = packOfClient(d.clientId, d.websiteId, ctx.invoices ?? [])
+  return pack ? RENEWAL_PRICES[pack] : d.annualCost
+}
+
 /** Servicios del cliente que se pueden facturar con un clic: hosting y dominios (con su importe) y webs. */
 export function billableServices(clientId: string, ctx: PrefillContext): BillableService[] {
   const out: BillableService[] = []
   for (const h of ctx.hostings.filter((x) => x.clientId === clientId))
     out.push({ kind: 'hosting', id: h.id, label: `Hosting ${h.provider} · ${h.plan}`, concept: 'HOSTING', description: `Alojamiento web ${h.provider} ${h.plan}`, subtotal: h.annualCost, recurring: true, websiteId: h.websiteId, domainId: null, hostingId: h.id, dueSuggest: toDateInput(h.renewsAt) })
   for (const d of ctx.domains.filter((x) => x.clientId === clientId))
-    out.push({ kind: 'domain', id: d.id, label: `Dominio ${d.name}`, concept: 'DOMAIN', description: `Renovación del dominio ${d.name}`, subtotal: d.annualCost, recurring: true, websiteId: d.websiteId, domainId: d.id, hostingId: null, dueSuggest: toDateInput(d.renewsAt) })
+    out.push({ kind: 'domain', id: d.id, label: `Dominio ${d.name}`, concept: 'DOMAIN', description: `Renovación de hosting y dominio ${d.name}`, subtotal: renewalAmount(d, ctx), recurring: true, websiteId: d.websiteId, domainId: d.id, hostingId: null, dueSuggest: toDateInput(d.renewsAt) })
   for (const w of ctx.websites.filter((x) => x.clientId === clientId && x.status !== 'ARCHIVED'))
     out.push({ kind: 'website', id: w.id, label: `Web ${w.domainName || w.name}`, concept: 'WEB_DEVELOPMENT', description: `Diseño y desarrollo de ${w.name}`, subtotal: 0, recurring: false, websiteId: w.id, domainId: null, hostingId: null, dueSuggest: '' })
   return out

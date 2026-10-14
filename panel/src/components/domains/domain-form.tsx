@@ -29,7 +29,13 @@ const schema = z.object({
 type Values = z.infer<typeof schema>
 
 const today = () => toDateInput(new Date().toISOString())
-const empty = (clientId = '', websiteId = ''): Values => ({ clientId, websiteId, name: '', registrar: '', registeredAt: today(), renewsAt: '', annualCost: 12, autoRenew: true, nameservers: '', dns: '', notes: '' })
+const plusOneYear = (dateInput: string) => {
+  const [y, m, d] = dateInput.split('-').map(Number)
+  if (!y) return ''
+  const r = new Date(y + 1, m - 1, d)
+  return `${r.getFullYear()}-${String(r.getMonth() + 1).padStart(2, '0')}-${String(r.getDate()).padStart(2, '0')}`
+}
+const empty = (clientId = '', websiteId = ''): Values => ({ clientId, websiteId, name: '', registrar: '', registeredAt: today(), renewsAt: plusOneYear(today()), annualCost: 12, autoRenew: true, nameservers: '', dns: '', notes: '' })
 const toValues = (d: Domain): Values => ({ clientId: d.clientId, websiteId: d.websiteId ?? '', name: d.name, registrar: d.registrar, registeredAt: toDateInput(d.registeredAt), renewsAt: toDateInput(d.renewsAt), annualCost: d.annualCost, autoRenew: d.autoRenew, nameservers: d.nameservers.join('\n'), dns: d.dns, notes: d.notes })
 
 export function DomainFormDialog({ open, onOpenChange, domain, clientId, websiteId }: { open: boolean; onOpenChange: (o: boolean) => void; domain?: Domain; clientId?: string; websiteId?: string }) {
@@ -41,9 +47,17 @@ export function DomainFormDialog({ open, onOpenChange, domain, clientId, website
   const { register, control, handleSubmit, reset, formState: { errors: e } } = form
   const selectedClient = useWatch({ control, name: 'clientId' })
   const selectedWeb = useWatch({ control, name: 'websiteId' })
+  const registeredAt = useWatch({ control, name: 'registeredAt' })
   useEffect(() => {
     if (open) reset(domain ? toValues(domain) : empty(clientId, websiteId))
   }, [open, domain, clientId, websiteId, reset])
+
+  // Alta nueva: la renovación (y su factura de hosting + dominio) es a 1 año del registro, salvo que se escriba otra fecha.
+  useEffect(() => {
+    if (!open || domain || form.formState.dirtyFields.renewsAt || !registeredAt) return
+    form.setValue('renewsAt', plusOneYear(registeredAt), { shouldDirty: false })
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [open, domain, registeredAt])
 
   // Alta nueva: con el cliente (y su web) se proponen dominio, registrador, nameservers, coste y web asociada.
   const client = prefill.clientById(selectedClient)

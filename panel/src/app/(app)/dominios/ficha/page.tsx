@@ -15,8 +15,9 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { ConfirmDialog } from '@/components/ui/confirm-dialog'
 import { Skeleton } from '@/components/ui/skeleton'
-import { clientsApi, domainsApi, websitesApi } from '@/hooks/use-entities'
+import { clientsApi, domainsApi, invoicesApi, websitesApi } from '@/hooks/use-entities'
 import { daysUntil, formatCurrency, formatDate } from '@/lib/format'
+import { packLabel, packOfClient, RENEWAL_LEAD_DAYS, RENEWAL_PRICES } from '@/lib/packs'
 import { routes } from '@/lib/routes'
 
 export default function DomainDetailPage() {
@@ -26,6 +27,7 @@ export default function DomainDetailPage() {
   const { data: client } = clientsApi.useOne(d?.clientId)
   const { data: web } = websitesApi.useOne(d?.websiteId ?? undefined)
   const remove = domainsApi.useRemove()
+  const { data: invoices } = invoicesApi.useList()
   const [dialog, setDialog] = useState<'edit' | 'delete' | 'invoice' | null>(null)
 
   if (isLoading) return <Skeleton className="h-96 w-full" />
@@ -39,6 +41,20 @@ export default function DomainDetailPage() {
       </div>
     )
   const days = daysUntil(d.renewsAt)
+  // Próxima renovación (si la guardada ya pasó, la siguiente aniversario) y su factura automática, 30 días antes.
+  const nextRenewal = (() => {
+    const t = new Date()
+    const today = new Date(t.getFullYear(), t.getMonth(), t.getDate())
+    const n = new Date(d.renewsAt)
+    const r = new Date(n.getFullYear(), n.getMonth(), n.getDate())
+    while (r < today) r.setFullYear(r.getFullYear() + 1)
+    return r
+  })()
+  const renewalKey = `${nextRenewal.getFullYear()}-${String(nextRenewal.getMonth() + 1).padStart(2, '0')}-${String(nextRenewal.getDate()).padStart(2, '0')}`
+  const renewalInvoice = invoices?.find((i) => i.domainId === d.id && i.concept === 'DOMAIN' && i.renewalOf === renewalKey)
+  const renewalPack = invoices ? packOfClient(d.clientId, d.websiteId, invoices) : null
+  const renewalAmount = renewalPack ? RENEWAL_PRICES[renewalPack] : d.annualCost
+  const invoiceDate = new Date(nextRenewal.getTime() - RENEWAL_LEAD_DAYS * 864e5)
 
   return (
     <div className="animate-fade-up">
@@ -84,6 +100,18 @@ export default function DomainDetailPage() {
               <Row label="Fecha de renovación">
                 {formatDate(d.renewsAt)}
                 {days !== null && <span className="ml-2 font-normal text-muted-foreground">({days < 0 ? `hace ${-days} días` : `en ${days} días`})</span>}
+              </Row>
+              <Row label="Factura de renovación de hosting y dominio" className="sm:col-span-2">
+                {renewalInvoice ? (
+                  <span className="font-normal text-muted-foreground">
+                    Emitida: {renewalInvoice.number} · {formatCurrency(renewalInvoice.subtotal)} + IVA · vence el {formatDate(renewalInvoice.dueAt)}
+                  </span>
+                ) : (
+                  <span className="font-normal text-muted-foreground">
+                    Se emite automáticamente el {formatDate(invoiceDate.toISOString())} (30 días antes) por {formatCurrency(renewalAmount)} + IVA
+                    {renewalPack ? ` · ${packLabel(renewalPack)}` : ' · coste anual del dominio (sin pack asignado)'}
+                  </span>
+                )}
               </Row>
               <Row label="Notas" className="sm:col-span-2">
                 <span className="font-normal text-muted-foreground">{d.notes || '—'}</span>

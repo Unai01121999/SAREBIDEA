@@ -4,7 +4,7 @@ import { ShieldAlert } from 'lucide-react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { Suspense } from 'react'
-import { useAutoMaintenance } from '@/hooks/use-auto-maintenance'
+import { useAutoMaintenance, useAutoRenewals } from '@/hooks/use-auto-maintenance'
 import { useCan, useMe } from '@/hooks/use-permissions'
 import { moduleOfPath } from '@/lib/permissions'
 import { GlobalSearch } from '@/components/layout/global-search'
@@ -17,6 +17,7 @@ import { useUiStore } from '@/store/ui-store'
 /** Facturas mensuales de mantenimiento en modo demostración (con Supabase las genera la base de datos). Solo con permiso de facturación. */
 function AutoMaintenance() {
   useAutoMaintenance()
+  useAutoRenewals()
   return null
 }
 

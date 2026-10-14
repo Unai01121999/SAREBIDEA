@@ -152,6 +152,8 @@ export interface Invoice {
   maintenance?: number
   /** En las facturas mensuales solo de mantenimiento: id de la primera factura (pack + 1.er mes) de la que salen. */
   originId?: string | null
+  /** En las facturas de renovación de hosting + dominio: fecha de renovación (aaaa-mm-dd) que se factura. */
+  renewalOf?: string | null
   /** Archivos de la factura real (jpg, png, webp o pdf); puede haber varios. */
   files?: InvoiceFileItem[]
   /** IVA en porcentaje (21 = 21 %). */

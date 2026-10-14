@@ -4,7 +4,7 @@ import { Link2 } from 'lucide-react'
 import Link from 'next/link'
 import { useMemo } from 'react'
 import type { FieldValues, Path, UseFormReturn } from 'react-hook-form'
-import { clientsApi, domainsApi, hostingsApi, useSettings, websitesApi } from '@/hooks/use-entities'
+import { clientsApi, domainsApi, hostingsApi, invoicesApi, useSettings, websitesApi } from '@/hooks/use-entities'
 import { fullAddress, type PrefillContext } from '@/lib/prefill'
 import { routes } from '@/lib/routes'
 import type { Client } from '@/types/domain'
@@ -15,8 +15,9 @@ export function usePrefillData() {
   const websites = websitesApi.useList().data
   const domains = domainsApi.useList().data
   const hostings = hostingsApi.useList().data
+  const invoices = invoicesApi.useList().data
   const settings = useSettings().data
-  const ctx: PrefillContext = useMemo(() => ({ websites: websites ?? [], domains: domains ?? [], hostings: hostings ?? [] }), [websites, domains, hostings])
+  const ctx: PrefillContext = useMemo(() => ({ invoices: invoices ?? [], websites: websites ?? [], domains: domains ?? [], hostings: hostings ?? [] }), [invoices, websites, domains, hostings])
   const ready = !!(clients && websites && domains && hostings)
   return { clients: clients ?? [], ctx, settings, ready, clientById: (id?: string) => clients?.find((c) => c.id === id) }
 }

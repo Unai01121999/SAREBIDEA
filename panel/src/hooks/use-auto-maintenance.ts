@@ -1,11 +1,11 @@
 'use client'
 
-import { addMonths, format } from 'date-fns'
+import { addDays, addMonths, addYears, format } from 'date-fns'
 import { es } from 'date-fns/locale'
 import { useEffect, useRef } from 'react'
-import { invoicesApi, useSettings } from '@/hooks/use-entities'
+import { domainsApi, invoicesApi, useSettings } from '@/hooks/use-entities'
 import { useCan } from '@/hooks/use-permissions'
-import { PACKS } from '@/lib/packs'
+import { PACKS, packOfClient, RENEWAL_LEAD_DAYS, RENEWAL_PRICES } from '@/lib/packs'
 import { supabase } from '@/lib/supabase'
 
 /**
@@ -75,4 +75,76 @@ export function useAutoMaintenance() {
     })()
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [invoices, settings])
+}
+
+/**
+ * Renovación anual de hosting + dominio (modo demostración). Con Supabase la genera la base de datos cada día a las 04:10 UTC
+ * (`generar_facturas_renovacion`, tarea `facturas-renovacion-anual`): 30 días antes de la fecha de renovación del dominio crea una factura
+ * de «Renovación de hosting y dominio» con el importe de su pack (Starter 90 € · Professional 120 € · Premium 180 €).
+ */
+export function useAutoRenewals() {
+  const can = useCan()
+  const { data: invoices } = invoicesApi.useList()
+  const { data: domains } = domainsApi.useList()
+  const { data: settings } = useSettings()
+  const create = invoicesApi.useCreate(true)
+  const running = useRef(false)
+  const created = useRef({ keys: new Set<string>(), max: 0 })
+
+  useEffect(() => {
+    if (supabase || !invoices || !domains || !settings || !can('billing', 'write') || running.current) return
+    const now = new Date()
+    const today = new Date(now.getFullYear(), now.getMonth(), now.getDate())
+    const year = now.getFullYear()
+    let max = Math.max(created.current.max, invoices.filter((i) => i.number.startsWith(`F-${year}-`)).reduce((m, i) => Math.max(m, Number(i.number.split('-')[2]) || 0), 0))
+    const todo: Parameters<typeof create.mutateAsync>[0][] = []
+    for (const d of domains) {
+      let next = new Date(d.renewsAt)
+      next = new Date(next.getFullYear(), next.getMonth(), next.getDate())
+      while (next < today) next = addYears(next, 1)
+      if (addDays(next, -RENEWAL_LEAD_DAYS) > today) continue
+      const renewalOf = format(next, 'yyyy-MM-dd')
+      const key = `${d.id}|${renewalOf}`
+      if (created.current.keys.has(key) || invoices.some((i) => i.domainId === d.id && i.concept === 'DOMAIN' && i.renewalOf === renewalOf)) continue
+      const pack = packOfClient(d.clientId, d.websiteId, invoices)
+      const amount = pack ? RENEWAL_PRICES[pack] : d.annualCost
+      if (!amount) continue
+      created.current.keys.add(key)
+      max += 1
+      created.current.max = max
+      const issued = addDays(next, -RENEWAL_LEAD_DAYS) > now ? addDays(next, -RENEWAL_LEAD_DAYS) : now
+      todo.push({
+        number: `F-${year}-${String(max).padStart(3, '0')}`,
+        clientId: d.clientId,
+        concept: 'DOMAIN',
+        description: `Renovación de hosting y dominio ${d.name} · ${format(next, 'dd/MM/yyyy')}`,
+        issuedAt: issued.toISOString(),
+        dueAt: next.toISOString(),
+        subtotal: amount,
+        pack,
+        maintenance: 0,
+        originId: null,
+        renewalOf,
+        taxRate: invoices.find((i) => i.clientId === d.clientId)?.taxRate ?? 21,
+        status: 'PENDING',
+        recurring: true,
+        websiteId: d.websiteId,
+        domainId: d.id,
+        hostingId: null,
+      })
+    }
+    if (!todo.length) return
+    running.current = true
+    void (async () => {
+      for (const t of todo) {
+        try {
+          await create.mutateAsync(t)
+        } catch {
+          /* ya existía o sin permiso: se ignora */
+        }
+      }
+      running.current = false
+    })()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [invoices, domains, settings])
 }
