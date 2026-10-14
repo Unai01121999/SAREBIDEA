@@ -129,6 +129,11 @@ El ejemplo 3 del portafolio es la web real **Taller Ibarra**, alojada en `public
 El ejemplo 4 del portafolio es la web real **Clínica Lur**: web estática de varias páginas (portada, aviso legal, privacidad y cookies). El código fuente está en `ejemplos-codigo/clinica-lur/` y la versión publicada en `public/ejemplos/clinica-lur/` (`/ejemplos/clinica-lur/`). Se abre en la misma vista previa que los demás ejemplos; la miniatura es una captura real (`preview-*.jpg`).
 
 - **Regenerar**: `cd ejemplos-codigo/clinica-lur && node build-demo.mjs`. Ejecuta `build.mjs` y adapta el resultado: rutas bajo `/ejemplos/clinica-lur/`, tipografías (Cormorant Garamond y Manrope) e iconos (Lucide) alojados en local (antes Google Fonts y unpkg), sin scripts ni `onerror` en línea (política de seguridad de `/ejemplos/`) y `noindex`.
+
+El ejemplo 5 del portafolio es la web real **Laura Gil** (asesoría fiscal): web estática de una página más aviso legal. El código fuente original está en `ejemplos-codigo/laura-gil/src/` y la versión publicada en `public/ejemplos/laura-gil/` (`/ejemplos/laura-gil/`). Se abre en la misma vista previa que los demás ejemplos; la miniatura es una captura real (`preview-*.jpg`).
+
+- **Regenerar**: `cd ejemplos-codigo/laura-gil && node build-demo.mjs`. Adapta la web original a la política de seguridad de `/ejemplos/`: tipografías (Cormorant Garamond y Manrope) alojadas en local (antes Google Fonts), sin `onerror` en línea, sin canonical ni `og:image` de marcador de posición y con `noindex`. Respeta las capturas existentes.
+- Los datos de contacto (`SITE` al inicio de `main.js`) y el servicio de recepción del formulario (`formEndpoint`) están vacíos en el original: la demo lo indica y el formulario no envía nada. Sus datos reales irían ahí.
 - `draftNotice` está en `false` en `site.config.mjs` para que no salga la franja de «Borrador» en la demo.
 - Faltan las fotos del equipo (`equipo-1..3.jpg`): la web muestra un hueco etiquetado, como estaba diseñada.
 
