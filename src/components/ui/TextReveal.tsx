@@ -25,7 +25,7 @@ export function TextReveal({ text, className = '', as = 'h2', delay = 0, immedia
   return (
     <Tag id={id} className={className} initial="hidden" {...trigger} aria-label={eyebrow ? `${eyebrow}: ${text}` : text}>
       {eyebrow && (
-        <span className="mb-5 flex items-center gap-2.5 eyebrow !text-cobalt">
+        <span className="mb-5 flex items-center gap-2.5 eyebrow !text-cobalt-deep">
           <span aria-hidden="true" className="size-1.5 rounded-full bg-cobalt" />
           {eyebrow}
         </span>

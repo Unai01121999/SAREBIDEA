@@ -64,8 +64,8 @@ export function FinalCta() {
     <section id="contacto" className="on-dark relative isolate overflow-hidden bg-night section-y text-paper" aria-labelledby="cta-title">
       {/* Glow animado: dos luces que derivan muy despacio (CSS, fuera del hilo principal) */}
       <div aria-hidden="true" className="pointer-events-none absolute inset-0 -z-10">
-        <div className="anim-drift absolute top-[-30%] left-[-10%] h-[90%] w-[70%] rounded-full bg-[radial-gradient(closest-side,rgb(212_69_31/0.5),transparent)]" />
-        <div className="anim-drift absolute right-[-15%] bottom-[-35%] h-[90%] w-[70%] rounded-full bg-[radial-gradient(closest-side,rgb(255_185_150/0.22),transparent)] [animation-delay:-13s]" />
+        <div className="anim-drift absolute top-[-30%] left-[-10%] h-[90%] w-[70%] rounded-full bg-[radial-gradient(closest-side,rgb(77_179_255/0.45),transparent)]" />
+        <div className="anim-drift absolute right-[-15%] bottom-[-35%] h-[90%] w-[70%] rounded-full bg-[radial-gradient(closest-side,rgb(159_212_255/0.25),transparent)] [animation-delay:-13s]" />
         <div className="absolute inset-0 [background-image:radial-gradient(rgb(255_255_255/0.07)_1px,transparent_1px)] [background-size:28px_28px] [mask-image:radial-gradient(60%_60%_at_50%_40%,#000,transparent)]" />
       </div>
 
@@ -214,7 +214,7 @@ export function FinalCta() {
                   <button
                     type="submit"
                     disabled={loading}
-                    className="group mt-2 inline-flex h-14 w-full items-center justify-center gap-2 rounded-[10px] bg-cobalt text-[1.0625rem] font-medium text-white shadow-[0_10px_30px_-12px_rgb(212_69_31/0.8)] transition-[background-color,scale,opacity] duration-200 ease-[var(--ease-out-strong)] hover:bg-[#e5532c] active:scale-[0.98] disabled:opacity-70 sm:col-span-2"
+                    className="group mt-2 inline-flex h-14 w-full items-center justify-center gap-2 rounded-[10px] bg-cobalt text-[1.0625rem] font-medium text-ink shadow-[0_10px_30px_-12px_rgb(77_179_255/0.7)] transition-[background-color,scale,opacity] duration-200 ease-[var(--ease-out-strong)] hover:bg-[#7cc6ff] active:scale-[0.98] disabled:opacity-70 sm:col-span-2"
                   >
                     {loading ? (
                       <span className="size-5 animate-spin rounded-full border-2 border-white/30 border-t-white" aria-label="Enviando" />

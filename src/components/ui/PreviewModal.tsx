@@ -70,7 +70,7 @@ export default function PreviewModal({ project, onClose }: { project: Project; o
           <a href={url} target="_blank" rel="noopener" className="inline-flex h-9 items-center gap-1.5 rounded-[8px] px-3 text-sm font-medium text-ink ring-1 ring-ink/15 transition-colors hover:bg-ink/5">
             Abrir en pestaña nueva <Icon name="arrowUpRight" size={14} />
           </a>
-          <a href="#contacto" onClick={onClose} className="inline-flex h-9 items-center rounded-[8px] bg-cobalt px-4 text-sm font-medium text-white transition-colors hover:bg-cobalt-deep">
+          <a href="#contacto" onClick={onClose} className="inline-flex h-9 items-center rounded-[8px] bg-cobalt px-4 text-sm font-medium text-ink transition-colors hover:bg-[#7cc6ff]">
             Quiero una web así
           </a>
           <button ref={closeRef} type="button" onClick={onClose} aria-label="Cerrar la vista previa" className="flex size-9 items-center justify-center rounded-[8px] ring-1 ring-ink/15 transition-colors hover:bg-ink/5">

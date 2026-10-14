@@ -55,15 +55,15 @@ function SeoVisual() {
       </div>
       <ul className="mt-2.5 space-y-1">
         {rows.map((r, i) => (
-          <li key={r.t} className={`flex items-center gap-3 rounded-xl px-3 py-2 ${r.you ? 'bg-cobalt/[0.07] ring-1 ring-cobalt/20' : 'opacity-55'}`}>
-            <span className={`flex size-7 items-center justify-center rounded-full ${r.you ? 'bg-cobalt text-white' : 'bg-black/5 text-mute'}`}>
+          <li key={r.t} className={`flex items-center gap-3 rounded-xl px-3 py-2 ${r.you ? 'bg-cobalt/[0.12] ring-1 ring-cobalt/40' : 'opacity-55'}`}>
+            <span className={`flex size-7 items-center justify-center rounded-full ${r.you ? 'bg-cobalt text-ink' : 'bg-black/5 text-mute'}`}>
               <Icon name="pin" size={14} />
             </span>
             <span className="min-w-0 flex-1 leading-tight">
               <span className={`block text-[13.5px] ${r.you ? 'font-semibold text-ink' : 'text-ink-2'}`}>{r.t}</span>
               <span className="block truncate text-[11.5px] text-mute">{r.u}</span>
             </span>
-            <span className={`text-[12px] tabular ${r.you ? 'font-semibold text-cobalt' : 'text-mute'}`}>{i + 1}.º</span>
+            <span className={`text-[12px] tabular ${r.you ? 'font-semibold text-cobalt-deep' : 'text-mute'}`}>{i + 1}.º</span>
           </li>
         ))}
       </ul>
@@ -89,7 +89,7 @@ function ConversionVisual() {
           viewport={{ once: true, margin: '0px 0px -15% 0px' }}
           transition={{ duration: 0.7, ease: easeOut, delay: 0.25 + i * 0.18 }}
         >
-          <span className="flex size-8 items-center justify-center rounded-xl bg-cobalt text-white">
+          <span className="flex size-8 items-center justify-center rounded-xl bg-cobalt text-ink">
             <Icon name={l.icon} size={16} />
           </span>
           <span className="flex-1 text-[14px] text-paper">{l.t}</span>
@@ -118,7 +118,7 @@ function SpeedVisual() {
           <div key={b.label}>
             <div className="mb-1.5 flex justify-between text-xs">
               <span className={b.you ? 'font-medium text-ink' : 'text-mute'}>{b.label}</span>
-              <span className={`tabular ${b.you ? 'font-medium text-cobalt' : 'text-mute'}`}>{b.value}</span>
+              <span className={`tabular ${b.you ? 'font-medium text-cobalt-deep' : 'text-mute'}`}>{b.value}</span>
             </div>
             <div className="h-2 overflow-hidden rounded-full bg-ink/[0.06]">
               <m.div
@@ -218,7 +218,7 @@ export function Services() {
                   <ul className="mt-6 grid max-w-[34rem] gap-x-6 gap-y-2.5 border-t border-line pt-5 sm:grid-cols-2" aria-label={`Qué incluye: ${s.title}`}>
                     {s.includes.map((item) => (
                       <li key={item} className="flex items-start gap-2.5 text-[0.95rem] leading-snug text-ink-2">
-                        <Icon name="check" size={16} strokeWidth={2.2} className="mt-0.5 shrink-0 text-cobalt" />
+                        <Icon name="check" size={16} strokeWidth={2.2} className="mt-0.5 shrink-0 text-cobalt-deep" />
                         {item}
                       </li>
                     ))}
@@ -241,7 +241,7 @@ export function Services() {
             <ul className="grid gap-x-8 gap-y-4 sm:grid-cols-2 lg:flex lg:gap-8">
               {serviceExtras.map((e) => (
                 <li key={e.label} className="flex items-center gap-3 text-[0.95rem] text-ink-2">
-                  <span className="flex size-9 shrink-0 items-center justify-center rounded-[8px] bg-white text-cobalt ring-1 ring-line">
+                  <span className="flex size-9 shrink-0 items-center justify-center rounded-[8px] bg-white text-cobalt-deep ring-1 ring-line">
                     <Icon name={e.icon} size={17} />
                   </span>
                   {e.label}

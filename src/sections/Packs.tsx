@@ -14,7 +14,7 @@ function List({ title, items, inherits }: { title: string; items: string[]; inhe
         {inherits && <li className="font-semibold text-ink">Todo lo anterior</li>}
         {items.map((t) => (
           <li key={t} className="flex gap-2.5">
-            <Icon name="check" size={16} strokeWidth={2.2} className="mt-0.5 shrink-0 text-cobalt" />
+            <Icon name="check" size={16} strokeWidth={2.2} className="mt-0.5 shrink-0 text-cobalt-deep" />
             <span>{t}</span>
           </li>
         ))}

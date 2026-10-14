@@ -7,7 +7,7 @@ type Variant = 'primary' | 'ghost' | 'light' | 'outline-light'
 
 const styles: Record<Variant, string> = {
   primary:
-    'bg-cobalt text-white shadow-[0_1px_0_rgb(255_255_255/0.18)_inset,0_10px_24px_-12px_rgb(212_69_31/0.7)] hover:bg-cobalt-deep',
+    'bg-cobalt text-ink shadow-[0_1px_0_rgb(255_255_255/0.35)_inset,0_10px_24px_-12px_rgb(77_179_255/0.8)] hover:bg-[#7cc6ff]',
   ghost: 'bg-transparent text-ink ring-1 ring-ink/20 hover:bg-ink hover:text-paper hover:ring-ink',
   light: 'bg-paper text-ink shadow-[0_10px_30px_-10px_rgb(0_0_0/0.5)] hover:bg-white',
   'outline-light': 'text-paper ring-1 ring-white/20 hover:bg-white/8',

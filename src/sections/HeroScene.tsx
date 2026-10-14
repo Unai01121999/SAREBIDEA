@@ -54,7 +54,7 @@ export function HeroScene() {
     <div ref={ref} className="relative aspect-[1/0.92] w-full [perspective:2600px] sm:[perspective:1800px] sm:aspect-[1/0.8] lg:aspect-[1/0.95]">
       {/* Luz ambiental detrás de la escena */}
       <m.div aria-hidden="true" className="absolute inset-[-10%] -z-10" style={{ transform: glow }}>
-        <div className="absolute top-[18%] left-[20%] h-[60%] w-[70%] rounded-full bg-[radial-gradient(closest-side,rgb(212_69_31/0.22),transparent)]" />
+        <div className="absolute top-[18%] left-[20%] h-[60%] w-[70%] rounded-full bg-[radial-gradient(closest-side,rgb(77_179_255/0.35),transparent)]" />
         <div className="absolute top-[42%] left-[48%] h-[48%] w-[50%] rounded-full bg-[radial-gradient(closest-side,rgb(255_201_168/0.55),transparent)]" />
       </m.div>
 
@@ -108,7 +108,7 @@ export function HeroScene() {
           {/* Notificación: una visita que se convierte en reserva */}
           <div className="absolute top-[4%] left-[7%] w-[min(58%,300px)] sm:left-[-6%] sm:w-[min(54%,300px)]" style={{ transform: 'translateZ(170px)' }}>
             <div className="anim-float-a flex items-center gap-3 rounded-2xl bg-white/70 p-2.5 pr-4 shadow-[0_1px_0_rgb(255_255_255/0.8)_inset,0_18px_40px_-14px_rgb(13_14_18/0.35)] ring-1 ring-black/[0.06] backdrop-blur-xl">
-              <span className="relative flex size-9 shrink-0 items-center justify-center rounded-xl bg-cobalt text-white">
+              <span className="relative flex size-9 shrink-0 items-center justify-center rounded-xl bg-cobalt text-ink">
                 <span className="anim-ping absolute inset-0 rounded-xl bg-cobalt" />
                 <Icon name="check" size={18} strokeWidth={2.2} className="relative" />
               </span>

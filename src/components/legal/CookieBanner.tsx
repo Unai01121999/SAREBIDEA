@@ -4,7 +4,7 @@ import { closePreferences, saveConsent, useConsentState, type Category } from '.
 // Aceptar y rechazar tienen exactamente el mismo estilo, tamaño y nivel (primera capa).
 const btn =
   'inline-flex h-12 flex-1 items-center justify-center rounded-[10px] px-5 text-[0.95rem] font-medium tracking-[-0.01em] transition-[background-color,scale] duration-200 active:scale-[0.97] sm:flex-none sm:min-w-[9.5rem]'
-const same = `${btn} bg-cobalt text-white hover:bg-cobalt-deep`
+const same = `${btn} bg-cobalt text-ink hover:bg-[#7cc6ff]`
 const outline = `${btn} bg-white text-ink ring-1 ring-line hover:bg-ink/[0.04]`
 
 const categories: { key: Category; title: string; body: string }[] = [
@@ -20,7 +20,7 @@ const categories: { key: Category; title: string; body: string }[] = [
   },
 ]
 
-const LEGAL_LINK = 'font-medium text-ink underline underline-offset-2 hover:text-cobalt'
+const LEGAL_LINK = 'font-medium text-ink underline underline-offset-2 hover:text-cobalt-deep'
 
 export function CookieBanner() {
   const { consent, panelOpen, undecided } = useConsentState()

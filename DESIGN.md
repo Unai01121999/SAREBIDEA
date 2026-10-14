@@ -65,7 +65,7 @@ Sustituir ejemplos por capturas reales: cada proyecto en `site.ts` acepta `image
 ## Rediseño v2 (identidad editorial)
 
 - **Tipografía**: titulares en Instrument Serif (`.display`, `.h-section`, `.font-head`, palabra destacada `.accent-word` en cursiva); UI, etiquetas (`.eyebrow`) y cifras en Funnel Display; texto en Geist.
-- **Paleta**: neutros cálidos (`--color-paper #f7f5f1`, `--color-paper-2`), tinta `#0b0c11`, acento terracota `#d4451f` (botón principal; antes cobalto), melocotón solo sobre fondos oscuros. El logotipo conserva su azul de marca.
+- **Paleta**: neutros fríos (`--color-paper #f5f6f9`, `--color-paper-2`), tinta `#0b0c11`, acento azul claro `#4db3ff` (más claro que el azul del logotipo, `#0a93f5`), con `#0f6fb8` para texto pequeño; el botón principal lleva texto oscuro para mantener el contraste.
 - **Formas**: radios contenidos (6–14 px), filetes de 1 px en lugar de sombras; tarjetas solo donde hacen falta.
 - **Composición**: cabecera fija a ancho completo con filete; servicios en filas editoriales alternas; packs como tabla de precios de tres columnas iguales (sin plan destacado); proceso y formulario sobre fondo oscuro.
 - **Movimiento**: sutil, y neutralizado con `prefers-reduced-motion`.

@@ -5,7 +5,7 @@ import { openPreferences } from '../../lib/consent'
 import { Icon } from '../ui/Icon'
 import { Logo } from '../ui/Logo'
 
-const A = 'font-medium text-ink underline underline-offset-2 hover:text-cobalt'
+const A = 'font-medium text-ink underline underline-offset-2 hover:text-cobalt-deep'
 
 function Section({ title, children }: { title: string; children: ReactNode }) {
   return (
@@ -282,7 +282,7 @@ function Cookies() {
         <button
           type="button"
           onClick={openPreferences}
-          className="inline-flex h-12 items-center rounded-[10px] bg-cobalt px-6 font-medium text-white transition-[background-color,scale] hover:bg-cobalt-deep active:scale-[0.97]"
+          className="inline-flex h-12 items-center rounded-[10px] bg-cobalt px-6 font-medium text-ink transition-[background-color,scale] hover:bg-[#7cc6ff] active:scale-[0.97]"
         >
           Configurar cookies
         </button>

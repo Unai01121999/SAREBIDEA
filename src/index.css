@@ -1,23 +1,23 @@
 @import 'tailwindcss';
 
 @theme {
-  --color-paper: #f7f5f1;
-  --color-paper-2: #efebe5;
+  --color-paper: #f5f6f9;
+  --color-paper-2: #eceef4;
   /* Un tono por sección: blanco, gris frío muy claro y tinta; el ritmo viene del contraste, no de beiges */
-  --color-tone-hero: #fbfaf7;
-  --color-tone-problem: #f0ece6;
+  --color-tone-hero: #fafbfd;
+  --color-tone-problem: #eef0f6;
   --color-tone-services: #ffffff;
   --color-tone-process: #0b0c11;
-  --color-tone-showcase: #f7f5f1;
-  --color-tone-faq: #f0ece6;
+  --color-tone-showcase: #f5f6f9;
+  --color-tone-faq: #eef0f6;
   --color-ink: #0b0c11;
   --color-ink-2: #2a2d38;
   --color-mute: #585c69;
   --color-line: rgb(11 12 17 / 0.12);
-  --color-cobalt: #d4451f;
-  --color-cobalt-deep: #a93515;
-  --color-cobalt-soft: #fde7de;
-  --color-lilac: #ffb996;
+  --color-cobalt: #4db3ff;
+  --color-cobalt-deep: #0f6fb8;
+  --color-cobalt-soft: #def0ff;
+  --color-lilac: #9fd4ff;
   --color-peach: #ffc9a8;
   --color-night: #0b0c11;
   --color-night-2: #14161e;

@@ -19,7 +19,7 @@ function Item({ q, a, open, onToggle }: { q: string; a: string; open: boolean; o
           <span className="font-head text-[clamp(1.35rem,1.15rem+0.7vw,1.75rem)] leading-tight text-ink">{q}</span>
           <span
             className={`flex size-9 shrink-0 items-center justify-center rounded-[8px] ring-1 transition-[background-color,color,transform] duration-300 ease-[var(--ease-out-strong)] ${
-              open ? 'rotate-45 bg-cobalt text-white ring-cobalt' : 'text-ink ring-line group-hover:bg-ink/[0.05]'
+              open ? 'rotate-45 bg-cobalt text-ink ring-cobalt' : 'text-ink ring-line group-hover:bg-ink/[0.05]'
             }`}
           >
             <Icon name="plus" size={16} />
