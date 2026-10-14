@@ -431,7 +431,8 @@ const MCta = ({ t, label, solid = true }: { t: T; label: string; solid?: boolean
 
 /** Mini-web móvil: cada estructura tiene su versión pensada para el móvil. */
 export function SiteMobile({ p, live = false }: { p: Project; live?: boolean }) {
-  if (live && p.livePreview && p.preview) return <LiveThumb src={p.preview} width={390} height={844} bg={p.theme.bg} />
+  // En el móvil todos los ejemplos con vista previa se muestran «en vivo» (la propia web dentro del teléfono), como Maison Alba; la miniatura de escritorio solo si `livePreview`.
+  if (live && p.preview) return <LiveThumb src={p.preview} width={390} height={844} bg={p.theme.bg} />
   if (p.screenshot) return <img src={p.screenshot.mobile} alt="" className="aspect-[9/19.5] w-full object-cover object-top" loading="lazy" width={780} height={1688} />
   const t = p.theme
   const hSize = t.font === 'serif' ? 12.5 : t.font === 'display' ? 12 : 11
