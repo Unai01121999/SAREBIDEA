@@ -23,10 +23,10 @@ export const legal = {
 
 export const nav = [
   { label: 'Servicios', href: '#servicios' },
+  { label: 'Quién soy', href: '#quien-soy' },
   { label: 'Cómo funciona', href: '#como-funciona' },
   { label: 'Packs', href: '#packs' },
   { label: 'Ejemplos', href: '#ejemplos' },
-  { label: 'Quién soy', href: '#quien-soy' },
   { label: 'FAQ', href: '#faq' },
 ]
 

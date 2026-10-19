@@ -73,10 +73,10 @@ export default function App() {
         <Hero />
         <Problem />
         <Services />
+        <About />
         <Process />
         <Packs />
         <Showcase />
-        <About />
         <Faq />
         <FinalCta />
       </main>

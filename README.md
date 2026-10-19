@@ -59,6 +59,8 @@ SINGLE=1 npm run build   # un único index.html autocontenido (vista previa)
 
 ## Páginas legales con URL propia
 
+**Orden de la portada:** cabecera, problema («Tu negocio está creciendo…»), servicios, **quién soy**, cómo funciona, packs, ejemplos, FAQ y contacto; el menú sigue ese mismo orden. La sección del problema se compone de la web antigua señalada (con una versión móvil) y seis tarjetas con icono cuyo número coincide con el de la chincheta; al pasar el ratón por una tarjeta o una chincheta se resalta su pareja.
+
 **Botón «Volver arriba»** (`src/components/ui/BackToTop.tsx`): fijo abajo a la derecha en la web principal; aparece al bajar unos 600 px y lleva al inicio con el scroll suave de la página (o de golpe con «reducir movimiento»). Mide 48×48 px y respeta la zona segura del móvil.
 
 `/aviso-legal/`, `/politica-de-privacidad/` y `/politica-de-cookies/` son páginas independientes (no una capa sobre la portada). `scripts/prerender.mjs` genera un HTML estático para cada una, con su título, descripción, URL canónica y etiquetas sociales, y las incluye en `sitemap.xml`. Los enlaces antiguos con `#` (`/#aviso-legal`…) redirigen a la dirección nueva. El texto está en `src/components/legal/LegalPage.tsx`.
