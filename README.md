@@ -35,7 +35,7 @@ SINGLE=1 npm run build   # un único index.html autocontenido (vista previa)
 ## SEO
 
 - `index.html`: título, descripción, canonical, Open Graph/Twitter y datos estructurados JSON-LD (WebSite, ProfessionalService con dirección en Gueñes y FAQPage). Si cambias las preguntas de `src/data/site.ts`, actualiza también el bloque FAQPage.
-- `public/og.jpg` (imagen al compartir), `public/sitemap.xml` y `public/robots.txt` (con el sitemap y `/panel/` bloqueado).
+- `public/og.jpg` (imagen al compartir), `public/sitemap.xml` (solo la web principal; las páginas legales no se incluyen) y `public/robots.txt` (con el sitemap y `/panel/` bloqueado).
 - `scripts/prerender.mjs` (incluido en `npm run build:all`) deja el HTML de la portada ya pintado en `dist/index.html` para buscadores y previsualizadores. Se omite solo si no hay Chromium.
 
 ## Servidor (.htaccess y cabeceras de seguridad)
