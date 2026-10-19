@@ -11,6 +11,12 @@ import { Input } from '@/components/ui/input'
 import { Skeleton } from '@/components/ui/skeleton'
 import { useSettings, useUpdateSettings } from '@/hooks/use-entities'
 
+/** Enlace a una red social: vacío o una dirección completa que empiece por http:// o https://. */
+const socialLink = z
+  .string()
+  .trim()
+  .refine((v) => v === '' || /^https?:\/\/\S+$/i.test(v), 'Escribe el enlace completo, empezando por https://')
+
 const companySchema = z.object({
   name: z.string().trim().min(2, 'Indica el nombre'),
   taxId: z.string().trim(),
@@ -18,6 +24,8 @@ const companySchema = z.object({
   email: z.email('Revisa el correo'),
   phone: z.string().trim(),
   website: z.string().trim(),
+  instagramUrl: socialLink,
+  facebookUrl: socialLink,
 })
 type CompanyValues = z.infer<typeof companySchema>
 
@@ -26,14 +34,14 @@ export function CompanyForm() {
   const save = useUpdateSettings()
   const { register, handleSubmit, reset, formState: { errors: e, isDirty } } = useForm<CompanyValues>({ resolver: zodResolver(companySchema) })
   useEffect(() => {
-    if (data) reset(data.company)
+    if (data) reset({ ...data.company, instagramUrl: data.company.instagramUrl ?? '', facebookUrl: data.company.facebookUrl ?? '' })
   }, [data, reset])
   if (!data) return <Skeleton className="h-80 max-w-2xl" />
   return (
     <Card className="max-w-2xl">
       <CardHeader>
         <CardTitle>Datos de la empresa</CardTitle>
-        <CardDescription>Aparecen en tus facturas y documentos.</CardDescription>
+        <CardDescription>Aparecen en tus facturas y documentos. Los enlaces de Instagram y Facebook se muestran como botones en el pie de la web.</CardDescription>
       </CardHeader>
       <form onSubmit={handleSubmit((v) => save.mutate({ company: v }))} noValidate>
         <CardContent className="grid gap-4 sm:grid-cols-2">
@@ -54,6 +62,12 @@ export function CompanyForm() {
           </Field>
           <Field label="Dirección" htmlFor="s-addr" className="sm:col-span-2">
             <Input id="s-addr" {...register('address')} />
+          </Field>
+          <Field label="Instagram (enlace de la cuenta)" error={e.instagramUrl?.message} htmlFor="s-ig" hint="Ejemplo: https://www.instagram.com/tucuenta">
+            <Input id="s-ig" type="url" inputMode="url" placeholder="https://www.instagram.com/…" {...register('instagramUrl')} aria-invalid={!!e.instagramUrl} />
+          </Field>
+          <Field label="Facebook (enlace de la cuenta)" error={e.facebookUrl?.message} htmlFor="s-fb" hint="Ejemplo: https://www.facebook.com/tupagina">
+            <Input id="s-fb" type="url" inputMode="url" placeholder="https://www.facebook.com/…" {...register('facebookUrl')} aria-invalid={!!e.facebookUrl} />
           </Field>
         </CardContent>
         <div className="flex justify-end border-t px-5 py-3">

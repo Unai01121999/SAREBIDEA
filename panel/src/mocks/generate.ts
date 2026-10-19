@@ -132,6 +132,8 @@ export const DEFAULT_SETTINGS: AppSettings = {
     email: 'sarebidea@sarebidea.com',
     phone: '',
     website: 'https://sarebidea.com',
+    instagramUrl: '',
+    facebookUrl: '',
   },
   taxes: { vat: 21, irpf: 15 },
   currency: 'EUR',

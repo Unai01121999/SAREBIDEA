@@ -1,6 +1,8 @@
+import { useEffect, useState } from 'react'
 import { brand } from '../data/site'
 import { Icon } from '../components/ui/Icon'
 import { openPreferences } from '../lib/consent'
+import { loadSocials, SOCIAL_FALLBACK, type Socials } from '../lib/social'
 import { Logo } from '../components/ui/Logo'
 
 const cols = [
@@ -24,6 +26,14 @@ const cols = [
 ]
 
 export function Footer() {
+  const [socials, setSocials] = useState<Socials>(SOCIAL_FALLBACK)
+  useEffect(() => {
+    let alive = true
+    void loadSocials().then((s) => alive && setSocials(s))
+    return () => {
+      alive = false
+    }
+  }, [])
   return (
     <footer className="on-dark relative overflow-hidden bg-night text-paper">
       <div className="container-x border-t border-white/10 pt-16 pb-10">
@@ -63,12 +73,14 @@ export function Footer() {
               </li>
             </ul>
             <div className="mt-5 flex gap-2">
-              {(['instagram', 'linkedin'] as const).map((n) => (
+              {(['instagram', 'facebook'] as const).map((n) => (
                 <a
                   key={n}
-                  href="#"
-                  aria-label={n === 'instagram' ? 'Instagram' : 'LinkedIn'}
-                  className="flex size-10 items-center justify-center rounded-[10px] ring-1 ring-white/15 transition-colors hover:bg-white/10"
+                  href={socials[n]}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label={n === 'instagram' ? 'Instagram de SAREBIDEA (se abre en una pestaña nueva)' : 'Facebook de SAREBIDEA (se abre en una pestaña nueva)'}
+                  className="flex size-11 items-center justify-center rounded-[10px] ring-1 ring-white/15 transition-colors hover:bg-white/10 hover:ring-white/30"
                 >
                   <Icon name={n} size={18} />
                 </a>

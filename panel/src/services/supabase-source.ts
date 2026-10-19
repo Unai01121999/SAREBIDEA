@@ -82,7 +82,9 @@ export const supabaseSource: DataSource = {
     async get() {
       const { data, error } = await db().from(TABLA_AJUSTES).select('datos').eq('id', 1).maybeSingle()
       if (error) throw error
-      return { ...DEFAULT_SETTINGS, ...((data?.datos as Partial<AppSettings>) ?? {}) }
+      const saved = (data?.datos as Partial<AppSettings>) ?? {}
+      // La empresa se mezcla campo a campo: los ajustes guardados antes de añadir un campo no lo traen.
+      return { ...DEFAULT_SETTINGS, ...saved, company: { ...DEFAULT_SETTINGS.company, ...(saved.company ?? {}) } }
     },
     async update(patch) {
       const next = { ...(await supabaseSource.settings.get()), ...patch }

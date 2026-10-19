@@ -215,7 +215,7 @@ export interface AdminUser {
 }
 
 export interface AppSettings {
-  company: { name: string; taxId: string; address: string; email: string; phone: string; website: string }
+  company: { name: string; taxId: string; address: string; email: string; phone: string; website: string; /** Enlace a la cuenta de Instagram (se muestra en el pie de la web). */ instagramUrl: string; /** Enlace a la cuenta de Facebook (se muestra en el pie de la web). */ facebookUrl: string }
   taxes: { vat: number; irpf: number }
   currency: 'EUR' | 'USD' | 'GBP'
   hostingProviders: string[]

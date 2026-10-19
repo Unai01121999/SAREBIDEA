@@ -31,6 +31,7 @@ const paths = {
       <path d="m4.5 7 7.5 6 7.5-6" />
     </>
   ),
+  facebook: <path d="M17 3h-3a4 4 0 0 0-4 4v3H7v4h3v7h4v-7h3l1-4h-4V7a1 1 0 0 1 1-1h2Z" />,
   instagram: (
     <>
       <rect x="4" y="4" width="16" height="16" rx="5" />
