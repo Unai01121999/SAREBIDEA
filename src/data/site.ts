@@ -311,7 +311,7 @@ export const faqs = [
   },
   {
     q: '¿Tengo que aportar los textos y fotografías?',
-    a: 'No. Escribimos los textos a partir de nuestra conversación y te ayudamos con las imágenes. Si tienes fotos propias, mejor; si no, usamos imágenes de calidad o organizamos una sesión.',
+    a: 'No es necesario que aportes los textos: los escribimos nosotros a partir de nuestra conversación. Las imágenes, si las aportas, mejor; si no, usamos imágenes de calidad o organizamos una sesión. Aun así, todo lo que aportes, mucho mejor.',
   },
   {
     q: '¿La web funciona en móvil?',
