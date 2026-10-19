@@ -1,0 +1,6 @@
+Carrusel «5 ventajas de tener una página web» · SAREBIDEA
+Formato 1080×1350 (vertical 4:5, válido para Instagram y LinkedIn). 7 diapositivas: portada, 5 ventajas y cierre de contacto.
+- png/            las 7 imágenes, en orden (00 a 06)
+- sarebidea-ventajas-pagina-web.pdf   el mismo carrusel en PDF (para LinkedIn «documento»)
+- carrusel.html   el diseño editable (textos y colores); node render.mjs regenera los PNG y el PDF
+Colores y tipografías: los de sarebidea.com (azul #4DB3FF, tinta #0B0C11, Instrument Serif / Funnel Display / Geist; logotipo con las A en #0A93F5).
