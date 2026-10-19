@@ -16,7 +16,7 @@ export function Hero() {
   })
 
   return (
-    <section id="top" className="grain relative isolate overflow-hidden bg-tone-hero pt-28 pb-10 sm:pt-32 lg:pt-36">
+    <section id="top" tabIndex={-1} className="focus:outline-none grain relative isolate overflow-hidden bg-tone-hero pt-28 pb-10 sm:pt-32 lg:pt-36">
       {/* Fondo: luz suave + retícula que se desvanece */}
       <div aria-hidden="true" className="pointer-events-none absolute inset-0 -z-10">
         <div className="absolute inset-0 bg-[radial-gradient(70%_60%_at_80%_20%,#dff0ff_0%,transparent_65%),radial-gradient(50%_40%_at_0%_100%,#eef0f6_0%,transparent_70%)]" />

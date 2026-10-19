@@ -4,6 +4,7 @@ import { currentLegalPage } from './hooks/useLegalRoute'
 // El texto legal es largo y solo se necesita al abrir una de sus páginas: se descarga entonces.
 const LegalPage = lazy(() => import('./components/legal/LegalPage').then((m) => ({ default: m.LegalPage })))
 import { CookieBanner } from './components/legal/CookieBanner'
+import { BackToTop } from './components/ui/BackToTop'
 import { useLenis } from './hooks/useLenis'
 import { useReducedMotionPref } from './hooks/useMediaQuery'
 import { Navbar } from './sections/Navbar'
@@ -80,6 +81,7 @@ export default function App() {
         <FinalCta />
       </main>
       <Footer />
+      <BackToTop />
       <CookieBanner />
     </MotionConfig>
     </LazyMotion>
