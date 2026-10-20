@@ -235,3 +235,14 @@ export interface EntityMap {
 export type EntityName = keyof EntityMap
 
 export type NewEntity<T extends { id: string }> = Omit<T, 'id' | 'createdAt' | 'updatedAt'>
+
+/** Nota descriptiva de un día del calendario (qué hay que hacer ese día). */
+export interface CalendarNote {
+  id: string
+  /** Día (aaaa-mm-dd). */
+  day: string
+  text: string
+  done: boolean
+  author: string
+  createdAt: string
+}

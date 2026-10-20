@@ -4,9 +4,9 @@
 import { addDays, addMonths, addYears, format, isAfter, isBefore, parseISO, startOfDay } from 'date-fns'
 import { RENEWAL_LEAD_DAYS, RENEWAL_PRICES, PACKS, packOfClient } from '@/lib/packs'
 import { routes } from '@/lib/routes'
-import type { Client, Domain, Hosting, Invoice, Task, Website } from '@/types/domain'
+import type { CalendarNote, Client, Domain, Hosting, Invoice, Task, Website } from '@/types/domain'
 
-export type CalendarCategory = 'client' | 'web' | 'domain' | 'renewal' | 'invoice' | 'maintenance' | 'task'
+export type CalendarCategory = 'client' | 'web' | 'domain' | 'renewal' | 'invoice' | 'maintenance' | 'task' | 'note'
 
 export const CATEGORIES: { key: CalendarCategory; label: string; dot: string; chip: string }[] = [
   { key: 'client', label: 'Clientes', dot: 'bg-slate-500', chip: 'bg-slate-500/12 text-slate-700 dark:text-slate-300' },
@@ -16,6 +16,7 @@ export const CATEGORIES: { key: CalendarCategory; label: string; dot: string; ch
   { key: 'invoice', label: 'Facturas', dot: 'bg-emerald-500', chip: 'bg-emerald-500/12 text-emerald-700 dark:text-emerald-300' },
   { key: 'maintenance', label: 'Mantenimiento', dot: 'bg-cyan-500', chip: 'bg-cyan-500/12 text-cyan-700 dark:text-cyan-300' },
   { key: 'task', label: 'Tareas', dot: 'bg-rose-500', chip: 'bg-rose-500/12 text-rose-700 dark:text-rose-300' },
+  { key: 'note', label: 'Notas', dot: 'bg-orange-500', chip: 'bg-orange-500/12 text-orange-700 dark:text-orange-300' },
 ]
 
 export interface CalendarEvent {
@@ -37,6 +38,8 @@ export interface CalendarData {
   hostings: Hosting[]
   invoices: Invoice[]
   tasks: Task[]
+  /** Notas descriptivas de cada día. */
+  notes: CalendarNote[]
   /** Si la persona no puede ver facturación no se muestran las facturas. */
   showInvoices: boolean
 }
@@ -53,6 +56,8 @@ export function buildEvents(data: CalendarData, from: Date, to: Date): CalendarE
     if (inRange(e.date)) out.push({ ...e, day: dayKey(e.date), planned: e.planned ?? isAfter(startOfDay(e.date), today) })
   }
   const client = (id: string) => data.clients.find((c) => c.id === id)?.company ?? ''
+
+  for (const n of data.notes) add({ id: `n-${n.id}`, date: parseISO(n.day), category: 'note', title: n.text.split('\n')[0], planned: false })
 
   for (const c of data.clients) add({ id: `c-${c.id}`, date: parseISO(c.createdAt), category: 'client', title: `Alta de cliente · ${c.company}`, href: routes.client(c.id) })
 

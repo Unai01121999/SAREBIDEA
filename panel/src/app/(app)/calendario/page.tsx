@@ -2,16 +2,20 @@
 
 import { addDays, addMonths, eachDayOfInterval, endOfMonth, endOfWeek, format, isSameMonth, isToday, parseISO, startOfMonth, startOfWeek } from 'date-fns'
 import { es } from 'date-fns/locale'
-import { CalendarDays, ChevronLeft, ChevronRight, ExternalLink } from 'lucide-react'
+import { CalendarDays, Check, ChevronLeft, ChevronRight, ExternalLink, NotebookPen, Pencil, Trash2, X } from 'lucide-react'
 import Link from 'next/link'
 import { useMemo, useState } from 'react'
 import { PageHeader } from '@/components/layout/page-header'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Checkbox } from '@/components/ui/checkbox'
+import { Textarea } from '@/components/ui/input'
 import { Skeleton } from '@/components/ui/skeleton'
 import { clientsApi, domainsApi, hostingsApi, invoicesApi, tasksApi, websitesApi } from '@/hooks/use-entities'
-import { useCan } from '@/hooks/use-permissions'
+import { useNoteActions, useNotes } from '@/hooks/use-notes'
+import { useCan, useMe } from '@/hooks/use-permissions'
+import type { CalendarNote } from '@/types/domain'
 import { buildEvents, CATEGORIES, dayKey, type CalendarCategory, type CalendarEvent } from '@/lib/calendar'
 
 const WEEKDAYS = ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom']
@@ -40,6 +44,117 @@ function EventRow({ e }: { e: CalendarEvent }) {
   )
 }
 
+/** Notas descriptivas del día: qué hay que hacer. Solo quien puede editar tareas las crea, edita o borra. */
+function DayNotes({ day, notes }: { day: string; notes: CalendarNote[] }) {
+  const can = useCan()
+  const canWrite = can('tasks', 'write')
+  const me = useMe().data
+  const { create, update, remove } = useNoteActions()
+  const [draft, setDraft] = useState('')
+  const [editing, setEditing] = useState<string | null>(null)
+  const [editText, setEditText] = useState('')
+  const pending = notes.filter((n) => !n.done).length
+
+  const add = () => {
+    if (!draft.trim()) return
+    create.mutate({ day, text: draft, author: me?.name ?? '' }, { onSuccess: () => setDraft('') })
+  }
+  const saveEdit = (id: string) => {
+    if (!editText.trim()) return
+    update.mutate({ id, text: editText }, { onSuccess: () => setEditing(null) })
+  }
+
+  return (
+    <Card>
+      <CardHeader className="flex-row items-center justify-between">
+        <CardTitle className="flex items-center gap-2 text-base">
+          <NotebookPen className="size-4 text-muted-foreground" />
+          Notas del día
+        </CardTitle>
+        {notes.length > 0 && <span className="text-xs text-muted-foreground tabular-nums">{pending ? `${pending} por hacer` : 'Todo hecho'}</span>}
+      </CardHeader>
+      <CardContent className="space-y-3">
+        {notes.length > 0 && (
+          <ul className="space-y-2">
+            {notes.map((n) => (
+              <li key={n.id} className="rounded-lg border border-border/70 p-3">
+                {editing === n.id ? (
+                  <div className="space-y-2">
+                    <Textarea
+                      value={editText}
+                      onChange={(e) => setEditText(e.target.value)}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) saveEdit(n.id)
+                        if (e.key === 'Escape') setEditing(null)
+                      }}
+                      maxLength={4000}
+                      rows={3}
+                      aria-label="Editar nota"
+                      autoFocus
+                    />
+                    <div className="flex justify-end gap-2">
+                      <Button size="sm" variant="outline" onClick={() => setEditing(null)}>
+                        <X /> Cancelar
+                      </Button>
+                      <Button size="sm" onClick={() => saveEdit(n.id)} disabled={!editText.trim() || update.isPending}>
+                        <Check /> Guardar
+                      </Button>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="flex items-start gap-3">
+                    <Checkbox
+                      checked={n.done}
+                      disabled={!canWrite}
+                      onCheckedChange={(v) => update.mutate({ id: n.id, done: v === true })}
+                      aria-label={n.done ? 'Marcar como pendiente' : 'Marcar como hecha'}
+                      className="mt-0.5"
+                    />
+                    <div className="min-w-0 flex-1">
+                      <p className={`whitespace-pre-wrap break-words text-sm leading-snug ${n.done ? 'text-muted-foreground line-through' : ''}`}>{n.text}</p>
+                      {n.author && <p className="mt-1 text-xs text-muted-foreground">{n.author}</p>}
+                    </div>
+                    {canWrite && (
+                      <div className="flex shrink-0 gap-1">
+                        <button type="button" onClick={() => { setEditing(n.id); setEditText(n.text) }} className="rounded p-1 text-muted-foreground transition-colors hover:text-foreground" aria-label="Editar nota">
+                          <Pencil className="size-4" />
+                        </button>
+                        <button type="button" onClick={() => remove.mutate(n.id)} className="rounded p-1 text-muted-foreground transition-colors hover:text-destructive" aria-label="Borrar nota">
+                          <Trash2 className="size-4" />
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                )}
+              </li>
+            ))}
+          </ul>
+        )}
+        {canWrite ? (
+          <div className="space-y-2">
+            <Textarea
+              value={draft}
+              onChange={(e) => setDraft(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) add()
+              }}
+              maxLength={4000}
+              rows={3}
+              placeholder="Qué hay que hacer este día…"
+              aria-label="Nueva nota del día"
+            />
+            <Button size="sm" onClick={add} disabled={!draft.trim() || create.isPending} className="w-full">
+              Añadir nota
+            </Button>
+          </div>
+        ) : (
+          notes.length === 0 && <p className="text-sm text-muted-foreground">No hay notas este día.</p>
+        )}
+      </CardContent>
+    </Card>
+  )
+}
+
 export default function CalendarPage() {
   const can = useCan()
   const showInvoices = can('billing', 'read')
@@ -49,6 +164,7 @@ export default function CalendarPage() {
   const hostings = hostingsApi.useList()
   const invoices = invoicesApi.useList()
   const tasks = tasksApi.useList()
+  const notes = useNotes()
   const loading = [clients, websites, domains, hostings, tasks].some((q) => q.isLoading)
 
   const [month, setMonth] = useState(() => startOfMonth(new Date()))
@@ -60,14 +176,16 @@ export default function CalendarPage() {
   const days = useMemo(() => eachDayOfInterval({ start: gridStart, end: gridEnd }), [gridStart.getTime(), gridEnd.getTime()]) // eslint-disable-line react-hooks/exhaustive-deps
 
   const data = useMemo(
-    () => ({ clients: clients.data ?? [], websites: websites.data ?? [], domains: domains.data ?? [], hostings: hostings.data ?? [], invoices: invoices.data ?? [], tasks: tasks.data ?? [], showInvoices }),
-    [clients.data, websites.data, domains.data, hostings.data, invoices.data, tasks.data, showInvoices],
+    () => ({ clients: clients.data ?? [], websites: websites.data ?? [], domains: domains.data ?? [], hostings: hostings.data ?? [], invoices: invoices.data ?? [], tasks: tasks.data ?? [], notes: notes.data ?? [], showInvoices }),
+    [clients.data, websites.data, domains.data, hostings.data, invoices.data, tasks.data, notes.data, showInvoices],
   )
   const all = useMemo(() => buildEvents(data, gridStart, gridEnd), [data, gridStart.getTime(), gridEnd.getTime()]) // eslint-disable-line react-hooks/exhaustive-deps
   const events = useMemo(() => all.filter((e) => !hidden.has(e.category)), [all, hidden])
   const byDay = useMemo(() => {
     const m = new Map<string, CalendarEvent[]>()
     for (const e of events) m.set(e.day, [...(m.get(e.day) ?? []), e])
+    // Las notas van primero en cada casilla: son lo que hay que hacer ese día.
+    for (const [k, l] of m) m.set(k, [...l.filter((e) => e.category === 'note'), ...l.filter((e) => e.category !== 'note')])
     return m
   }, [events])
   const counts = useMemo(() => {
@@ -80,13 +198,15 @@ export default function CalendarPage() {
 
   const toggle = (k: CalendarCategory) => setHidden((h) => { const n = new Set(h); if (n.has(k)) n.delete(k); else n.add(k); return n })
   const goTo = (m: Date) => { setMonth(m); setSelected(dayKey(isSameMonth(m, new Date()) ? new Date() : m)) }
-  const selectedEvents = byDay.get(selected) ?? []
+  // Las notas se muestran (y se editan) en su propia tarjeta; el resto de acciones, en la lista del día.
+  const selectedEvents = (byDay.get(selected) ?? []).filter((e) => e.category !== 'note')
+  const selectedNotes = useMemo(() => (notes.data ?? []).filter((n) => n.day === selected), [notes.data, selected])
 
   return (
     <div className="animate-fade-up">
       <PageHeader
         title="Calendario"
-        description="Altas de webs y dominios, renovaciones, facturas y tareas. Lo previsto aparece con trazo discontinuo."
+        description="Altas de webs y dominios, renovaciones, facturas, tareas y notas de cada día. Lo previsto aparece con trazo discontinuo."
         actions={
           <>
             <Button variant="outline" size="icon" onClick={() => goTo(addMonths(month, -1))} aria-label="Mes anterior">
@@ -194,6 +314,7 @@ export default function CalendarPage() {
                 )}
               </CardContent>
             </Card>
+            <DayNotes day={selected} notes={selectedNotes} />
             <Card>
               <CardHeader>
                 <CardTitle className="text-base">Próximas acciones (60 días)</CardTitle>
