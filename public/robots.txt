@@ -1,5 +1,3 @@
 User-agent: *
 Allow: /
-Disallow: /panel/
-Disallow: /ejemplos/
 Sitemap: https://sarebidea.com/sitemap.xml

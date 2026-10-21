@@ -59,6 +59,10 @@ ErrorDocument 404 /404.html
 </IfModule>
 
 # ── 6. Archivos que nunca deben servirse ────────────────────────────────────────────────────────────────
+# Carpetas y archivos ocultos (.git/, .env…) devuelven 404; se deja pasar .well-known (certificados SSL).
+<IfModule mod_alias.c>
+  RedirectMatch 404 /\.(?!well-known)
+</IfModule>
 <FilesMatch "^\.ht">
   Require all denied
 </FilesMatch>

@@ -29,6 +29,11 @@ export function FinalCta() {
       pack: String(d.get('pack') ?? ''),
       description: String(d.get('description') ?? ''),
     }
+    // Campo trampa: invisible para las personas; si viene relleno es un bot. Se le da por enviado sin guardar nada.
+    if (String(d.get('website') ?? '')) {
+      setSent(true)
+      return
+    }
     const errs = validateLead(v)
     setErrors(errs)
     setFailed('')
@@ -42,8 +47,8 @@ export function FinalCta() {
       await createLead({ ...v, pack: v.pack as PackChoice, company: v.company.trim(), name: v.name.trim(), email: v.email.trim(), description: v.description.trim(), source: 'web' })
       setSent(true)
     } catch (e) {
-      if ((e as { code?: string })?.code === 'invalid_argument') {
-        setFailed('Esta vista previa solo guarda solicitudes enviadas por el equipo de SAREBIDEA. En la web publicada, el formulario funcionará para cualquier visitante.')
+      if ((e as { code?: string })?.code === 'rate_limited') {
+        setFailed(`Hemos recibido varias solicitudes seguidas desde este correo. Espera un rato o escríbenos a ${brand.email}.`)
         return
       }
       setFailed(`No hemos podido enviar tu solicitud. Inténtalo de nuevo o escríbenos a ${brand.email}.`)
@@ -121,33 +126,38 @@ export function FinalCta() {
                   exit={{ opacity: 0, transform: 'scale(0.98)' }}
                   transition={{ duration: 0.2, ease: easeOut }}
                   aria-label="Solicitar propuesta"
+                  aria-busy={loading}
                 >
+                  <div aria-hidden="true" className="absolute -left-[9999px] h-px w-px overflow-hidden">
+                    <label htmlFor="website">No rellenes este campo</label>
+                    <input id="website" name="website" type="text" tabIndex={-1} autoComplete="off" />
+                  </div>
                   <div>
                     <label htmlFor="company" className="mb-2 block text-[0.875rem] font-medium text-white/80">
                       Nombre de la empresa
                     </label>
-                    <input id="company" name="company" autoComplete="organization" placeholder="Panadería Urrutia" className={field} {...aria('company')} />
+                    <input id="company" name="company" autoComplete="organization" placeholder="Panadería Urrutia" maxLength={120} className={field} {...aria('company')} />
                     {err('company')}
                   </div>
                   <div>
                     <label htmlFor="name" className="mb-2 block text-[0.875rem] font-medium text-white/80">
                       Persona de contacto
                     </label>
-                    <input id="name" name="name" autoComplete="name" placeholder="Ane Etxeberria Goñi" className={field} {...aria('name')} />
+                    <input id="name" name="name" autoComplete="name" placeholder="Ane Etxeberria Goñi" maxLength={120} className={field} {...aria('name')} />
                     {err('name')}
                   </div>
                   <div>
                     <label htmlFor="phone" className="mb-2 block text-[0.875rem] font-medium text-white/80">
                       Teléfono
                     </label>
-                    <input id="phone" name="phone" type="tel" inputMode="tel" autoComplete="tel" placeholder="600 000 000" className={field} {...aria('phone')} />
+                    <input id="phone" name="phone" type="tel" inputMode="tel" autoComplete="tel" placeholder="600 000 000" maxLength={40} className={field} {...aria('phone')} />
                     {err('phone')}
                   </div>
                   <div>
                     <label htmlFor="email" className="mb-2 block text-[0.875rem] font-medium text-white/80">
                       Correo electrónico
                     </label>
-                    <input id="email" name="email" type="email" inputMode="email" autoComplete="email" placeholder="tu@negocio.com" className={field} {...aria('email')} />
+                    <input id="email" name="email" type="email" inputMode="email" autoComplete="email" placeholder="tu@negocio.com" maxLength={160} className={field} {...aria('email')} />
                     {err('email')}
                   </div>
                   <div className="sm:col-span-2">
@@ -217,7 +227,10 @@ export function FinalCta() {
                     className="group mt-2 inline-flex h-14 w-full items-center justify-center gap-2 rounded-[10px] bg-cobalt text-[1.0625rem] font-medium text-ink shadow-[0_10px_30px_-12px_rgb(77_179_255/0.7)] transition-[background-color,scale,opacity] duration-200 ease-[var(--ease-out-strong)] hover:bg-[#7cc6ff] active:scale-[0.98] disabled:opacity-70 sm:col-span-2"
                   >
                     {loading ? (
-                      <span className="size-5 animate-spin rounded-full border-2 border-white/30 border-t-white" aria-label="Enviando" />
+                      <>
+                        <span className="size-5 animate-spin rounded-full border-2 border-white/30 border-t-white" aria-hidden="true" />
+                        <span className="sr-only">Enviando…</span>
+                      </>
                     ) : (
                       <>
                         Quiero mi web
@@ -225,6 +238,14 @@ export function FinalCta() {
                       </>
                     )}
                   </button>
+                  <p className="text-[12.5px] leading-relaxed text-white/55 sm:col-span-2">
+                    Responsable: {brand.name}. Finalidad: responder a tu solicitud y preparar tu propuesta. No cedemos tus datos a terceros salvo obligación legal.
+                    Puedes acceder, rectificar o suprimir tus datos escribiendo a {brand.email}. Más información en la{' '}
+                    <a href="/politica-de-privacidad/" className="inline-block py-1 underline underline-offset-2 hover:text-paper">
+                      Política de privacidad
+                    </a>
+                    .
+                  </p>
                 </m.form>
               )}
             </AnimatePresence>

@@ -47,9 +47,10 @@ export function AuthGate({ children }: { children: React.ReactNode }) {
       if (!alive) return
       if (!session) return setStep({ kind: 'signin' })
       const email = session.user.email?.toLowerCase() ?? ''
-      // Quién puede entrar y con qué rol lo decide la tabla panel_users (se gestiona desde Configuración → Usuarios). Si la comprobación no responde, se usa la lista compilada.
+      // Quién puede entrar y con qué rol lo decide solo la tabla panel_users (se gestiona desde Configuración → Usuarios).
       const { data: me, error: meErr } = await sb.rpc('panel_me')
-      if (meErr ? !adminEmails.includes(email) : !me) return setStep({ kind: 'forbidden', email })
+      if (meErr) return alive && setError('No se ha podido comprobar tu acceso. Revisa la conexión y recarga la página.')
+      if (!me) return setStep({ kind: 'forbidden', email })
 
       const { data: aal } = await sb.auth.mfa.getAuthenticatorAssuranceLevel()
       if (aal?.currentLevel === 'aal2') return alive && setStep({ kind: 'ready' })

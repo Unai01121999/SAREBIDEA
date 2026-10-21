@@ -36,7 +36,7 @@ const store: Store = {
     return { email: data.user.email, aal }
   },
   async panelUserByEmail(email) {
-    return desdeFila(must(await admin.from(T).select('*').ilike('correo', email).maybeSingle()))
+    return desdeFila(must(await admin.from(T).select('*').eq('correo', email.toLowerCase()).maybeSingle()))
   },
   async panelUserById(id) {
     return desdeFila(must(await admin.from(T).select('*').eq('id', id).maybeSingle()))

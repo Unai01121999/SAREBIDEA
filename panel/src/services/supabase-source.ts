@@ -12,6 +12,7 @@ const db = () => {
   return supabase
 }
 
+const PAGE = 1000
 const prefixes: Record<EntityName, string> = { clients: 'cli', websites: 'web', domains: 'dom', hostings: 'hos', invoices: 'inv', tasks: 'tsk', users: 'usr' }
 // El historial (tabla `activity`) lo escribe la propia base de datos con disparadores, con el nombre de quien hace el cambio.
 
@@ -25,9 +26,8 @@ async function ensureClientService(name: EntityName, item: Record<string, unknow
   }
   const service = map[name]?.()
   if (!service || !item.clientId) return
-  const { data } = await db().from(TABLAS.clients).select('servicios').eq('id', item.clientId as string).maybeSingle()
-  const services = (data?.servicios as string[] | undefined) ?? []
-  if (data && !services.includes(service)) await db().from(TABLAS.clients).update({ servicios: [...services, service] }).eq('id', item.clientId as string)
+  // Atómico en la base de datos: dos altas a la vez no se pisan la lista de servicios.
+  await db().rpc('anadir_servicio_cliente', { p_cliente: item.clientId as string, p_servicio: service })
 }
 
 function createRepo<K extends EntityName>(name: K): Repository<EntityMap[K]> {
@@ -38,9 +38,15 @@ function createRepo<K extends EntityName>(name: K): Repository<EntityMap[K]> {
   const toRow = (o: object) => aFila(cols, o)
   return {
     async list() {
-      const { data, error } = await db().from(table).select('*').order('creado_el', { ascending: false }).limit(5000)
-      if (error) throw error
-      return (data ?? []).map((r) => fromRow(r))
+      // Por páginas de 1000 (el máximo que devuelve Supabase por consulta), sin tope total.
+      const rows: Record<string, unknown>[] = []
+      for (let from = 0; ; from += PAGE) {
+        const { data, error } = await db().from(table).select('*').order('creado_el', { ascending: false }).order('id').range(from, from + PAGE - 1)
+        if (error) throw error
+        rows.push(...(data ?? []))
+        if (!data || data.length < PAGE) break
+      }
+      return rows.map((r) => fromRow(r))
     },
     async get(id) {
       const { data, error } = await db().from(table).select('*').eq('id', id).maybeSingle()
@@ -49,9 +55,11 @@ function createRepo<K extends EntityName>(name: K): Repository<EntityMap[K]> {
     },
     async create(input) {
       const now = new Date().toISOString()
-      const item = { ...input, id: uid(prefixes[name]), createdAt: now, updatedAt: now } as unknown as T
-      const { error } = await db().from(table).insert(toRow(item))
+      const draft = { ...input, id: uid(prefixes[name]), createdAt: now, updatedAt: now }
+      // Se devuelve la fila guardada: la base de datos puede completar datos (p. ej. el número de factura).
+      const { data, error } = await db().from(table).insert(toRow(draft)).select('*').single()
       if (error) throw error
+      const item = fromRow(data)
       await ensureClientService(name, item as unknown as Record<string, unknown>)
       return item
     },
@@ -87,10 +95,10 @@ export const supabaseSource: DataSource = {
       return { ...DEFAULT_SETTINGS, ...saved, company: { ...DEFAULT_SETTINGS.company, ...(saved.company ?? {}) } }
     },
     async update(patch) {
-      const next = { ...(await supabaseSource.settings.get()), ...patch }
-      const { error } = await db().from(TABLA_AJUSTES).upsert({ id: 1, datos: next })
+      // Solo se envía lo que cambia y la base de datos lo mezcla: dos personas guardando a la vez no se pisan.
+      const { error } = await db().rpc('actualizar_ajustes', { p_cambios: patch })
       if (error) throw error
-      return next
+      return supabaseSource.settings.get()
     },
   },
 }

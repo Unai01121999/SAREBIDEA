@@ -4,7 +4,7 @@
 import { createServer } from 'node:http'
 import { execSync } from 'node:child_process'
 import { existsSync, mkdirSync, readdirSync, readFileSync, writeFileSync } from 'node:fs'
-import { dirname, extname, join } from 'node:path'
+import { dirname, extname, join, resolve, sep } from 'node:path'
 
 const dist = 'dist'
 if (!existsSync(join(dist, 'index.html'))) throw new Error('Falta dist/: ejecuta antes `npm run build`.')
@@ -58,10 +58,12 @@ const server = createServer((req, res) => {
   const path = decodeURIComponent((req.url ?? '/').split('?')[0])
   // Las rutas de página devuelven la plantilla sin prerenderizar (como hará el servidor con la portada y con cada carpeta).
   if (pages.some((p) => p.route === path)) return void res.writeHead(200, { 'content-type': 'text/html' }).end(template)
-  const file = join(dist, path.endsWith('/') ? path + 'index.html' : path)
-  if (!existsSync(file)) return void res.writeHead(404).end()
+  const file = resolve(dist, '.' + (path.endsWith('/') ? path + 'index.html' : path))
+  // Solo se sirven archivos de dist/ (nada de «../»).
+  if (!file.startsWith(resolve(dist) + sep) || !existsSync(file)) return void res.writeHead(404).end()
   res.writeHead(200, { 'content-type': types[extname(file)] ?? 'application/octet-stream' }).end(readFileSync(file))
-}).listen(0)
+})
+await new Promise((ok) => server.listen(0, '127.0.0.1', ok))
 const port = server.address().port
 
 // Precarga de las fuentes que se ven al abrir la web (titular, texto y botones): el navegador las pide a la vez que el CSS.

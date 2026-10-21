@@ -161,6 +161,18 @@ El ejemplo 6 del portafolio es la web real **Bar Costa** (bar de cenas de fin de
 
 Mejora de la presentación sin tocar el contenido: el texto (485 fragmentos), los 33 enlaces, el `<head>` de SEO (título, metas, canonical, JSON-LD), las rutas, el formulario y el panel son idénticos a la versión anterior (comprobado automáticamente antes y después). Cambios principales: `src/index.css` (utilidades de ritmo `.section-y` / `.section-gap`, `.card-lift`, escala de titulares y `lede`, sombras más contenidas, sin vaivenes continuos), `Hero.tsx` (tipografía y columnas por anchura), `Services.tsx` (composición editorial), `Packs.tsx` (tres tarjetas iguales), `Faq.tsx`, `About.tsx`, `FinalCta.tsx` (contraste de etiquetas) y `Footer.tsx` (dos columnas en móvil).
 
+## Revisión de seguridad (2026-10-21)
+Cambios tras revisar todo el código (migración `supabase/migrations/018_endurecimiento_revision.sql`, ya aplicada):
+- **Formulario de contacto:** campo trampa oculto contra bots, límite en la base de datos (3 solicitudes por correo y hora, 20 en total cada 10 minutos; si se supera, mensaje propio), el visitante anónimo solo puede rellenar los campos del formulario, límites de longitud iguales a los de la base de datos, aviso de protección de datos (RGPD) con enlace a la Política de privacidad y botón accesible mientras envía.
+- **Facturas:** el número (`F-AAAA-NNN`) lo asigna la base de datos si se deja vacío, con el año de la fecha de emisión y un único cerrojo compartido por el panel y las tareas automáticas (sin huecos ni duplicados). La base de datos rechaza números con otro formato.
+- **Permisos:** las funciones internas (`sincronizar_coste_dominios`, `pack_del_dominio`, `precio_renovacion`, disparadores y funciones antiguas) ya no se pueden llamar desde la API; el historial solo lo escriben los disparadores; el autor de las notas del calendario lo pone la base de datos; las URLs de las webs deben ser http(s).
+- **Usuarios del panel:** la función `manage-panel-users` compara el correo exacto (antes `_` y `%` funcionaban como comodines). Si la comprobación de acceso falla, el panel muestra un error en vez de usar la lista compilada.
+- **Escrituras atómicas:** añadir un servicio a un cliente y guardar Configuración ya no pisan cambios simultáneos (funciones `anadir_servicio_cliente` y `actualizar_ajustes`). Las listas se cargan por páginas, sin el tope de 5000.
+- **Servidor:** cabeceras HSTS, nosniff, Referrer-Policy y Permissions-Policy también en `/panel/`; carpetas ocultas (`.git/`…) devuelven 404; `robots.txt` ya no bloquea `/ejemplos/` ni `/panel/` para que Google lea su `noindex`.
+- **Compilación:** el servidor temporal del prerenderizado solo escucha en local y no sirve nada fuera de `dist/`. React y las animaciones van en archivos aparte que el navegador reutiliza de su caché tras cada actualización.
+- **Esquema completo:** `supabase/esquema-actual.sql` es la copia del esquema real (tablas, funciones, disparadores, políticas, almacenamiento y tareas programadas) para poder auditar o recrear la base de datos.
+- **Pendiente en el panel de Supabase (no se puede hacer desde el código):** activar *Leaked password protection* (Authentication → Providers → Email) y comprobar que *Allow new users to sign up* está desactivado.
+
 ## Zips y ejecución en local
 
 - `sarebidea-codigo-completo.zip` incluye `LEEME.txt` (pasos) y los archivos `.env` / `panel/.env` con la conexión pública a Supabase (clave *publishable*, pública por diseño; no se suben a git). Sin ellos el formulario solo guardaría en el navegador y el panel entraría en «Modo demostración».

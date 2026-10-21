@@ -86,6 +86,13 @@ function createRepo<K extends EntityName>(name: K): Repository<EntityMap[K]> {
       await sleep(LATENCY)
       const now = new Date().toISOString()
       const item = { ...input, id: uid(prefixes[name]), createdAt: now, updatedAt: now } as unknown as T
+      // Igual que la base de datos: factura sin número → el siguiente del año de emisión.
+      const inv = item as unknown as { number?: string; issuedAt?: string }
+      if (name === 'invoices' && !inv.number) {
+        const year = new Date(inv.issuedAt ?? now).getFullYear()
+        const max = getDb().invoices.filter((x) => new RegExp(`^F-${year}-\\d+$`).test(x.number)).reduce((m, x) => Math.max(m, Number(x.number.split('-')[2])), 0)
+        inv.number = `F-${year}-${String(max + 1).padStart(3, '0')}`
+      }
       table().unshift(item)
       ensureClientService(name, item as unknown as Record<string, unknown>)
       log(name, item as never, 'creado')

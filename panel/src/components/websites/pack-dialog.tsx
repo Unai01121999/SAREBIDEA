@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Field } from '@/components/forms/fields'
 import { FormDialog } from '@/components/forms/form-dialog'
 import { Input } from '@/components/ui/input'
@@ -15,7 +15,6 @@ import { PACK_TYPES, type PackType } from '@/types/domain'
 /** Alta de una web vendida como pack: crea la web y, si se quiere, la factura del pack y la del primer mes de mantenimiento. */
 export function PackDialog({ open, onOpenChange, clientId }: { open: boolean; onOpenChange: (o: boolean) => void; clientId?: string }) {
   const { data: clients } = clientsApi.useList()
-  const { data: invoices } = invoicesApi.useList()
   const { data: settings } = useSettings()
   const createWeb = websitesApi.useCreate()
   const createInvoice = invoicesApi.useCreate()
@@ -40,11 +39,6 @@ export function PackDialog({ open, onOpenChange, clientId }: { open: boolean; on
   const selected = clients?.find((c) => c.id === client)
   const vat = settings?.taxes.vat ?? 21
   const p = PACKS[pack]
-  const numbers = useMemo(() => {
-    const year = new Date().getFullYear()
-    const max = (invoices ?? []).filter((i) => i.number.startsWith(`F-${year}-`)).reduce((m, i) => Math.max(m, Number(i.number.split('-')[2]) || 0), 0)
-    return (n: number) => `F-${year}-${String(max + n).padStart(3, '0')}`
-  }, [invoices])
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -69,10 +63,9 @@ export function PackDialog({ open, onOpenChange, clientId }: { open: boolean; on
       publishDate: null,
     })
     const due = new Date(now.getTime() + 30 * 864e5).toISOString()
-    let n = 1
     const base = { clientId: selected.id, issuedAt: now.toISOString(), dueAt: due, taxRate: vat, status: 'PENDING' as const, websiteId: web.id, domainId: null, hostingId: null }
     // Primera factura conjunta: pack en la base imponible + mantenimiento del primer mes. Los meses siguientes se generan solos (solo mantenimiento).
-    if (billPack) await createInvoice.mutateAsync({ ...base, number: numbers(n++), concept: 'WEB_DEVELOPMENT', description: `${p.label} · diseño y desarrollo web + mantenimiento del primer mes`, subtotal: p.price, pack, maintenance: p.maintenance, originId: null, recurring: false })
+    if (billPack) await createInvoice.mutateAsync({ ...base, number: '' /* lo asigna la base de datos (o la demo): el siguiente del año */, concept: 'WEB_DEVELOPMENT', description: `${p.label} · diseño y desarrollo web + mantenimiento del primer mes`, subtotal: p.price, pack, maintenance: p.maintenance, originId: null, recurring: false })
     onOpenChange(false)
   }
 

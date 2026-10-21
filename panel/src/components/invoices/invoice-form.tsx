@@ -18,7 +18,8 @@ import { PACKS, RENEWAL_PRICES } from '@/lib/packs'
 import { INVOICE_CONCEPTS, INVOICE_STATUSES, PACK_TYPES, type Invoice, type PackType } from '@/types/domain'
 
 const schema = z.object({
-  number: z.string().trim().min(3, 'Indica el número de factura'),
+  // Vacío = la base de datos asigna el siguiente número del año de emisión (sin huecos ni repetidos).
+  number: z.string().trim().refine((v) => v === '' || /^F-\d{4}-\d+$/.test(v), 'Formato: F-AAAA-NNN (por ejemplo F-2026-001)'),
   clientId: z.string().min(1, 'Elige un cliente'),
   concept: z.enum(INVOICE_CONCEPTS),
   description: z.string().trim().min(2, 'Describe brevemente el concepto'),
@@ -53,7 +54,7 @@ export function InvoiceFormDialog({ open, onOpenChange, invoice, clientId, servi
     return `F-${year}-${String(max + 1).padStart(3, '0')}`
   }, [invoices])
 
-  const blank = (): Values => ({ number: nextNumber, clientId: clientId ?? '', concept: 'WEB_DEVELOPMENT', description: '', issuedAt: toDateInput(new Date().toISOString()), dueAt: toDateInput(addDays(new Date(), 30).toISOString()), subtotal: 0, maintenance: 0, pack: '', kind: 'FIRST', taxRate: settings?.taxes.vat ?? 21, status: 'PENDING', recurring: false, websiteId: '', domainId: '', hostingId: '' })
+  const blank = (): Values => ({ number: '', clientId: clientId ?? '', concept: 'WEB_DEVELOPMENT', description: '', issuedAt: toDateInput(new Date().toISOString()), dueAt: toDateInput(addDays(new Date(), 30).toISOString()), subtotal: 0, maintenance: 0, pack: '', kind: 'FIRST', taxRate: settings?.taxes.vat ?? 21, status: 'PENDING', recurring: false, websiteId: '', domainId: '', hostingId: '' })
 
   const { register, control, handleSubmit, reset, setValue, setError, clearErrors, formState: { errors: e, dirtyFields } } = useForm<Values>({ resolver: zodResolver(schema), defaultValues: blank() })
   const [subtotal, maintenance, taxRate, selectedClient, pack, kind] = useWatch({ control, name: ['subtotal', 'maintenance', 'taxRate', 'clientId', 'pack', 'kind'] })
@@ -111,6 +112,7 @@ export function InvoiceFormDialog({ open, onOpenChange, invoice, clientId, servi
 
   const submit = handleSubmit(async (v) => {
     if (!legacy && !v.pack) return setError('pack', { message: 'Elige el pack que se factura' })
+    if (invoice && !v.number) return setError('number', { message: 'Indica el número de factura' })
     const { kind, pack: packKey, ...rest } = v
     void kind
     // Si la factura no tiene web y el cliente tiene una sola, se vincula a ella automáticamente.
@@ -126,8 +128,8 @@ export function InvoiceFormDialog({ open, onOpenChange, invoice, clientId, servi
 
   return (
     <FormDialog open={open} onOpenChange={onOpenChange} title={invoice ? `Editar factura ${invoice.number}` : 'Nueva factura'} onSubmit={submit} submitting={create.isPending || update.isPending} submitLabel={invoice ? 'Guardar cambios' : 'Crear factura'} wide>
-      <Field label="Número" required error={e.number?.message} htmlFor="i-num">
-        <Input id="i-num" {...register('number')} aria-invalid={!!e.number} />
+      <Field label="Número" required={!!invoice} error={e.number?.message} hint={invoice ? undefined : 'Déjalo vacío y se asigna el siguiente automáticamente al guardar.'} htmlFor="i-num">
+        <Input id="i-num" {...register('number')} placeholder={invoice ? undefined : `Automático (${nextNumber})`} aria-invalid={!!e.number} />
       </Field>
       <Field label="Cliente" required error={e.clientId?.message} htmlFor="i-client">
         <ClientSelectField control={control} name="clientId" id="i-client" />

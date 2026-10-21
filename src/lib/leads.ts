@@ -37,7 +37,12 @@ export async function createLead(input: LeadInput): Promise<void> {
         descripcion: input.description,
       }),
     })
-    if (!res.ok) throw Object.assign(new Error(`No se pudo guardar la solicitud (${res.status})`), { status: res.status })
+    if (!res.ok) {
+      // La base de datos limita los envíos seguidos (antispam): se avisa con un mensaje propio.
+      const body = await res.text().catch(() => '')
+      const code = body.includes('demasiadas_solicitudes') ? 'rate_limited' : undefined
+      throw Object.assign(new Error(`No se pudo guardar la solicitud (${res.status})`), { status: res.status, code })
+    }
     return
   }
   try {
