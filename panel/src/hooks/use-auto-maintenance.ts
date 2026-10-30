@@ -9,7 +9,7 @@ import { PACKS, packOfClient, RENEWAL_LEAD_DAYS, RENEWAL_PRICES } from '@/lib/pa
 import { supabase } from '@/lib/supabase'
 
 /**
- * Facturación del mantenimiento: la primera factura de un pack lleva pack + primer mes; a partir del mes siguiente se genera
+ * Facturación del mantenimiento: la factura del diseño web que lleva el primer mes (segunda factura + mantenimiento); a partir del mes siguiente se genera
  * una factura independiente solo de mantenimiento, una por mes, con la misma fecha de emisión (día del mes) que la primera.
  * Solo para el modo demostración (sin Supabase). Con Supabase las genera la propia base de datos cada día a las 04:05 UTC
  * (función `generar_facturas_mantenimiento`, tarea `facturas-mantenimiento-mensual` de pg_cron), aunque nadie abra el panel.

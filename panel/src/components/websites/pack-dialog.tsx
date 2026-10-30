@@ -12,7 +12,7 @@ import { guessDomain } from '@/lib/prefill'
 import { cn } from '@/lib/utils'
 import { PACK_TYPES, type PackType } from '@/types/domain'
 
-/** Alta de una web vendida como pack: crea la web y, si se quiere, la factura del pack y la del primer mes de mantenimiento. */
+/** Alta de una web vendida como pack: crea la web y, si se quiere, la primera factura (50 % del diseño web). */
 export function PackDialog({ open, onOpenChange, clientId }: { open: boolean; onOpenChange: (o: boolean) => void; clientId?: string }) {
   const { data: clients } = clientsApi.useList()
   const { data: settings } = useSettings()
@@ -39,6 +39,7 @@ export function PackDialog({ open, onOpenChange, clientId }: { open: boolean; on
   const selected = clients?.find((c) => c.id === client)
   const vat = settings?.taxes.vat ?? 21
   const p = PACKS[pack]
+  const half = Math.round(p.price * 50) / 100
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -64,8 +65,8 @@ export function PackDialog({ open, onOpenChange, clientId }: { open: boolean; on
     })
     const due = new Date(now.getTime() + 30 * 864e5).toISOString()
     const base = { clientId: selected.id, issuedAt: now.toISOString(), dueAt: due, taxRate: vat, status: 'PENDING' as const, websiteId: web.id, domainId: null, hostingId: null }
-    // Primera factura conjunta: pack en la base imponible + mantenimiento del primer mes. Los meses siguientes se generan solos (solo mantenimiento).
-    if (billPack) await createInvoice.mutateAsync({ ...base, number: '' /* lo asigna la base de datos (o la demo): el siguiente del año */, concept: 'WEB_DEVELOPMENT', description: `${p.label} · diseño y desarrollo web + mantenimiento del primer mes`, subtotal: p.price, pack, maintenance: p.maintenance, originId: null, recurring: false })
+    // Primera factura: 50 % del diseño web, sin mantenimiento. El 50 % restante (con o sin el primer mes de mantenimiento) se factura después desde Facturación.
+    if (billPack) await createInvoice.mutateAsync({ ...base, number: '' /* lo asigna la base de datos (o la demo): el siguiente del año */, concept: 'WEB_DEVELOPMENT', description: `${p.label} · diseño web · primer pago (50 %)`, subtotal: half, pack, maintenance: 0, originId: null, recurring: false })
     onOpenChange(false)
   }
 
@@ -97,8 +98,8 @@ export function PackDialog({ open, onOpenChange, clientId }: { open: boolean; on
       <label className="flex items-start gap-2 text-sm sm:col-span-2">
         <input type="checkbox" className="mt-1" checked={billPack} onChange={(e) => setBillPack(e.target.checked)} />
         <span>
-          Crear la primera factura (pack + primer mes de mantenimiento): {formatCurrency(p.price)} + {formatCurrency(p.maintenance)} + {vat} % IVA = {formatCurrency((p.price + p.maintenance) * (1 + vat / 100))}
-          <span className="block text-xs text-muted-foreground">Los meses siguientes se facturan solos, en facturas independientes de {formatCurrency(p.maintenance)}/mes + IVA.</span>
+          Crear la primera factura (diseño web, 50 %): {formatCurrency(half)} + {vat} % IVA = {formatCurrency(half * (1 + vat / 100))}
+          <span className="block text-xs text-muted-foreground">El 50 % restante se factura desde Facturación («Segunda factura»), con o sin el primer mes de mantenimiento ({formatCurrency(p.maintenance)}/mes + IVA); a partir de ahí el mantenimiento se factura solo cada mes.</span>
         </span>
       </label>
     </FormDialog>

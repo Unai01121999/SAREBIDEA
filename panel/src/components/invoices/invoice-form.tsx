@@ -8,7 +8,7 @@ import { z } from '@/lib/zod'
 import { ClientSelectField, Field, SelectField, SwitchField } from '@/components/forms/fields'
 import { FormDialog } from '@/components/forms/form-dialog'
 import { ClientContext, usePrefillData } from '@/components/forms/prefill'
-import { invoiceDefaults, type InvoiceKind } from '@/lib/prefill'
+import { INVOICE_KINDS, invoiceDefaults, type InvoiceKind } from '@/lib/prefill'
 import { Input, Textarea } from '@/components/ui/input'
 import { invoicesApi, useSettings, websitesApi } from '@/hooks/use-entities'
 import { formatCurrency, fromDateInput, toDateInput } from '@/lib/format'
@@ -30,7 +30,7 @@ const schema = z.object({
   status: z.enum(INVOICE_STATUSES),
   maintenance: z.number({ error: 'Introduce el mantenimiento' }).min(0, 'No puede ser negativo'),
   pack: z.string(),
-  kind: z.enum(['FIRST', 'MAINTENANCE', 'RENEWAL']),
+  kind: z.enum(['DEPOSIT', 'FINAL', 'FINAL_MAINT', 'MAINTENANCE', 'RENEWAL']),
   recurring: z.boolean(),
   websiteId: z.string(),
   domainId: z.string(),
@@ -38,7 +38,23 @@ const schema = z.object({
 })
 type Values = z.infer<typeof schema>
 
-const toValues = (i: Invoice): Values => ({ number: i.number, clientId: i.clientId, concept: i.concept, description: i.description, issuedAt: toDateInput(i.issuedAt), dueAt: toDateInput(i.dueAt), subtotal: i.subtotal, maintenance: i.maintenance ?? 0, pack: i.pack ?? '', kind: i.concept === 'DOMAIN' && i.pack ? 'RENEWAL' : i.concept === 'MAINTENANCE' && i.pack ? 'MAINTENANCE' : 'FIRST', taxRate: i.taxRate, status: i.status, recurring: i.recurring, websiteId: i.websiteId ?? '', domainId: i.domainId ?? '', hostingId: i.hostingId ?? '' })
+/** Tipo de una factura ya guardada (para editarla). */
+function kindOf(i: Invoice): InvoiceKind {
+  if (i.concept === 'DOMAIN') return 'RENEWAL'
+  if (i.concept === 'MAINTENANCE') return 'MAINTENANCE'
+  if ((i.maintenance ?? 0) > 0) return 'FINAL_MAINT'
+  return /segundo pago/i.test(i.description) ? 'FINAL' : 'DEPOSIT'
+}
+
+const KIND_HINT: Record<InvoiceKind, string> = {
+  DEPOSIT: '50 % del precio del pack, sin mantenimiento.',
+  FINAL: '50 % restante del pack, sin mantenimiento. El mantenimiento mensual no empieza a facturarse.',
+  FINAL_MAINT: '50 % restante del pack + primer mes de mantenimiento. Desde aquí, el mantenimiento mensual se factura solo cada mes.',
+  MAINTENANCE: 'Solo el mantenimiento mensual del pack.',
+  RENEWAL: 'Renovación anual de dominio y hosting: Starter 90 €, Professional 120 €, Premium 180 €. Se emite sola 30 días antes.',
+}
+
+const toValues = (i: Invoice): Values => ({ number: i.number, clientId: i.clientId, concept: i.concept, description: i.description, issuedAt: toDateInput(i.issuedAt), dueAt: toDateInput(i.dueAt), subtotal: i.subtotal, maintenance: i.maintenance ?? 0, pack: i.pack ?? '', kind: kindOf(i), taxRate: i.taxRate, status: i.status, recurring: i.recurring, websiteId: i.websiteId ?? '', domainId: i.domainId ?? '', hostingId: i.hostingId ?? '' })
 
 export function InvoiceFormDialog({ open, onOpenChange, invoice, clientId, serviceKey }: { open: boolean; onOpenChange: (o: boolean) => void; invoice?: Invoice; clientId?: string; /** Servicio a facturar de entrada, p. ej. "hosting:hos_001". */ serviceKey?: string }) {
   const create = invoicesApi.useCreate()
@@ -54,7 +70,7 @@ export function InvoiceFormDialog({ open, onOpenChange, invoice, clientId, servi
     return `F-${year}-${String(max + 1).padStart(3, '0')}`
   }, [invoices])
 
-  const blank = (): Values => ({ number: '', clientId: clientId ?? '', concept: 'WEB_DEVELOPMENT', description: '', issuedAt: toDateInput(new Date().toISOString()), dueAt: toDateInput(addDays(new Date(), 30).toISOString()), subtotal: 0, maintenance: 0, pack: '', kind: 'FIRST', taxRate: settings?.taxes.vat ?? 21, status: 'PENDING', recurring: false, websiteId: '', domainId: '', hostingId: '' })
+  const blank = (): Values => ({ number: '', clientId: clientId ?? '', concept: 'WEB_DEVELOPMENT', description: '', issuedAt: toDateInput(new Date().toISOString()), dueAt: toDateInput(addDays(new Date(), 30).toISOString()), subtotal: 0, maintenance: 0, pack: '', kind: 'DEPOSIT', taxRate: settings?.taxes.vat ?? 21, status: 'PENDING', recurring: false, websiteId: '', domainId: '', hostingId: '' })
 
   const { register, control, handleSubmit, reset, setValue, setError, clearErrors, formState: { errors: e, dirtyFields } } = useForm<Values>({ resolver: zodResolver(schema), defaultValues: blank() })
   const [subtotal, maintenance, taxRate, selectedClient, pack, kind] = useWatch({ control, name: ['subtotal', 'maintenance', 'taxRate', 'clientId', 'pack', 'kind'] })
@@ -77,11 +93,19 @@ export function InvoiceFormDialog({ open, onOpenChange, invoice, clientId, servi
     setValue('pack', packKey)
     clearErrors('pack')
     setValue('kind', k)
-    setValue('subtotal', k === 'FIRST' ? p.price : k === 'RENEWAL' ? RENEWAL_PRICES[packKey as PackType] : 0)
-    setValue('maintenance', k === 'RENEWAL' ? 0 : p.maintenance)
-    setValue('concept', k === 'FIRST' ? 'WEB_DEVELOPMENT' : k === 'RENEWAL' ? 'DOMAIN' : 'MAINTENANCE')
-    setValue('recurring', k !== 'FIRST')
-    setValue('description', k === 'FIRST' ? `${p.label} · diseño y desarrollo web + mantenimiento del primer mes` : k === 'RENEWAL' ? `Renovación de hosting y dominio${renewalName ? ` ${renewalName}` : ''}` : `Mantenimiento mensual ${p.label}`)
+    const design = k === 'DEPOSIT' || k === 'FINAL' || k === 'FINAL_MAINT'
+    // Diseño web en dos pagos del 50 % (sin IVA); el segundo puede llevar el primer mes de mantenimiento.
+    setValue('subtotal', design ? Math.round(p.price * 50) / 100 : k === 'RENEWAL' ? RENEWAL_PRICES[packKey as PackType] : 0)
+    setValue('maintenance', k === 'FINAL_MAINT' || k === 'MAINTENANCE' ? p.maintenance : 0)
+    setValue('concept', design ? 'WEB_DEVELOPMENT' : k === 'RENEWAL' ? 'DOMAIN' : 'MAINTENANCE')
+    setValue('recurring', !design)
+    setValue('description', {
+      DEPOSIT: `${p.label} · diseño web · primer pago (50 %)`,
+      FINAL: `${p.label} · diseño web · segundo pago (50 % restante)`,
+      FINAL_MAINT: `${p.label} · diseño web · segundo pago (50 % restante) + mantenimiento del primer mes`,
+      MAINTENANCE: `Mantenimiento mensual ${p.label}`,
+      RENEWAL: `Renovación anual de dominio y hosting${renewalName ? ` ${renewalName}` : ''}`,
+    }[k])
   }
 
   // Factura nueva: al elegir el cliente se proponen los datos que ya tiene (su pack, tipo de factura, web, IVA…). Solo se rellena lo que aún no se ha tocado.
@@ -99,7 +123,7 @@ export function InvoiceFormDialog({ open, onOpenChange, invoice, clientId, servi
       for (const f of ['pack', 'description'] as const) setValue(f, '')
       setValue('subtotal', 0)
       setValue('maintenance', 0)
-      setValue('kind', 'FIRST')
+      setValue('kind', 'DEPOSIT')
       setValue('concept', 'WEB_DEVELOPMENT')
       autoFilled.current = false
     }
@@ -141,8 +165,8 @@ export function InvoiceFormDialog({ open, onOpenChange, invoice, clientId, servi
           <Field label="Pack" required error={e.pack?.message} htmlFor="i-pack" hint={!invoice ? packNote || undefined : undefined}>
             <SelectField control={control} name="pack" id="i-pack" options={PACK_TYPES.map((k) => ({ value: k, label: `${PACKS[k].label} · ${PACKS[k].price} €` }))} onValueChange={(v) => applyPack(v, kind as InvoiceKind)} />
           </Field>
-          <Field label="Tipo de factura" htmlFor="i-kind" hint={kind === 'FIRST' ? 'Pack + mantenimiento del primer mes. Los meses siguientes se facturan solos.' : kind === 'RENEWAL' ? 'Renovación anual de hosting y dominio: Starter 90 €, Professional 120 €, Premium 180 €. Se emite sola 30 días antes.' : 'Solo el mantenimiento mensual.'}>
-            <SelectField control={control} name="kind" id="i-kind" options={[{ value: 'FIRST', label: 'Primera factura: pack + mantenimiento' }, { value: 'MAINTENANCE', label: 'Solo mantenimiento mensual' }, { value: 'RENEWAL', label: 'Renovación anual de hosting y dominio' }]} onValueChange={(v) => pack && applyPack(pack, v as InvoiceKind)} />
+          <Field label="Tipo de factura" htmlFor="i-kind" hint={KIND_HINT[kind as InvoiceKind]}>
+            <SelectField control={control} name="kind" id="i-kind" options={INVOICE_KINDS} onValueChange={(v) => pack && applyPack(pack, v as InvoiceKind)} />
           </Field>
         </>
       )}
