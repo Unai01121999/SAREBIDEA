@@ -138,15 +138,13 @@ export function billableServices(clientId: string, ctx: PrefillContext): Billabl
 
 /**
  * Tipos de factura de un pack. El diseño web se cobra en dos pagos del 50 %:
- * DEPOSIT = primer pago (sin mantenimiento) · FINAL = segundo pago (sin mantenimiento) ·
- * FINAL_MAINT = segundo pago + primer mes de mantenimiento (desde ahí el mantenimiento mensual se factura solo) ·
- * MAINTENANCE = mantenimiento mensual · RENEWAL = renovación anual de dominio y hosting.
+ * DEPOSIT = primer pago · FINAL = segundo pago (50 % restante) · MAINTENANCE = mantenimiento mensual, que se factura
+ * aparte del diseño web (desde la primera, los meses siguientes se generan solos) · RENEWAL = renovación anual de dominio y hosting.
  */
-export type InvoiceKind = 'DEPOSIT' | 'FINAL' | 'FINAL_MAINT' | 'MAINTENANCE' | 'RENEWAL'
+export type InvoiceKind = 'DEPOSIT' | 'FINAL' | 'MAINTENANCE' | 'RENEWAL'
 export const INVOICE_KINDS: { value: InvoiceKind; label: string }[] = [
   { value: 'DEPOSIT', label: 'Primera factura: diseño web (50 %)' },
   { value: 'FINAL', label: 'Segunda factura: diseño web (50 % restante)' },
-  { value: 'FINAL_MAINT', label: 'Segunda factura: diseño web (50 % restante) + mantenimiento' },
   { value: 'MAINTENANCE', label: 'Mantenimiento mensual' },
   { value: 'RENEWAL', label: 'Renovación anual de dominio y hosting' },
 ]
@@ -171,10 +169,10 @@ export function invoiceDefaults(client: Client, ctx: PrefillContext, serviceKey?
   else if ((web ?? webs.find((w) => w.pack))?.pack) [pack, source] = [(web ?? webs.find((w) => w.pack))!.pack!, 'el pack de su web']
   else if (client.packInterest && client.packInterest !== 'INDECISO') [pack, source] = [client.packInterest, 'el pack que eligió en el formulario']
 
-  // Tipo propuesto según lo ya facturado del diseño web: nada → primer pago; solo el primero → segundo pago + mantenimiento; ya pagado → mantenimiento.
+  // Tipo propuesto según lo ya facturado del diseño web: nada → primer pago; solo el primero → segundo pago; ya pagado → mantenimiento.
   const design = invoices.filter((i) => i.clientId === client.id && i.pack && !i.originId && i.concept === 'WEB_DEVELOPMENT' && i.status !== 'CANCELLED' && (!web || !i.websiteId || i.websiteId === web.id))
   const designDone = design.length >= 2 || design.some((i) => (i.maintenance ?? 0) > 0)
-  const kind: InvoiceKind = domain ? 'RENEWAL' : design.length === 0 ? 'DEPOSIT' : designDone ? 'MAINTENANCE' : 'FINAL_MAINT'
+  const kind: InvoiceKind = domain ? 'RENEWAL' : design.length === 0 ? 'DEPOSIT' : designDone ? 'MAINTENANCE' : 'FINAL'
   const lastTax = [...invoices].filter((i) => i.clientId === client.id).sort((a, b) => b.issuedAt.localeCompare(a.issuedAt))[0]?.taxRate
   return { pack, kind, source, websiteId: web?.id, domainId: domain?.id, taxRate: lastTax, dueAt: domain ? toDateInput(domain.renewsAt) : undefined, renewalName: domain?.name }
 }

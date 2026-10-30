@@ -2,7 +2,7 @@
 // en eventos con fecha. Además de lo ya ocurrido calcula lo previsto: las facturas mensuales de mantenimiento, la renovación
 // anual de hosting + dominio y su factura (30 días antes). Funciones puras: no tocan la base de datos.
 import { addDays, addMonths, addYears, format, isAfter, isBefore, parseISO, startOfDay } from 'date-fns'
-import { RENEWAL_LEAD_DAYS, RENEWAL_PRICES, PACKS, packOfClient } from '@/lib/packs'
+import { maintenanceSeeds, RENEWAL_LEAD_DAYS, RENEWAL_PRICES, PACKS, packOfClient } from '@/lib/packs'
 import { routes } from '@/lib/routes'
 import type { CalendarNote, Client, Domain, Hosting, Invoice, Task, Website } from '@/types/domain'
 
@@ -102,9 +102,9 @@ export function buildEvents(data: CalendarData, from: Date, to: Date): CalendarE
       const kind = isMaintenance ? 'Factura de mantenimiento' : isRenewal ? 'Factura de renovación de hosting y dominio' : 'Factura'
       add({ id: `i-${i.id}`, date: parseISO(i.issuedAt), category, title: `${kind} · ${i.number}`, detail: `${client(i.clientId)}${i.status === 'PAID' ? ' · pagada' : ''}`, href: routes.invoice(i.id), planned: false })
     }
-    // Facturas mensuales de mantenimiento que aún no existen: el mismo día de cada mes en que se emitió la primera factura del pack.
-    for (const first of data.invoices) {
-      if (!first.pack || !first.maintenance || first.originId || first.concept !== 'WEB_DEVELOPMENT' || first.status === 'CANCELLED') continue
+    // Facturas mensuales de mantenimiento que aún no existen: el mismo día de cada mes en que se emitió la primera de mantenimiento.
+    for (const first of maintenanceSeeds(data.invoices)) {
+      if (!first.pack || !first.maintenance) continue
       const exist = new Set(data.invoices.filter((i) => i.originId === first.id).map((i) => format(parseISO(i.issuedAt), 'yyyy-MM')))
       const base = parseISO(first.issuedAt)
       for (let k = 1; k <= 60; k++) {

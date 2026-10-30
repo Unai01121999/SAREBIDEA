@@ -18,6 +18,23 @@ export const RENEWAL_PRICES: Record<PackType, number> = { STARTER: 90, PROFESSIO
 /** Días de antelación con los que se emite la factura de renovación. */
 export const RENEWAL_LEAD_DAYS = 30
 
+/**
+ * Facturas que arrancan el mantenimiento mensual automático: la primera factura de «Mantenimiento mensual» hecha a mano
+ * (o, en facturas antiguas, la de diseño web que llevaba el primer mes). Una por cliente y web: de cada una salen las
+ * facturas de los meses siguientes. Mismo criterio que la función SQL `generar_facturas_mantenimiento`.
+ */
+export function maintenanceSeeds<T extends { id: string; clientId: string; websiteId: string | null; pack?: PackType | null; maintenance?: number | null; originId?: string | null; concept: string; status: string; issuedAt: string }>(invoices: T[]): T[] {
+  const seeds = new Map<string, T>()
+  const candidates = invoices
+    .filter((i) => i.pack && (i.maintenance ?? 0) > 0 && !i.originId && (i.concept === 'MAINTENANCE' || i.concept === 'WEB_DEVELOPMENT') && i.status !== 'CANCELLED')
+    .sort((a, b) => a.issuedAt.localeCompare(b.issuedAt))
+  for (const i of candidates) {
+    const key = `${i.clientId}|${i.websiteId ?? ''}`
+    if (!seeds.has(key)) seeds.set(key, i)
+  }
+  return [...seeds.values()]
+}
+
 /** Pack del cliente: el de la primera factura de pack de esa web; si no hay, el de la primera del cliente. */
 export function packOfClient(clientId: string, websiteId: string | null | undefined, invoices: { clientId: string; websiteId: string | null; pack?: PackType | null; originId?: string | null; concept: string; status: string; issuedAt: string }[]): PackType | null {
   const firsts = invoices

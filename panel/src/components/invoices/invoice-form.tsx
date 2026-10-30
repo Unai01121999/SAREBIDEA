@@ -30,7 +30,7 @@ const schema = z.object({
   status: z.enum(INVOICE_STATUSES),
   maintenance: z.number({ error: 'Introduce el mantenimiento' }).min(0, 'No puede ser negativo'),
   pack: z.string(),
-  kind: z.enum(['DEPOSIT', 'FINAL', 'FINAL_MAINT', 'MAINTENANCE', 'RENEWAL']),
+  kind: z.enum(['DEPOSIT', 'FINAL', 'MAINTENANCE', 'RENEWAL']),
   recurring: z.boolean(),
   websiteId: z.string(),
   domainId: z.string(),
@@ -42,15 +42,13 @@ type Values = z.infer<typeof schema>
 function kindOf(i: Invoice): InvoiceKind {
   if (i.concept === 'DOMAIN') return 'RENEWAL'
   if (i.concept === 'MAINTENANCE') return 'MAINTENANCE'
-  if ((i.maintenance ?? 0) > 0) return 'FINAL_MAINT'
   return /segundo pago/i.test(i.description) ? 'FINAL' : 'DEPOSIT'
 }
 
 const KIND_HINT: Record<InvoiceKind, string> = {
   DEPOSIT: '50 % del precio del pack, sin mantenimiento.',
-  FINAL: '50 % restante del pack, sin mantenimiento. El mantenimiento mensual no empieza a facturarse.',
-  FINAL_MAINT: '50 % restante del pack + primer mes de mantenimiento. Desde aquí, el mantenimiento mensual se factura solo cada mes.',
-  MAINTENANCE: 'Solo el mantenimiento mensual del pack.',
+  FINAL: '50 % restante del pack, sin mantenimiento (el mantenimiento se factura aparte).',
+  MAINTENANCE: 'Mantenimiento mensual del pack. Desde la primera, los meses siguientes se facturan solos.',
   RENEWAL: 'Renovación anual de dominio y hosting: Starter 90 €, Professional 120 €, Premium 180 €. Se emite sola 30 días antes.',
 }
 
@@ -93,16 +91,15 @@ export function InvoiceFormDialog({ open, onOpenChange, invoice, clientId, servi
     setValue('pack', packKey)
     clearErrors('pack')
     setValue('kind', k)
-    const design = k === 'DEPOSIT' || k === 'FINAL' || k === 'FINAL_MAINT'
-    // Diseño web en dos pagos del 50 % (sin IVA); el segundo puede llevar el primer mes de mantenimiento.
+    const design = k === 'DEPOSIT' || k === 'FINAL'
+    // Diseño web en dos pagos del 50 % (sin IVA); el mantenimiento se factura aparte.
     setValue('subtotal', design ? Math.round(p.price * 50) / 100 : k === 'RENEWAL' ? RENEWAL_PRICES[packKey as PackType] : 0)
-    setValue('maintenance', k === 'FINAL_MAINT' || k === 'MAINTENANCE' ? p.maintenance : 0)
+    setValue('maintenance', k === 'MAINTENANCE' ? p.maintenance : 0)
     setValue('concept', design ? 'WEB_DEVELOPMENT' : k === 'RENEWAL' ? 'DOMAIN' : 'MAINTENANCE')
     setValue('recurring', !design)
     setValue('description', {
       DEPOSIT: `${p.label} · diseño web · primer pago (50 %)`,
       FINAL: `${p.label} · diseño web · segundo pago (50 % restante)`,
-      FINAL_MAINT: `${p.label} · diseño web · segundo pago (50 % restante) + mantenimiento del primer mes`,
       MAINTENANCE: `Mantenimiento mensual ${p.label}`,
       RENEWAL: `Renovación anual de dominio y hosting${renewalName ? ` ${renewalName}` : ''}`,
     }[k])

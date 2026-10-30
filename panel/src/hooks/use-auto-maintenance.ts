@@ -5,11 +5,11 @@ import { es } from 'date-fns/locale'
 import { useEffect, useRef } from 'react'
 import { domainsApi, invoicesApi, useSettings } from '@/hooks/use-entities'
 import { useCan } from '@/hooks/use-permissions'
-import { PACKS, packOfClient, RENEWAL_LEAD_DAYS, RENEWAL_PRICES } from '@/lib/packs'
+import { maintenanceSeeds, PACKS, packOfClient, RENEWAL_LEAD_DAYS, RENEWAL_PRICES } from '@/lib/packs'
 import { supabase } from '@/lib/supabase'
 
 /**
- * Facturación del mantenimiento: la factura del diseño web que lleva el primer mes (segunda factura + mantenimiento); a partir del mes siguiente se genera
+ * Facturación del mantenimiento (aparte del diseño web): desde la primera factura de «Mantenimiento mensual», cada mes siguiente se genera
  * una factura independiente solo de mantenimiento, una por mes, con la misma fecha de emisión (día del mes) que la primera.
  * Solo para el modo demostración (sin Supabase). Con Supabase las genera la propia base de datos cada día a las 04:05 UTC
  * (función `generar_facturas_mantenimiento`, tarea `facturas-mantenimiento-mensual` de pg_cron), aunque nadie abra el panel.
@@ -30,8 +30,8 @@ export function useAutoMaintenance() {
     const year = now.getFullYear()
     let max = Math.max(created.current.max, invoices.filter((i) => i.number.startsWith(`F-${year}-`)).reduce((m, i) => Math.max(m, Number(i.number.split('-')[2]) || 0), 0))
     const todo: Parameters<typeof create.mutateAsync>[0][] = []
-    for (const first of invoices) {
-      if (!first.pack || !first.maintenance || first.originId || first.concept !== 'WEB_DEVELOPMENT' || first.status === 'CANCELLED') continue
+    for (const first of maintenanceSeeds(invoices)) {
+      if (!first.pack || !first.maintenance) continue
       for (let k = 1; k <= 36; k++) {
         const issued = addMonths(new Date(first.issuedAt), k)
         if (issued > now) break

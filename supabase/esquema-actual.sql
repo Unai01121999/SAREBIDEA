@@ -483,7 +483,7 @@ declare
   creadas int := 0; filas int;
 begin
   perform pg_advisory_xact_lock(hashtext('generar_facturas_mantenimiento'));
-  for f in select * from public.facturas where pack is not null and mantenimiento > 0 and factura_origen_id is null and concepto = 'WEB_DEVELOPMENT' and estado <> 'CANCELLED' loop
+  for f in select distinct on (cliente_id, coalesce(web_id, '')) * from public.facturas where pack is not null and mantenimiento > 0 and factura_origen_id is null and concepto in ('MAINTENANCE', 'WEB_DEVELOPMENT') and estado <> 'CANCELLED' order by cliente_id, coalesce(web_id, ''), fecha_emision loop
     for k in 1..36 loop
       emision := f.fecha_emision + make_interval(months => k);
       exit when (emision at time zone 'Europe/Madrid')::date > hoy;
