@@ -1,5 +1,5 @@
 import { AnimatePresence, m, useMotionValueEvent, useScroll } from 'motion/react'
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { nav } from '../data/site'
 import { easeOut } from '../lib/motion'
 import { Button } from '../components/ui/Button'
@@ -12,13 +12,25 @@ export function Navbar({ onPrivate }: { onPrivate: () => void }) {
   const [hidden, setHidden] = useState(false)
   const [open, setOpen] = useState(false)
 
-  // Dinámica: aparece el cristal al bajar; se esconde al bajar rápido y vuelve al subir.
+  const idle = useRef<number | undefined>(undefined)
+
+  // Móvil y tableta: mientras la página se desplaza, la barra se esconde; cuando se para, vuelve a aparecer.
+  // (Antes dependía del sentido del desplazamiento y el rebote del scroll del móvil la hacía parpadear.)
+  // Escritorio: se esconde al bajar rápido y vuelve al subir.
   useMotionValueEvent(scrollY, 'change', (y) => {
     const prev = scrollY.getPrevious() ?? 0
     setScrolled(y > 24)
+    if (window.matchMedia('(max-width: 1023px)').matches) {
+      window.clearTimeout(idle.current)
+      if (y <= 80) return setHidden(false)
+      setHidden(true)
+      idle.current = window.setTimeout(() => setHidden(false), 220)
+      return
+    }
     setHidden(y > 640 && y > prev + 4)
     if (y < prev - 4) setHidden(false)
   })
+  useEffect(() => () => window.clearTimeout(idle.current), [])
 
   useEffect(() => {
     document.documentElement.style.overflow = open ? 'hidden' : ''
@@ -30,7 +42,7 @@ export function Navbar({ onPrivate }: { onPrivate: () => void }) {
   return (
     <>
       <header
-        className={`fixed inset-x-0 top-0 z-50 transition-[transform,background-color,border-color,backdrop-filter] duration-500 ease-[var(--ease-out-strong)] ${hidden && !open ? '-translate-y-full' : 'translate-y-0'} ${
+        className={`fixed inset-x-0 top-0 z-50 transition-[translate,background-color,border-color] duration-300 ease-[var(--ease-out-strong)] will-change-[translate] ${hidden && !open ? '-translate-y-full' : 'translate-y-0'} ${
           scrolled || open ? 'border-b border-line bg-paper/80 backdrop-blur-xl backdrop-saturate-150' : 'border-b border-transparent bg-transparent'
         }`}
       >

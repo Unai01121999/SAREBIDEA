@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
-import { closePreferences, saveConsent, useConsentState, type Category } from '../../lib/consent'
+import { closePreferences, openPreferences, saveConsent, useConsentState, type Category } from '../../lib/consent'
 
 // Aceptar y rechazar tienen exactamente el mismo estilo, tamaño y nivel (primera capa).
 const btn =
@@ -23,19 +23,11 @@ const categories: { key: Category; title: string; body: string }[] = [
 const LEGAL_LINK = 'font-medium text-ink underline underline-offset-2 hover:text-cobalt-deep'
 
 export function CookieBanner() {
+  // Un único estado para el panel (el del módulo de consentimiento): al guardar se cierra siempre, venga de donde venga.
   const { consent, panelOpen, undecided } = useConsentState()
-  const [panel, setPanel] = useState(false)
-  const showPanel = panel || panelOpen
-  const show = undecided || showPanel
-
-  const close = () => {
-    setPanel(false)
-    closePreferences()
-  }
-
-  if (!show) return null
-  return showPanel ? (
-    <Preferences initial={consent} onClose={close} />
+  if (!undecided && !panelOpen) return null
+  return panelOpen ? (
+    <Preferences initial={consent} onClose={closePreferences} />
   ) : (
     <section
       role="region"
@@ -55,7 +47,7 @@ export function CookieBanner() {
         <button type="button" className={same} onClick={() => saveConsent({ analytics: false, marketing: false })}>
           Rechazar todo
         </button>
-        <button type="button" className={outline} onClick={() => setPanel(true)}>
+        <button type="button" className={outline} onClick={openPreferences}>
           Configurar
         </button>
         <button type="button" className={same} onClick={() => saveConsent({ analytics: true, marketing: true })}>
@@ -105,9 +97,21 @@ function Preferences({ initial, onClose }: { initial: ReturnType<typeof useConse
         aria-labelledby="cookie-title"
         className="on-light max-h-[92dvh] w-full max-w-[40rem] overflow-y-auto rounded-[14px] bg-paper p-6 shadow-float sm:p-8"
       >
-        <h2 id="cookie-title" className="font-head text-[2rem] leading-none">
-          Configurar cookies
-        </h2>
+        <div className="flex items-start justify-between gap-4">
+          <h2 id="cookie-title" className="font-head text-[2rem] leading-none">
+            Configurar cookies
+          </h2>
+          <button
+            type="button"
+            onClick={onClose}
+            aria-label="Cerrar sin guardar"
+            className="-mt-1 -mr-2 inline-flex size-11 shrink-0 items-center justify-center rounded-[10px] text-ink-2 transition-colors hover:bg-ink/[0.06]"
+          >
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden="true">
+              <path d="M6 6l12 12M18 6 6 18" />
+            </svg>
+          </button>
+        </div>
         <p className="mt-2 text-[0.95rem] leading-relaxed text-ink-2">
           Elige qué categorías permites. Todo lo opcional está desactivado por defecto. Consulta el detalle en la{' '}
           <a href="/politica-de-cookies/" className={LEGAL_LINK} onClick={onClose}>
