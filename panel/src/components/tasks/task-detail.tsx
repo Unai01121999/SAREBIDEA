@@ -8,7 +8,7 @@ import { Avatar } from '@/components/ui/avatar'
 import { Button } from '@/components/ui/button'
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Textarea } from '@/components/ui/input'
-import { useCan } from '@/hooks/use-permissions'
+import { useCan, useMe } from '@/hooks/use-permissions'
 import { tasksApi } from '@/hooks/use-entities'
 import { formatDate, timeAgo } from '@/lib/format'
 import { taskStatusLabel } from '@/lib/labels'
@@ -20,12 +20,14 @@ import { routes } from '@/lib/routes'
 export function TaskDetailDialog({ task, clientName, webName, onClose, onEdit, onDelete }: { task?: Task; clientName?: string; webName?: string; onClose: () => void; onEdit: (t: Task) => void; onDelete: (t: Task) => void }) {
   const update = tasksApi.useUpdate(true)
   const canWrite = useCan()('tasks', 'write')
+  // El autor real lo fija la base de datos (disparador trg_autor_comentarios); aquí solo se muestra al momento.
+  const me = useMe().data
   const [text, setText] = useState('')
 
   const addComment = () => {
     const t = text.trim()
     if (!task || !t) return
-    update.mutate({ id: task.id, patch: { comments: [...task.comments, { id: uid('cmt'), author: 'Unai', text: t, createdAt: new Date().toISOString() }] } })
+    update.mutate({ id: task.id, patch: { comments: [...task.comments, { id: uid('cmt'), author: me?.name ?? 'Yo', text: t, createdAt: new Date().toISOString() }] } })
     setText('')
   }
 

@@ -6,6 +6,8 @@ import type { InvoiceFileItem } from '@/types/domain'
 export const INVOICE_FILE_TYPES = ['image/jpeg', 'image/png', 'image/webp', 'application/pdf']
 export const INVOICE_FILE_ACCEPT = '.jpg,.jpeg,.png,.webp,.pdf,image/jpeg,image/png,image/webp,application/pdf'
 const BUCKET = 'facturas'
+/** Ruta de un adjunto en el almacenamiento: «<id de factura>/<marca de tiempo>-<nombre saneado>». La base de datos exige lo mismo. */
+const STORAGE_PATH = /^[A-Za-z0-9_-]+\/[0-9]+-[A-Za-z0-9._-]+$/
 const MAX = supabase ? 10 * 1024 * 1024 : 1.5 * 1024 * 1024
 
 const safe = (name: string) => name.normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/[^a-zA-Z0-9._-]+/g, '_').slice(-80)
@@ -42,11 +44,17 @@ export async function openInvoiceFile(file: Pick<InvoiceFileItem, 'path'>) {
   const tab = window.open('', '_blank') // se abre ya, dentro del clic, para que el navegador no bloquee la ventana
   try {
     let url: string
-    if (file.path.startsWith('data:')) {
-      const blob = await (await fetch(file.path)).blob()
-      url = URL.createObjectURL(blob)
+    if (!supabase) {
+      // Modo demostración: el archivo está en el navegador como data URL. Solo PDF o imagen, y se abre con su tipo forzado
+      // (nunca como HTML: un «data:text/html» guardado a mano no podría ejecutar nada en el panel).
+      const m = /^data:([a-z/+.-]+)(;base64)?,/i.exec(file.path)
+      const type = m?.[1].toLowerCase()
+      if (!type || !INVOICE_FILE_TYPES.includes(type)) throw new Error('Archivo no válido')
+      const bytes = Uint8Array.from(atob(file.path.slice(m![0].length)), (c) => c.charCodeAt(0))
+      url = URL.createObjectURL(new Blob([bytes], { type }))
     } else {
-      if (!supabase) throw new Error('Supabase no está configurado')
+      // Con Supabase solo se abren rutas del almacenamiento privado con el formato que crea uploadInvoiceFile.
+      if (!STORAGE_PATH.test(file.path)) throw new Error('Archivo no válido')
       const { data, error } = await supabase.storage.from(BUCKET).createSignedUrl(file.path, 300)
       if (error || !data) throw error ?? new Error('Sin URL')
       url = data.signedUrl

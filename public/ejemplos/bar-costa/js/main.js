@@ -87,7 +87,7 @@
     if (new Date(y, m - 1, dd) < new Date(new Date().setHours(0, 0, 0, 0))) return msg("Esa fecha ya ha pasado.", false);
     if (!$("#priv").checked) return msg("Debes aceptar la política de privacidad.", false);
     const r = Store.add({ nombre: v("nombre"), tel: v("tel"), personas: v("personas"), fecha: v("fecha"), hora: v("hora"), coment: v("coment") });
-    msg(`¡Gracias, ${r.nombre}! Hemos recibido tu solicitud (ref. ${r.id}). ${Content.T("bk.ok")}`, true);
+    msg(`Esto es una web de ejemplo de SAREBIDEA: la reserva no se ha enviado ni guardado. En la web real de tu bar, aquí te llegaría la solicitud de ${r.nombre}.`, true);
     $("#form").reset(); $("#personas").value = "2";
   });
 

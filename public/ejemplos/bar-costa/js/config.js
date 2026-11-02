@@ -33,8 +33,8 @@ window.BAR = {
 
   // ÁREA PRIVADA — cambia esta contraseña. OJO: al ser una web estática sin
   // servidor, NO es seguridad real (ver LEEME.md). Sirve como demo.
-  adminUser: "admin",
-  adminPass: "demo",
+  adminUser: "",
+  adminPass: "",
 
   // Imágenes (provisionales, de Unsplash). Cambia por fotos propias del local.
   img: {

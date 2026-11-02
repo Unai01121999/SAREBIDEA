@@ -16,15 +16,19 @@ export interface PanelUserRow {
 }
 
 export interface Store {
-  /** Usuario de la sesión: correo y nivel de autenticación (aal2 = con doble factor). `null` si el token no vale. */
-  caller(jwt: string): Promise<{ email: string; aal: string } | null>
+  /** Usuario de la sesión: id de su cuenta, correo y nivel de autenticación (aal2 = con doble factor). `null` si el token no vale. */
+  caller(jwt: string): Promise<{ id: string; email: string; aal: string } | null>
   panelUserByEmail(email: string): Promise<PanelUserRow | null>
+  /** Usuario del panel vinculado a una cuenta de Authentication (los roles se asignan por cuenta, no por correo). */
+  panelUserByAuthId(authId: string): Promise<PanelUserRow | null>
   panelUserById(id: string): Promise<PanelUserRow | null>
   insertPanelUser(row: PanelUserRow): Promise<void>
   updatePanelUser(id: string, patch: Partial<PanelUserRow>): Promise<PanelUserRow>
   deletePanelUser(id: string): Promise<void>
-  /** Crea la cuenta de acceso. Si el correo ya existía en Authentication, devuelve su id y le cambia la contraseña. */
-  authCreateOrReset(email: string, password: string): Promise<{ id: string }>
+  /** Crea la cuenta de acceso. Si el correo ya existía en Authentication, devuelve su id (existed) y le cambia la contraseña. */
+  authCreateOrReset(email: string, password: string): Promise<{ id: string; existed: boolean }>
+  /** Cierra todas las sesiones de la cuenta y, si se pide, borra su doble factor (tendrá que configurarlo de nuevo). */
+  resetAccess(authId: string, removeFactors: boolean): Promise<void>
   authSetPassword(authId: string, password: string): Promise<void>
   authDelete(authId: string): Promise<void>
   /** Anota la acción en la tabla `activity` (los demás cambios los anota un disparador de la base de datos). */
@@ -50,7 +54,7 @@ async function requireOwner(store: Store, authorization: string | null) {
   const who = await store.caller(jwt)
   if (!who) throw new HttpError(401, 'Sesión no válida')
   if (who.aal !== 'aal2') throw new HttpError(403, 'Hace falta el segundo factor')
-  const me = await store.panelUserByEmail(who.email.toLowerCase())
+  const me = await store.panelUserByAuthId(who.id)
   if (!me || !me.active || me.role !== 'OWNER') throw new HttpError(403, 'Solo el propietario puede gestionar usuarios')
   return me
 }
@@ -72,6 +76,8 @@ export async function handle(store: Store, authorization: string | null, body: R
     if (password.length < 10) throw new HttpError(400, 'La contraseña debe tener al menos 10 caracteres')
     if (await store.panelUserByEmail(email)) throw new HttpError(409, 'Ese correo ya tiene acceso al panel')
     const auth = await store.authCreateOrReset(email, password)
+    // Si la cuenta ya existía (p. ej. alguien la registró antes), se le quitan sesiones y doble factor: no se hereda nada.
+    if (auth.existed) await store.resetAccess(auth.id, true)
     const row: PanelUserRow = { id: `usr_${store.randomId()}`, name, email, role, active: true, auth_id: auth.id }
     await store.insertPanelUser(row)
     await store.logActivity({ entityId: row.id, actor: me.name, message: `Usuario creado: ${name} (${ROLE_LABEL[role]})` })
@@ -99,6 +105,8 @@ export async function handle(store: Store, authorization: string | null, body: R
       patch.active = Boolean(body.active)
     }
     const saved = await store.updatePanelUser(target.id, { ...patch, updated_at: new Date().toISOString() })
+    // Al quitar el acceso se cierran también sus sesiones abiertas.
+    if (patch.active === false && target.auth_id) await store.resetAccess(target.auth_id, false)
     const what = [patch.name !== undefined && 'nombre', patch.role && `rol: ${ROLE_LABEL[patch.role]}`, patch.active !== undefined && (patch.active ? 'acceso activado' : 'acceso desactivado')].filter(Boolean).join(', ')
     await store.logActivity({ entityId: target.id, actor: me.name, message: `Usuario actualizado: ${saved.name} (${what})` })
     return { user: toPublic(saved) }
@@ -110,12 +118,22 @@ export async function handle(store: Store, authorization: string | null, body: R
     const password = store.randomPassword()
     if (!target.auth_id) {
       const auth = await store.authCreateOrReset(target.email, password)
+      if (auth.existed) await store.resetAccess(auth.id, true)
       await store.updatePanelUser(target.id, { auth_id: auth.id })
     } else {
       await store.authSetPassword(target.auth_id, password)
+      // Con la contraseña nueva, las sesiones abiertas con la anterior dejan de valer.
+      await store.resetAccess(target.auth_id, false)
     }
     await store.logActivity({ entityId: target.id, actor: me.name, message: `Contraseña restablecida: ${target.name}` })
     return { tempPassword: password }
+  }
+
+  if (action === 'reset_mfa') {
+    if (!target.auth_id) throw new HttpError(400, 'Este usuario aún no tiene cuenta de acceso')
+    await store.resetAccess(target.auth_id, true)
+    await store.logActivity({ entityId: target.id, actor: me.name, message: `Doble factor restablecido: ${target.name}` })
+    return { ok: true }
   }
 
   if (action === 'delete') {

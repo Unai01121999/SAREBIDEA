@@ -23,7 +23,7 @@ ErrorDocument 404 /404.html
 <IfModule mod_alias.c>
   RedirectMatch 404 /\.(?!well-known)
 </IfModule>
-<FilesMatch "(^\.ht|^\.env|\.(env|log|sql|bak|map|md|lock|ya?ml)$|~$)">
+<FilesMatch "(^\.ht|^\.env|\.(env|log|sql|bak|map|md|lock|ya?ml|bat|command|sh)$|~$|^LEEME)">
   Require all denied
 </FilesMatch>
 

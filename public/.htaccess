@@ -69,6 +69,6 @@ ErrorDocument 404 /404.html
 <FilesMatch "^\.ht">
   Require all denied
 </FilesMatch>
-<FilesMatch "(^\.env|\.(env|log|sql|bak|map|md|lock|ya?ml)$|~$)">
+<FilesMatch "(^\.env|\.(env|log|sql|bak|map|md|lock|ya?ml|bat|command|sh)$|~$|^LEEME)">
   Require all denied
 </FilesMatch>

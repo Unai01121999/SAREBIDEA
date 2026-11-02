@@ -1,8 +1,8 @@
 'use client'
 
 import { zodResolver } from '@hookform/resolvers/zod'
-import { Check, Copy, KeyRound, Minus, Plus, Trash2 } from 'lucide-react'
-import { useQueryClient } from '@tanstack/react-query'
+import { Check, Copy, KeyRound, Minus, Plus, ShieldOff, Trash2 } from 'lucide-react'
+import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { useState } from 'react'
 import { toast } from 'sonner'
 import { useForm } from 'react-hook-form'
@@ -23,7 +23,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { usersApi } from '@/hooks/use-entities'
 import { useCan } from '@/hooks/use-permissions'
 import { dataSource } from '@/services'
-import { createPanelUser, deletePanelUser, resetPanelUserPassword, updatePanelUser } from '@/services/panel-users'
+import { createPanelUser, deletePanelUser, mfaStatus, resetPanelUserMfa, resetPanelUserPassword, updatePanelUser } from '@/services/panel-users'
 import { roleLabel } from '@/lib/labels'
 import { USER_ROLES, type AdminUser, type UserRole } from '@/types/domain'
 
@@ -50,6 +50,8 @@ export function UsersPanel() {
   const [open, setOpen] = useState(false)
   const [busy, setBusy] = useState(false)
   const [toDelete, setToDelete] = useState<AdminUser | undefined>()
+  const mfa = useQuery({ queryKey: ['estado-doble-factor'], queryFn: mfaStatus, enabled: real && canManage })
+  const [toResetMfa, setToResetMfa] = useState<AdminUser | undefined>()
   const [credentials, setCredentials] = useState<{ email: string; password: string; created: boolean } | null>(null)
   const { register, control, handleSubmit, reset, formState: { errors: e } } = useForm<Values>({ resolver: zodResolver(schema), defaultValues: { name: '', email: '', role: 'EDITOR', password: '' } })
 
@@ -75,6 +77,11 @@ export function UsersPanel() {
       const r = await resetPanelUserPassword(u.id)
       setCredentials({ email: u.email, password: r.tempPassword, created: false })
     })
+  const confirmResetMfa = async () => {
+    if (!toResetMfa) return
+    const done = await run(() => resetPanelUserMfa(toResetMfa.id), 'Doble factor restablecido: lo configurará de nuevo al entrar')
+    if (done) setToResetMfa(undefined)
+  }
   const confirmDelete = async () => {
     if (!toDelete) return
     if (real) {
@@ -132,6 +139,9 @@ export function UsersPanel() {
                         <div className="min-w-0">
                           <p className="truncate font-medium">{u.name}</p>
                           <p className="truncate text-xs text-muted-foreground">{u.email}</p>
+                          {real && canManage && mfa.data && (
+                            <p className={`text-[11px] ${mfa.data[u.id] ? 'text-success' : 'text-warning'}`}>{mfa.data[u.id] ? 'Doble factor activado' : 'Doble factor pendiente de configurar'}</p>
+                          )}
                         </div>
                       </div>
                     </TableCell>
@@ -164,6 +174,11 @@ export function UsersPanel() {
                           {real && (
                             <Button variant="ghost" size="icon-sm" disabled={busy} onClick={() => resetPassword(u)} aria-label={`Restablecer contraseña de ${u.name}`} title="Restablecer contraseña" className="text-muted-foreground">
                               <KeyRound />
+                            </Button>
+                          )}
+                          {real && mfa.data?.[u.id] && (
+                            <Button variant="ghost" size="icon-sm" disabled={busy} onClick={() => setToResetMfa(u)} aria-label={`Restablecer doble factor de ${u.name}`} title="Restablecer doble factor (si ha perdido el móvil)" className="text-muted-foreground">
+                              <ShieldOff />
                             </Button>
                           )}
                           <Button variant="ghost" size="icon-sm" onClick={() => setToDelete(u)} aria-label={`Eliminar ${u.name}`} className="text-muted-foreground hover:text-destructive">
@@ -257,6 +272,7 @@ export function UsersPanel() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+      <ConfirmDialog open={!!toResetMfa} onOpenChange={(o) => !o && setToResetMfa(undefined)} title={`Restablecer el doble factor de ${toResetMfa?.name ?? ''}`} description="Se borrará su código de la app de autenticación y se cerrarán sus sesiones. Al volver a entrar, tendrá que escanear un QR nuevo." loading={busy} confirmLabel="Restablecer" onConfirm={confirmResetMfa} />
       <ConfirmDialog open={!!toDelete} onOpenChange={(o) => !o && setToDelete(undefined)} title={`Eliminar a ${toDelete?.name ?? ''}`} description="Perderá el acceso al panel de inmediato." loading={busy || mockRemove.isPending} onConfirm={confirmDelete} />
     </div>
   )

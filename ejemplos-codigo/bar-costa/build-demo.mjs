@@ -55,24 +55,39 @@ let index = head(readFileSync(join(out, 'index.html'), 'utf8'))
 index = index.replace('<script src="js/main.js"></script>', '<script src="js/img-fallback.js"></script>\n<script src="js/main.js"></script>')
 writeFileSync(join(out, 'index.html'), index)
 
-// admin.html: el script en línea pasa a un archivo
-let admin = head(readFileSync(join(out, 'admin.html'), 'utf8'))
-const m = admin.match(/<script>\n([\s\S]*?)<\/script>/)
-if (!m) throw new Error('No se encontró el script en línea de admin.html')
-writeFileSync(join(out, 'js/admin.js'), m[1])
-admin = admin.replace(m[0], '<script src="js/img-fallback.js"></script>\n<script src="js/admin.js"></script>')
-writeFileSync(join(out, 'admin.html'), admin)
+// Demo pública: sin «área privada». admin.html (y su script) no se publican: el panel del bar solo tiene sentido en la web real
+// de cada cliente, con su propio servidor, y aquí mostraba un acceso con usuario y contraseña escritos en el código.
+rmSync(join(out, 'admin.html'), { force: true })
+rmSync(join(out, 'js/admin.js'), { force: true })
+index = readFileSync(join(out, 'index.html'), 'utf8')
+// Todos los enlaces al área privada (menú y pie), con su separador «·» si lo lleva delante.
+const adminLink = /(<span class="sep">·<\/span>)?\s*<a href="admin\.html"[^>]*><\/a>/g
+if (!adminLink.test(index)) throw new Error('No se encontró el enlace a admin.html')
+writeFileSync(join(out, 'index.html'), index.replace(adminLink, ''))
+
+// Reservas de la demo: no se guarda nada en el navegador (podrían ser datos reales de alguien que crea que es un bar de verdad)
+// y el mensaje deja claro que es una web de ejemplo.
+const store = join(out, 'js/store.js')
+const storeText = readFileSync(store, 'utf8')
+const saveFn = /const save = \(l\) => \{[^\n]*\};/
+if (!saveFn.test(storeText)) throw new Error('No se encontró save() en store.js')
+writeFileSync(store, storeText.replace(saveFn, 'const save = () => {}; // demo: no se guarda nada\n  try { localStorage.removeItem(KEY); } catch (e) {}'))
+const mainFile = join(out, 'js/main.js')
+const mainText = readFileSync(mainFile, 'utf8')
+const okMsg = 'msg(`¡Gracias, ${r.nombre}! Hemos recibido tu solicitud (ref. ${r.id}). ${Content.T("bk.ok")}`, true);'
+if (!mainText.includes(okMsg)) throw new Error('No se encontró el mensaje de reserva en main.js')
+writeFileSync(mainFile, mainText.replace(okMsg, 'msg(`Esto es una web de ejemplo de SAREBIDEA: la reserva no se ha enviado ni guardado. En la web real de tu bar, aquí te llegaría la solicitud de ${r.nombre}.`, true);'))
 
 // `onerror` en línea dentro de las plantillas de JS
 for (const f of ['js/main.js', 'js/editor.js']) {
   const p = join(out, f)
   writeFileSync(p, readFileSync(p, 'utf8').replace(/ onerror="[^"]*"/g, ''))
 }
-// Contraseña de la demo pública
+// Sin credenciales en la demo pública (no hay área privada)
 const cfg = join(out, 'js/config.js')
 const cfgText = readFileSync(cfg, 'utf8')
 if (!/adminPass: "[^"]*"/.test(cfgText)) throw new Error('No se encontró adminPass')
-writeFileSync(cfg, cfgText.replace(/adminPass: "[^"]*"/, 'adminPass: "demo"'))
+writeFileSync(cfg, cfgText.replace(/adminUser: "[^"]*"/, 'adminUser: ""').replace(/adminPass: "[^"]*"/, 'adminPass: ""'))
 
 // Archivos que no forman parte de la web publicada
 for (const f of ['server.js', 'package.json', '.env.example', 'LEEME.md', 'INSTRUCCIONES_EXPORTACION.md']) rmSync(join(out, f), { force: true })

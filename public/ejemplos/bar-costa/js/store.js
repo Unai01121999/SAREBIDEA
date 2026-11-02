@@ -3,7 +3,8 @@
 window.Store = (function () {
   const KEY = "bar_reservas_v1";
   const load = () => { try { return JSON.parse(localStorage.getItem(KEY)) || []; } catch (e) { return []; } };
-  const save = (l) => { try { localStorage.setItem(KEY, JSON.stringify(l)); } catch (e) {} };
+  const save = () => {}; // demo: no se guarda nada
+  try { localStorage.removeItem(KEY); } catch (e) {}
   return {
     all: load,
     add(r) {

@@ -37,7 +37,13 @@ const store: Store = {
     const asUser = createClient(Deno.env.get('SUPABASE_URL')!, Deno.env.get('SUPABASE_ANON_KEY')!, { global: { headers: { Authorization: `Bearer ${jwt}` } }, auth: { persistSession: false, autoRefreshToken: false } })
     const { data: role } = await asUser.rpc('panel_role')
     if (!role) return null
-    return { email: data.user.email, aal }
+    return { id: data.user.id, email: data.user.email, aal }
+  },
+  async panelUserByAuthId(authId) {
+    return desdeFila(must(await admin.from(T).select('*').eq('id_autenticacion', authId).maybeSingle()))
+  },
+  async resetAccess(authId, removeFactors) {
+    must(await admin.rpc('reiniciar_acceso_usuario', { p_user: authId, p_borrar_factores: removeFactors }))
   },
   async panelUserByEmail(email) {
     return desdeFila(must(await admin.from(T).select('*').eq('correo', email.toLowerCase()).maybeSingle()))
@@ -56,7 +62,7 @@ const store: Store = {
   },
   async authCreateOrReset(email, password) {
     const created = await admin.auth.admin.createUser({ email, password, email_confirm: true })
-    if (!created.error && created.data.user) return { id: created.data.user.id }
+    if (!created.error && created.data.user) return { id: created.data.user.id, existed: false }
     // Ya existía en Authentication: se reutiliza y se le pone la nueva contraseña.
     for (let page = 1; page <= 20; page++) {
       const { data, error } = await admin.auth.admin.listUsers({ page, perPage: 200 })
@@ -65,7 +71,7 @@ const store: Store = {
       if (found) {
         const upd = await admin.auth.admin.updateUserById(found.id, { password, email_confirm: true })
         if (upd.error) throw new HttpError(500, upd.error.message)
-        return { id: found.id }
+        return { id: found.id, existed: true }
       }
       if (data.users.length < 200) break
     }

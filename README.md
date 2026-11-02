@@ -194,6 +194,18 @@ El formulario de contacto lleva una verificación de Cloudflare Turnstile (casil
 - **12 horas también en el servidor:** `panel_role()` solo reconoce sesiones de menos de 12 horas (tabla `auth.sessions`), igual que la función `manage-panel-users`. La tarea `cerrar-sesiones-caducadas` (pg_cron, cada hora) borra las sesiones caducadas y sus tokens de renovación. Migración `021_sesiones_panel.sql`.
 - **CSP sin `'unsafe-inline'` para scripts:** `panel/scripts/csp.mjs` calcula al compilar la huella SHA-256 de cada script en línea de Next.js y la escribe en `out/.htaccess`.
 
+## Usuarios del panel y correcciones menores (seguridad, 2026-11)
+- **Roles por cuenta, no por correo:** `panel_role()`, `panel_me()` y la función `manage-panel-users` identifican a cada persona por su cuenta de acceso (`auth.uid()`), así que cambiar el correo de una cuenta no da el rol de otra. Migración `022_usuarios_panel_seguro.sql`.
+- **Altas seguras:** si al dar de alta a alguien ya existía una cuenta con ese correo, se le cierran las sesiones y se borra su doble factor (no hereda nada de quien la creara).
+- **Restablecer doble factor:** en Configuración → Usuarios, botón con escudo (por si alguien pierde el móvil). Cada usuario muestra si tiene el doble factor activado o pendiente (`estado_doble_factor()`, solo para el propietario).
+- **Sesiones:** restablecer la contraseña o desactivar a un usuario cierra sus sesiones abiertas (`reiniciar_acceso_usuario`, solo la función de servidor).
+- **CSV sin fórmulas:** las exportaciones anteponen `'` a los textos que empiezan por `= + - @`, para que Excel no los ejecute.
+- **Adjuntos de facturas:** la base de datos solo admite rutas del almacenamiento privado con tipo PDF o imagen, y el panel nunca abre un adjunto como HTML. Migración `023_correcciones_bajas.sql`.
+- **Comentarios de tareas:** el autor y la fecha los pone la base de datos; los comentarios guardados no se pueden reescribir.
+- **Historial:** cada rol solo ve los eventos de los apartados a los que tiene acceso (facturas, configuración…).
+- **Demo del bar:** sin «área privada» ni credenciales; el formulario de reservas avisa de que es una demo y no guarda nada.
+- **Lanzadores locales:** solo escuchan en `127.0.0.1` y fijan la versión de `serve`; `.htaccess` bloquea `.bat`, `.command` y `LEEME*` si se suben por error.
+
 ## Zips y ejecución en local
 
 - `sarebidea-codigo-completo.zip` incluye `LEEME.txt` (pasos) y los archivos `.env` / `panel/.env` con la conexión pública a Supabase (clave *publishable*, pública por diseño; no se suben a git). Sin ellos el formulario solo guardaría en el navegador y el panel entraría en «Modo demostración».

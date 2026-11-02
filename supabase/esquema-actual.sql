@@ -826,3 +826,104 @@ create table if not exists public.envios_formulario (
 create index if not exists envios_formulario_ip on public.envios_formulario (ip_hash, creado_el);
 alter table public.envios_formulario enable row level security;
 revoke all on public.envios_formulario from anon, authenticated;
+
+-- ─── Migraciones 022 y 023 (usuarios del panel por cuenta, reinicio de acceso, adjuntos, comentarios, historial) ──
+-- Se aplican al final: sustituyen las versiones anteriores de panel_role, panel_me y my_panel_role.
+-- 1) Los roles se asignan por la cuenta de acceso (auth.uid()), no por el correo del token.
+create or replace function public.panel_role()
+ returns text language sql stable security definer set search_path to 'public'
+as $function$
+  select u.rol from public.usuarios_panel u
+   where u.id_autenticacion = auth.uid() and u.activo
+     and coalesce(auth.jwt()->>'aal', '') = 'aal2'
+     and exists (select 1 from auth.sessions s
+                  where s.id = nullif(auth.jwt()->>'session_id', '')::uuid
+                    and s.created_at > now() - interval '12 hours')
+   limit 1;
+$function$;
+create or replace function public.panel_me()
+ returns jsonb language sql stable security definer set search_path to 'public'
+as $function$
+  select jsonb_build_object('name', u.nombre, 'email', u.correo, 'role', u.rol)
+    from public.usuarios_panel u where u.id_autenticacion = auth.uid() and u.activo limit 1;
+$function$;
+create or replace function public.my_panel_role()
+ returns text language sql stable security definer set search_path to 'public'
+as $function$
+  select u.rol from public.usuarios_panel u where u.id_autenticacion = auth.uid() and u.activo limit 1;
+$function$;
+
+-- 2) Cerrar sesiones / borrar el doble factor de un usuario (solo la función manage-panel-users, con la clave de servicio).
+create or replace function public.reiniciar_acceso_usuario(p_user uuid, p_borrar_factores boolean)
+ returns jsonb language plpgsql security definer set search_path to 'public'
+as $function$
+declare s int; f int := 0;
+begin
+  delete from auth.sessions where user_id = p_user;
+  get diagnostics s = row_count;
+  if p_borrar_factores then
+    delete from auth.mfa_factors where user_id = p_user;
+    get diagnostics f = row_count;
+  end if;
+  return jsonb_build_object('sesiones', s, 'factores', f);
+end $function$;
+revoke execute on function public.reiniciar_acceso_usuario(uuid, boolean) from public, anon, authenticated;
+grant execute on function public.reiniciar_acceso_usuario(uuid, boolean) to service_role;
+
+-- 3) Estado del doble factor de cada usuario, solo para quien gestiona usuarios.
+create or replace function public.estado_doble_factor()
+ returns table(id text, doble_factor boolean) language sql stable security definer set search_path to 'public'
+as $function$
+  select u.id, exists (select 1 from auth.mfa_factors f where f.user_id = u.id_autenticacion and f.status = 'verified')
+    from public.usuarios_panel u
+   where public.panel_can('settings', 'write');
+$function$;
+revoke execute on function public.estado_doble_factor() from public, anon;
+grant execute on function public.estado_doble_factor() to authenticated;
+-- B1 · Adjuntos de facturas: solo rutas del almacenamiento privado («<id factura>/<marca>-<nombre>») y tipos PDF/imagen.
+create or replace function public.archivos_factura_validos(p jsonb)
+ returns boolean language sql immutable set search_path to 'public'
+as $function$
+  select jsonb_typeof(coalesce(p, '[]'::jsonb)) = 'array'
+     and not exists (
+       select 1 from jsonb_array_elements(coalesce(p, '[]'::jsonb)) e
+        where jsonb_typeof(e) <> 'object'
+           or coalesce(e->>'path', '') !~ '^[A-Za-z0-9_-]+/[0-9]+-[A-Za-z0-9._-]+$'
+           or coalesce(e->>'type', '') not in ('image/jpeg', 'image/png', 'image/webp', 'application/pdf'));
+$function$;
+alter table public.facturas add constraint facturas_archivos_validos check (public.archivos_factura_validos(archivos));
+alter table public.facturas add constraint facturas_archivo_ruta_valida check (archivo_ruta is null or archivo_ruta ~ '^[A-Za-z0-9_-]+/[0-9]+-[A-Za-z0-9._-]+$');
+
+-- B8 · Comentarios de tareas: el autor (y la fecha) de cada comentario nuevo los pone la base de datos;
+--      los comentarios ya guardados no se pueden reescribir (sí quitar).
+create or replace function public.trg_autor_comentarios()
+ returns trigger language plpgsql security definer set search_path to 'public'
+as $function$
+declare quien text; viejos jsonb := '[]'; e jsonb; res jsonb := '[]';
+begin
+  select u.nombre into quien from public.usuarios_panel u where u.id_autenticacion = auth.uid() limit 1;
+  if quien is null then return new; end if;
+  if tg_op = 'UPDATE' then viejos := coalesce(old.comentarios, '[]'); end if;
+  for e in select * from jsonb_array_elements(coalesce(new.comentarios, '[]')) loop
+    if exists (select 1 from jsonb_array_elements(viejos) o where o->>'id' = e->>'id') then
+      res := res || (select o from jsonb_array_elements(viejos) o where o->>'id' = e->>'id' limit 1);
+    else
+      res := res || jsonb_build_object('id', coalesce(e->>'id', 'cmt_' || substr(replace(gen_random_uuid()::text, '-', ''), 1, 10)),
+                                       'text', left(coalesce(e->>'text', ''), 4000), 'author', quien, 'createdAt', to_jsonb(now()));
+    end if;
+  end loop;
+  new.comentarios := res;
+  return new;
+end $function$;
+revoke execute on function public.trg_autor_comentarios() from public, anon, authenticated;
+create trigger tareas_autor_comentarios before insert or update of comentarios on public.tareas for each row execute function public.trg_autor_comentarios();
+
+-- B9 · Historial: cada rol ve solo los eventos de los apartados a los que tiene acceso.
+alter policy "activity ver" on public.actividad using (
+  case entidad
+    when 'invoice' then public.panel_can('billing', 'read')
+    when 'settings' then public.panel_can('settings', 'read')
+    when 'user' then public.panel_can('settings', 'read')
+    when 'task' then public.panel_can('tasks', 'read')
+    else public.panel_can('clients', 'read')
+  end);

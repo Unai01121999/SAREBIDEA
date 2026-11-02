@@ -3,7 +3,11 @@ export function downloadCsv(filename: string, rows: Record<string, string | numb
   if (!rows.length) return
   const headers = Object.keys(rows[0])
   const esc = (v: unknown) => {
-    const s = v === null || v === undefined ? '' : String(v)
+    let s = v === null || v === undefined ? '' : String(v)
+    // Inyección de fórmulas: un texto que empieza por = + - @ (o tabulador/retorno) lo ejecutaría Excel como fórmula
+    // (p. ej. un nombre de empresa «=HYPERLINK(…)» enviado desde el formulario). Se antepone ' para que sea texto.
+    // Los números (importes, negativos incluidos) se exportan tal cual.
+    if (typeof v !== 'number' && /^[=+\-@\t\r]/.test(s)) s = `'${s}`
     return /[";\n\r]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s
   }
   const body = [headers.join(';'), ...rows.map((r) => headers.map((h) => esc(r[h])).join(';'))].join('\r\n')
