@@ -1,9 +1,11 @@
 import { AnimatePresence, m } from 'motion/react'
-import { useState, type FormEvent } from 'react'
+import { useRef, useState, type FormEvent } from 'react'
 import { createLead, validateLead, type LeadFormErrors, type PackChoice } from '../lib/leads'
 import { brand, businessTypes, packs } from '../data/site'
 import { easeOut } from '../lib/motion'
 import { Icon } from '../components/ui/Icon'
+import { Turnstile, type TurnstileHandle } from '../components/ui/Turnstile'
+import { supabaseRest } from '../lib/supabase'
 import { Reveal } from '../components/ui/Reveal'
 import { TextReveal } from '../components/ui/TextReveal'
 
@@ -15,6 +17,9 @@ export function FinalCta() {
   const [errors, setErrors] = useState<LeadFormErrors>({})
   const [failed, setFailed] = useState('')
   const [loading, setLoading] = useState(false)
+  const [captcha, setCaptcha] = useState('')
+  const [captchaError, setCaptchaError] = useState(false)
+  const turnstile = useRef<TurnstileHandle>(null)
 
   const onSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault()
@@ -42,16 +47,22 @@ export function FinalCta() {
       ;(form.elements.namedItem(first) as HTMLElement | null)?.focus()
       return
     }
+    if (supabaseRest && !captcha) {
+      setFailed(captchaError ? `No se ha podido cargar la verificación de seguridad. Recarga la página o escríbenos a ${brand.email}.` : 'Completa la verificación de seguridad que aparece encima del botón.')
+      return
+    }
     setLoading(true)
     try {
-      await createLead({ ...v, pack: v.pack as PackChoice, company: v.company.trim(), name: v.name.trim(), email: v.email.trim(), description: v.description.trim(), source: 'web' })
+      await createLead({ ...v, pack: v.pack as PackChoice, company: v.company.trim(), name: v.name.trim(), email: v.email.trim(), description: v.description.trim(), source: 'web', captcha, website: '' })
       setSent(true)
     } catch (e) {
-      if ((e as { code?: string })?.code === 'rate_limited') {
-        setFailed(`Hemos recibido varias solicitudes seguidas desde este correo. Espera un rato o escríbenos a ${brand.email}.`)
-        return
-      }
-      setFailed(`No hemos podido enviar tu solicitud. Inténtalo de nuevo o escríbenos a ${brand.email}.`)
+      const code = (e as { code?: string })?.code
+      if (code === 'rate_limited') setFailed(`Hemos recibido varias solicitudes seguidas. Espera un rato o escríbenos a ${brand.email}.`)
+      else if (code === 'captcha') setFailed('La verificación de seguridad ha caducado o no es válida. Vuelve a completarla y envía de nuevo.')
+      else setFailed(`No hemos podido enviar tu solicitud. Inténtalo de nuevo o escríbenos a ${brand.email}.`)
+      // Cada token del CAPTCHA vale para un solo envío: se pide uno nuevo.
+      setCaptcha('')
+      turnstile.current?.reset()
     } finally {
       setLoading(false)
     }
@@ -216,6 +227,11 @@ export function FinalCta() {
                     />
                     {err('description')}
                   </div>
+                  {supabaseRest && (
+                    <div className="sm:col-span-2">
+                      <Turnstile ref={turnstile} onToken={setCaptcha} onError={() => setCaptchaError(true)} />
+                    </div>
+                  )}
                   {failed && (
                     <p role="alert" className="text-sm text-[#ffb4b4] sm:col-span-2">
                       {failed}

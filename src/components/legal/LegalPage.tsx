@@ -172,6 +172,7 @@ function Privacidad() {
           items={[
             'Supabase: base de datos donde se guardan las solicitudes (servidores en la Unión Europea).',
             'Resend: envío del aviso interno por correo electrónico cuando recibimos una solicitud (proveedor con sede en EE. UU.).',
+            'Cloudflare (Turnstile): verificación de seguridad del formulario para frenar el spam automatizado; trata la dirección IP y datos técnicos del navegador solo para esa comprobación (proveedor con sede en EE. UU.).',
             'Hostinger: alojamiento web y servicios de correo asociados al dominio.',
             'Google (Google Analytics): solo si aceptas las cookies de analítica; mide el uso de la web de forma agregada (ver Política de cookies).',
           ]}

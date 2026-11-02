@@ -808,3 +808,13 @@ create policy "facturas archivos: leer" on storage.objects for select to authent
 create policy "facturas archivos: subir" on storage.objects for insert to authenticated with check ((bucket_id = 'facturas'::text) AND panel_can('billing'::text, 'write'::text));
 create policy "facturas archivos: reemplazar" on storage.objects for update to authenticated using ((bucket_id = 'facturas'::text) AND panel_can('billing'::text, 'write'::text)) with check ((bucket_id = 'facturas'::text) AND panel_can('billing'::text, 'write'::text));
 create policy "facturas archivos: borrar" on storage.objects for delete to authenticated using ((bucket_id = 'facturas'::text) AND panel_can('billing'::text, 'write'::text));
+
+-- ─── CAPTCHA del formulario (migración 020) ─────────────────────────────────────────────────────────────
+create table if not exists public.envios_formulario (
+  id bigint generated always as identity primary key,
+  ip_hash text not null,
+  creado_el timestamptz not null default now()
+);
+create index if not exists envios_formulario_ip on public.envios_formulario (ip_hash, creado_el);
+alter table public.envios_formulario enable row level security;
+revoke all on public.envios_formulario from anon, authenticated;

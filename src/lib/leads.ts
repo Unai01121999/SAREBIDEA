@@ -1,6 +1,6 @@
-// Envío del formulario de contacto. Con Supabase configurado (VITE_SUPABASE_URL y VITE_SUPABASE_ANON_KEY) se guarda
-// en la tabla `solicitudes` (el visitante anónimo solo puede INSERTAR, lo garantiza la base de datos) y aparece en el panel
-// como cliente con origen «Formulario web». Sin Supabase (desarrollo local) se guarda en localStorage para poder probar.
+// Envío del formulario de contacto. Con Supabase configurado (VITE_SUPABASE_URL y VITE_SUPABASE_ANON_KEY) se envía a la
+// función `enviar-solicitud`, que comprueba el CAPTCHA (Cloudflare Turnstile), aplica los límites por IP y correo y guarda la
+// solicitud en la tabla `solicitudes`; aparece en el panel como cliente con origen «Formulario web». Sin Supabase (desarrollo local) se guarda en localStorage para poder probar.
 import { supabaseRest } from './supabase'
 
 export const PACK_CHOICES = ['STARTER', 'PROFESSIONAL', 'PREMIUM', 'INDECISO'] as const
@@ -17,16 +17,20 @@ export type LeadInput = {
   pack: PackChoice
   description: string
   source?: 'web'
+  /** Token del CAPTCHA (Cloudflare Turnstile). */
+  captcha?: string
+  /** Campo trampa para bots (debe ir vacío). */
+  website?: string
 }
 
 const LOCAL_KEY = 'sarebidea-leads'
 
 export async function createLead(input: LeadInput): Promise<void> {
   if (supabaseRest) {
-    // Tabla `solicitudes` (columnas en español); `nombre` es la persona de contacto.
-    const res = await fetch(`${supabaseRest.url}/rest/v1/solicitudes`, {
+    // Columnas de la tabla `solicitudes` (en español); `nombre` es la persona de contacto.
+    const res = await fetch(`${supabaseRest.url}/functions/v1/enviar-solicitud`, {
       method: 'POST',
-      headers: { apikey: supabaseRest.anonKey, Authorization: `Bearer ${supabaseRest.anonKey}`, 'Content-Type': 'application/json', Prefer: 'return=minimal' },
+      headers: { apikey: supabaseRest.anonKey, 'Content-Type': 'application/json' },
       body: JSON.stringify({
         empresa: input.company,
         nombre: input.name,
@@ -35,12 +39,14 @@ export async function createLead(input: LeadInput): Promise<void> {
         tipo_negocio: input.businessType,
         pack_interes: input.pack,
         descripcion: input.description,
+        website: input.website ?? '',
+        token: input.captcha ?? '',
       }),
     })
     if (!res.ok) {
-      // La base de datos limita los envíos seguidos (antispam): se avisa con un mensaje propio.
+      // Errores con mensaje propio: CAPTCHA no superado y demasiados envíos seguidos (antispam).
       const body = await res.text().catch(() => '')
-      const code = body.includes('demasiadas_solicitudes') ? 'rate_limited' : undefined
+      const code = res.status === 403 || body.includes('"captcha"') ? 'captcha' : res.status === 429 || body.includes('demasiadas_solicitudes') ? 'rate_limited' : undefined
       throw Object.assign(new Error(`No se pudo guardar la solicitud (${res.status})`), { status: res.status, code })
     }
     return

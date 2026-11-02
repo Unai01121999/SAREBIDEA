@@ -180,6 +180,13 @@ Cambios tras revisar todo el código (migración `supabase/migrations/018_endure
 - **Esquema completo:** `supabase/esquema-actual.sql` es la copia del esquema real (tablas, funciones, disparadores, políticas, almacenamiento y tareas programadas) para poder auditar o recrear la base de datos.
 - **Pendiente en el panel de Supabase (no se puede hacer desde el código):** activar *Leaked password protection* (Authentication → Providers → Email) y comprobar que *Allow new users to sign up* está desactivado.
 
+## CAPTCHA del formulario (Cloudflare Turnstile)
+El formulario de contacto lleva una verificación de Cloudflare Turnstile (casilla «No soy un robot», normalmente automática) y ya no escribe directamente en la base de datos: lo envía a la Edge Function `enviar-solicitud`, que en el servidor comprueba el CAPTCHA (y que se resolvió en sarebidea.com), el campo trampa, los datos, y los límites (5 envíos por IP y hora, 15 al día, 3 por correo y hora y 120 en total por hora como red de seguridad). Las IP solo se guardan como huella SHA-256 durante 2 días (tabla `envios_formulario`, migración `020_captcha_formulario.sql`).
+- Clave pública (Site Key): en `src/components/ui/Turnstile.tsx` (o `VITE_TURNSTILE_SITE_KEY`).
+- Clave secreta: secreto `TURNSTILE_SECRET_KEY` en Supabase → Edge Functions → Secrets. Sin ella, la función responde «config» y no guarda nada.
+- El script de Cloudflare solo se descarga cuando el formulario se acerca a la pantalla. La CSP de `public/.htaccess` permite `challenges.cloudflare.com` (script y marco).
+- Pendiente tras subir la web nueva: quitar el `INSERT` directo del visitante anónimo en `solicitudes` (paso 2 de la migración 020).
+
 ## Zips y ejecución en local
 
 - `sarebidea-codigo-completo.zip` incluye `LEEME.txt` (pasos) y los archivos `.env` / `panel/.env` con la conexión pública a Supabase (clave *publishable*, pública por diseño; no se suben a git). Sin ellos el formulario solo guardaría en el navegador y el panel entraría en «Modo demostración».
