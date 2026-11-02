@@ -6,7 +6,7 @@
 // 5) Guarda la solicitud con la clave de servicio; los disparadores de la base de datos crean el cliente y envían el aviso por correo.
 import { createClient } from 'npm:@supabase/supabase-js@2'
 
-const TURNSTILE_SECRET = Deno.env.get('TURNSTILE_SECRET_KEY')
+const TURNSTILE_SECRET = Deno.env.get('TURNSTILE_SECRET_KEY')?.trim()
 const HOSTS = ['sarebidea.com', 'www.sarebidea.com']
 const ORIGINS = ['https://sarebidea.com', 'https://www.sarebidea.com']
 const LIMITS = { ipHour: 5, ipDay: 15, emailHour: 3, globalHour: 120 }
@@ -74,7 +74,14 @@ Deno.serve(async (req) => {
   const check = await fetch('https://challenges.cloudflare.com/turnstile/v0/siteverify', { method: 'POST', body: form })
     .then((r) => r.json())
     .catch(() => null)
-  if (!check?.success || !HOSTS.includes(check.hostname)) return json(403, { error: 'captcha' })
+  if (!check?.success || !HOSTS.includes(check.hostname)) {
+    // Códigos de Cloudflare (p. ej. invalid-input-response = token falso o caducado; invalid-input-secret = clave secreta mal puesta).
+    console.warn('enviar-solicitud: captcha rechazado', JSON.stringify(check?.['error-codes'] ?? 'sin respuesta'), check?.hostname ?? '')
+    // Pista si la clave secreta está mal (sin revelarla): longitud, si es la Site Key pública o si lleva comillas.
+    if (JSON.stringify(check?.['error-codes'] ?? '').includes('invalid-input-secret'))
+      console.warn('enviar-solicitud: revisa TURNSTILE_SECRET_KEY', JSON.stringify({ longitud: TURNSTILE_SECRET.length, esLaSiteKey: TURNSTILE_SECRET.startsWith('0x4AAAAAAFwssq'), empiezaPor0x: TURNSTILE_SECRET.startsWith('0x'), comillas: /["']/.test(TURNSTILE_SECRET) }))
+    return json(403, { error: 'captcha' })
+  }
 
   // 4) Límites por IP, por correo y global
   const ipHash = await sha256(`sarebidea-formulario:${ip || 'sin-ip'}`)
