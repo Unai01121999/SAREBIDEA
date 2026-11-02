@@ -34,7 +34,8 @@ Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') return new Response('ok', { headers: cors(origin) })
   if (req.method !== 'POST') return json(405, { error: 'metodo' })
   if (!TURNSTILE_SECRET) {
-    console.error('enviar-solicitud: falta el secreto TURNSTILE_SECRET_KEY')
+    // Solo los nombres (nunca los valores) de secretos parecidos, para detectar una errata en el nombre.
+    console.error('enviar-solicitud: falta el secreto TURNSTILE_SECRET_KEY; parecidos:', Object.keys(Deno.env.toObject()).filter((k) => /turn|captcha|secret/i.test(k)).join(', ') || 'ninguno')
     return json(500, { error: 'config' })
   }
 
