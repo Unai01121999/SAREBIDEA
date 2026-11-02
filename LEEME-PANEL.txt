@@ -1,0 +1,25 @@
+SAREBIDEA · PANEL PRIVADO PARA PUBLICAR (panel.sarebidea.com)
+=============================================================
+
+DÓNDE SE SUBE
+  En Hostinger, el subdominio panel.sarebidea.com tiene su propia carpeta. Para verla:
+  hPanel → Sitios web → sarebidea.com → Dominios → Subdominios → mira la «Carpeta» de panel.sarebidea.com
+  (suele ser  public_html/panel  o  domains/panel.sarebidea.com/public_html).
+
+PARA PUBLICAR
+  1) Entra en el Administrador de archivos y abre ESA carpeta del subdominio.
+  2) Borra su contenido anterior.
+  3) Sube TODO el contenido de este zip (incluido el archivo oculto .htaccess) y descomprímelo ahí.
+     index.html, _next/, clientes/, facturacion/… deben quedar directamente dentro de la carpeta del subdominio.
+  4) Activa el certificado SSL del subdominio si no lo está: hPanel → Seguridad → SSL → panel.sarebidea.com.
+  5) Abre https://panel.sarebidea.com y pulsa Ctrl+F5.
+
+IMPORTANTE
+  · Si antes tenías el panel en public_html/panel y esa NO es la carpeta del subdominio, bórrala: ya no se usa
+    (sarebidea.com/panel/… redirige al subdominio).
+  · El .htaccess de este zip lleva la política de seguridad con las huellas de los scripts de ESTA compilación.
+    Sube siempre el zip completo: si mezclas archivos de compilaciones distintas, el panel se quedará en blanco.
+
+SESIONES
+  · La sesión dura lo que la pestaña: al cerrarla hay que volver a entrar (contraseña + código).
+  · Se cierra sola tras 30 minutos sin actividad y, como máximo, a las 12 horas.

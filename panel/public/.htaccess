@@ -1,5 +1,28 @@
-# Panel privado: nunca debe indexarse y tiene su propia política de contenido
-# (la exportación estática de Next.js necesita scripts en línea; no hay forma de usar nonces en hosting estático).
+# Panel privado SAREBIDEA · https://panel.sarebidea.com (subdominio propio, aislado de la web pública y de las demos).
+# Este archivo es una PLANTILLA: al compilar, scripts/csp.mjs pone en script-src las huellas SHA-256 de los
+# scripts en línea que genera Next.js, así la política de contenido no necesita 'unsafe-inline' para scripts.
+
+Options -Indexes
+DirectoryIndex index.html
+ErrorDocument 404 /404.html
+
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+  # Siempre por HTTPS
+  RewriteCond %{HTTPS} !=on
+  RewriteCond %{HTTP:X-Forwarded-Proto} !https
+  RewriteCond %{HTTP_HOST} ^panel\.sarebidea\.com$ [NC]
+  RewriteRule ^ https://panel.sarebidea.com%{REQUEST_URI} [L,R=301]
+</IfModule>
+
+# Carpetas y archivos ocultos (.git/, .env…) devuelven 404; se deja pasar .well-known (certificados SSL).
+<IfModule mod_alias.c>
+  RedirectMatch 404 /\.(?!well-known)
+</IfModule>
+<FilesMatch "(^\.ht|^\.env|\.(env|log|sql|bak|map|md|lock|ya?ml)$|~$)">
+  Require all denied
+</FilesMatch>
+
 <IfModule mod_headers.c>
   Header always set X-Robots-Tag "noindex, nofollow, noarchive"
   Header always set X-Frame-Options "DENY"
@@ -8,6 +31,8 @@
   Header always set X-Content-Type-Options "nosniff"
   Header always set Permissions-Policy "camera=(), microphone=(), geolocation=(), payment=(), usb=()"
   Header always set Cross-Origin-Opener-Policy "same-origin"
+  Header always set Cross-Origin-Resource-Policy "same-origin"
   Header set Cache-Control "no-cache"
-  Header always set Content-Security-Policy "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self' data:; connect-src 'self' https://acipnrmskjupfznxjpvt.supabase.co; frame-ancestors 'none'; base-uri 'self'; form-action 'self'; object-src 'none'"
+  Header always set Content-Security-Policy "default-src 'self'; script-src 'self' __SCRIPT_HASHES__; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self' data:; connect-src 'self' https://acipnrmskjupfznxjpvt.supabase.co; frame-ancestors 'none'; base-uri 'self'; form-action 'self'; object-src 'none'"
+  Header unset X-Powered-By
 </IfModule>

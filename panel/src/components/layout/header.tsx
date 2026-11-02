@@ -72,12 +72,12 @@ export function Header() {
               </DropdownMenuItem>
             )}
             <DropdownMenuItem asChild>
-              <a href="/">
+              <a href="https://sarebidea.com/">
                 <ArrowLeft /> Volver a la web
               </a>
             </DropdownMenuItem>
             {supabase && (
-              <DropdownMenuItem onSelect={() => supabase?.auth.signOut().then(() => window.location.reload())}>
+              <DropdownMenuItem onSelect={() => { sessionStorage.removeItem('sarebidea-panel-inicio'); void supabase?.auth.signOut().then(() => window.location.reload()) }}>
                 <LogOut /> Cerrar sesión
               </DropdownMenuItem>
             )}

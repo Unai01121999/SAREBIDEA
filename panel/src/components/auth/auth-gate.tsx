@@ -2,7 +2,7 @@
 
 import type { Session } from '@supabase/supabase-js'
 import { Lock, ShieldCheck } from 'lucide-react'
-import { useEffect, useState, type FormEvent } from 'react'
+import { useEffect, useRef, useState, type FormEvent } from 'react'
 import { LogoMark } from '@/components/layout/logo'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -12,7 +12,8 @@ import { adminEmails, supabase } from '@/lib/supabase'
 // Acceso al panel:
 // 1. Correo y contraseña (usuario creado a mano en Supabase, sin registro público).
 // 2. Segundo factor: código de 6 cifras de una app de autenticación. La primera vez se escanea un QR.
-// Solo pasan las cuentas de NEXT_PUBLIC_ADMIN_EMAILS. La sesión es la misma que usa la web pública.
+// Solo pasan las cuentas de la tabla de usuarios del panel. La sesión vive en esta pestaña (sessionStorage) y se cierra
+// tras 30 minutos sin actividad; la base de datos además la invalida a las 12 horas.
 // Importante: esto controla la INTERFAZ. Los datos reales deben protegerse en la base de datos con RLS (ver README).
 
 type Step =
@@ -106,20 +107,21 @@ export function AuthGate({ children }: { children: React.ReactNode }) {
   }
 
   const signOut = async () => {
+    sessionStorage.removeItem('sarebidea-panel-inicio')
     await supabase?.auth.signOut()
     setStep({ kind: 'signin' })
   }
 
   if (step.kind === 'ready')
     return (
-      <>
+      <IdleSignOut onExpire={setError}>
         {!supabase && (
           <div role="status" className="border-b bg-warning/12 px-4 py-1.5 text-center text-xs text-warning">
             Modo demostración: datos de ejemplo guardados en este navegador y sin inicio de sesión.
           </div>
         )}
         {children}
-      </>
+      </IdleSignOut>
     )
 
   return (
@@ -209,7 +211,7 @@ export function AuthGate({ children }: { children: React.ReactNode }) {
           )}
         </div>
         <p className="mt-6 text-center text-xs text-muted-foreground">
-          <a href="/" className="hover:underline">
+          <a href="https://sarebidea.com/" className="hover:underline">
             ← Volver a la web
           </a>
         </p>
@@ -225,4 +227,57 @@ function CodeField() {
       <Input id="mfa-code" name="code" inputMode="numeric" autoComplete="one-time-code" maxLength={7} autoFocus className="h-12 text-center text-xl tracking-[0.4em] tabular" />
     </div>
   )
+}
+
+const IDLE_MS = 30 * 60_000
+/** Igual que la base de datos (panel_role): una sesión solo vale 12 horas desde que se entra. */
+const MAX_MS = 12 * 3600_000
+const KEY = 'sarebidea-panel-actividad'
+const START = 'sarebidea-panel-inicio'
+
+/** Cierra la sesión tras 30 minutos sin actividad (ratón, teclado, toques o desplazamiento) en esta pestaña, o a las 12 horas. */
+function IdleSignOut({ onExpire, children }: { onExpire: (msg: string) => void; children: React.ReactNode }) {
+  const expire = useRef(onExpire)
+  useEffect(() => {
+    expire.current = onExpire
+  })
+  useEffect(() => {
+    if (!supabase) return
+    const sb = supabase
+    const now = () => Date.now()
+    const touch = () => sessionStorage.setItem(KEY, String(now()))
+    const last = () => Number(sessionStorage.getItem(KEY) ?? now())
+    touch()
+    if (!sessionStorage.getItem(START)) sessionStorage.setItem(START, String(now()))
+    let done = false
+    const check = () => {
+      if (done) return
+      const idle = now() - last() >= IDLE_MS
+      const tooOld = now() - Number(sessionStorage.getItem(START) ?? now()) >= MAX_MS
+      if (!idle && !tooOld) return
+      done = true
+      sessionStorage.removeItem(START)
+      expire.current(idle ? 'Hemos cerrado la sesión tras 30 minutos sin actividad. Vuelve a entrar.' : 'Por seguridad, la sesión dura como máximo 12 horas. Vuelve a entrar.')
+      void sb.auth.signOut({ scope: 'local' })
+    }
+    let t = 0
+    const onActivity = () => {
+      // Como mucho una escritura cada 10 s.
+      if (now() - t > 10_000) {
+        t = now()
+        touch()
+      }
+    }
+    const events = ['pointerdown', 'keydown', 'wheel', 'touchstart', 'scroll'] as const
+    events.forEach((e) => window.addEventListener(e, onActivity, { passive: true, capture: true }))
+    const onVisible = () => document.visibilityState === 'visible' && check()
+    document.addEventListener('visibilitychange', onVisible)
+    const id = window.setInterval(check, 30_000)
+    return () => {
+      events.forEach((e) => window.removeEventListener(e, onActivity, { capture: true }))
+      document.removeEventListener('visibilitychange', onVisible)
+      window.clearInterval(id)
+    }
+  }, [])
+  return <>{children}</>
 }

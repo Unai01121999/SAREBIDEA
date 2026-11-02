@@ -12,6 +12,9 @@ ErrorDocument 404 /404.html
   # www → sin www (y a HTTPS) en un solo salto
   RewriteCond %{HTTP_HOST} ^www\.sarebidea\.com$ [NC]
   RewriteRule ^ https://sarebidea.com%{REQUEST_URI} [L,R=301]
+  # El panel privado está ahora en su propio subdominio: las direcciones antiguas /panel/… llevan allí.
+  RewriteCond %{HTTP_HOST} ^sarebidea\.com$ [NC]
+  RewriteRule ^panel(/(.*))?$ https://panel.sarebidea.com/$2 [L,R=301]
   # HTTP → HTTPS (solo para sarebidea.com, para no romper la dirección de pruebas de Hostinger)
   RewriteCond %{HTTP_HOST} ^sarebidea\.com$ [NC]
   RewriteCond %{HTTPS} !=on

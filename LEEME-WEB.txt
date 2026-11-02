@@ -1,11 +1,13 @@
-SAREBIDEA · WEB Y PANEL PARA PUBLICAR
-=====================================
+SAREBIDEA · WEB PÚBLICA PARA PUBLICAR (sarebidea.com)
+=====================================================
 
 PARA PUBLICAR EN HOSTINGER
   1) Entra en el Administrador de archivos → public_html.
   2) Borra el contenido anterior (haz antes una copia si quieres).
+     ¡OJO! Si la carpeta del subdominio panel.sarebidea.com está dentro de public_html (por ejemplo public_html/panel),
+     NO la borres: ahí vive el panel privado (se sube con su propio zip, sarebidea-panel.zip).
   3) Sube TODO el contenido de esta carpeta (incluidos los archivos ocultos que empiezan por punto, como .htaccess) y descomprímelo ahí.
-     Los archivos index.html, assets/, panel/, ejemplos/ deben quedar directamente dentro de public_html (no dentro de otra carpeta).
+     Los archivos index.html, assets/, ejemplos/ deben quedar directamente dentro de public_html (no dentro de otra carpeta).
   4) Abre tu dominio y pulsa Ctrl+F5 (Cmd+Mayús+R en Mac) para saltarte la caché del navegador.
 
 PARA VERLA EN TU ORDENADOR (SIN SUBIRLA)
@@ -15,7 +17,8 @@ PARA VERLA EN TU ORDENADOR (SIN SUBIRLA)
     · Mac/Linux: ejecuta ver-en-mi-ordenador.command
   Se abre http://localhost:8080
 
-El panel privado está en /panel/ (por ejemplo https://tudominio.com/panel/).
+El panel privado ya NO va en este zip: está en https://panel.sarebidea.com (zip aparte: sarebidea-panel.zip).
+Las direcciones antiguas sarebidea.com/panel/… redirigen solas al subdominio.
 
 ¿SE SIGUE VIENDO LA VERSIÓN ANTIGUA?
   1) Abre https://tudominio.com/version.txt  → debe mostrar la fecha de la última compilación y un nombre «css index-XXXX.css».

@@ -273,7 +273,14 @@ CREATE OR REPLACE FUNCTION public.panel_role()
  STABLE SECURITY DEFINER
  SET search_path TO 'public'
 AS $function$
-  select u.rol from public.usuarios_panel u where lower(u.correo) = lower(coalesce(auth.jwt()->>'email', '')) and u.activo and coalesce(auth.jwt()->>'aal', '') = 'aal2' limit 1;
+  -- Usuario activo, con doble factor y con una sesión de menos de 12 horas (migración 021).
+  select u.rol from public.usuarios_panel u
+   where lower(u.correo) = lower(coalesce(auth.jwt()->>'email', '')) and u.activo
+     and coalesce(auth.jwt()->>'aal', '') = 'aal2'
+     and exists (select 1 from auth.sessions s
+                  where s.id = nullif(auth.jwt()->>'session_id', '')::uuid
+                    and s.created_at > now() - interval '12 hours')
+   limit 1;
 $function$
 ;
 
@@ -799,6 +806,7 @@ create policy "websites ver" on public.webs as permissive for select to authenti
 -- ─── Tareas programadas (pg_cron, hora UTC) ────────────────────────────────────────────────────────────
 -- select cron.schedule('facturas-mantenimiento-mensual', '5 4 * * *', 'select public.generar_facturas_mantenimiento()');
 -- select cron.schedule('facturas-renovacion-anual', '10 4 * * *', 'select public.generar_facturas_renovacion_con_costes()');
+-- select cron.schedule('cerrar-sesiones-caducadas', '17 * * * *', 'select public.cerrar_sesiones_caducadas()');  -- función en la migración 021
 
 -- ─── Almacenamiento: adjuntos de facturas (privado, máx. 10 MB, PDF o imagen) ───────────────────────────
 insert into storage.buckets (id, name, public, file_size_limit, allowed_mime_types)

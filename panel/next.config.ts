@@ -1,10 +1,9 @@
 import type { NextConfig } from 'next'
 
-// El panel se compila como sitio ESTÁTICO y se sirve desde /panel (junto a la web pública, p. ej. en Hostinger).
-// No necesita servidor Node: los datos vendrán de Supabase desde el navegador cuando se conecte.
+// El panel se compila como sitio ESTÁTICO y se sirve en su propio subdominio (https://panel.sarebidea.com, Hostinger).
+// Un origen propio aísla su sesión de la web pública y de las demos. No necesita servidor Node: los datos vienen de Supabase.
 const config: NextConfig = {
   output: 'export',
-  basePath: '/panel',
   trailingSlash: true,
   images: { unoptimized: true },
   reactStrictMode: true,

@@ -33,6 +33,10 @@ const store: Store = {
     } catch {
       aal = ''
     }
+    // Misma regla que la base de datos: la sesión debe seguir viva y tener menos de 12 horas (panel_role con el token del usuario).
+    const asUser = createClient(Deno.env.get('SUPABASE_URL')!, Deno.env.get('SUPABASE_ANON_KEY')!, { global: { headers: { Authorization: `Bearer ${jwt}` } }, auth: { persistSession: false, autoRefreshToken: false } })
+    const { data: role } = await asUser.rpc('panel_role')
+    if (!role) return null
     return { email: data.user.email, aal }
   },
   async panelUserByEmail(email) {

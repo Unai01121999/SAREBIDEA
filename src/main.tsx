@@ -16,6 +16,14 @@ import App from './App.tsx'
 
 initAnalytics() // Google Analytics: solo se carga si se acepta la analítica
 
+// El panel vivía antes en sarebidea.com/panel y guardaba aquí su sesión. Ahora está en panel.sarebidea.com:
+// se borra cualquier sesión antigua que quede en este navegador para que ningún script de la web pueda leerla.
+try {
+  for (const k of Object.keys(localStorage)) if (/^sb-.*-auth-token/.test(k)) localStorage.removeItem(k)
+} catch {
+  /* almacenamiento bloqueado: no hay nada que borrar */
+}
+
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <App />

@@ -30,7 +30,7 @@ SINGLE=1 npm run build   # un único index.html autocontenido (vista previa)
 - `panel/`: aplicación aparte (Next.js + Prisma + PostgreSQL) para gestionar clientes, webs, dominios, hosting, facturación y tareas. Ver `panel/README.md`.
 
 ### Publicar web + panel en Hostinger
-`npm run build:all` compila la web pública y el panel y deja todo en `dist/` (el panel en `dist/panel/`). Sube el contenido de `dist/` a `public_html`. Variables al compilar: `VITE_SUPABASE_URL`/`VITE_SUPABASE_ANON_KEY` (web) y `NEXT_PUBLIC_SUPABASE_URL`/`NEXT_PUBLIC_SUPABASE_ANON_KEY` (panel). El botón «Área privada» de la web abre `/panel/`.
+`npm run build:all` compila la web pública en `dist/` (súbela a la carpeta de sarebidea.com, `public_html`) y el panel en `panel/out/` (súbelo a la carpeta del subdominio **panel.sarebidea.com**). Variables al compilar: `VITE_SUPABASE_URL`/`VITE_SUPABASE_ANON_KEY` (web) y `NEXT_PUBLIC_SUPABASE_URL`/`NEXT_PUBLIC_SUPABASE_ANON_KEY` (panel). El botón «Área privada» de la web abre https://panel.sarebidea.com/ y las direcciones antiguas `sarebidea.com/panel/…` redirigen allí.
 
 ## SEO
 
@@ -40,7 +40,7 @@ SINGLE=1 npm run build   # un único index.html autocontenido (vista previa)
 
 ## Servidor (.htaccess y cabeceras de seguridad)
 
-`public/.htaccess` (y los de `public/assets/`, `panel/public/` y `_next/static`, que genera `scripts/merge-panel.mjs`) configuran Hostinger:
+`public/.htaccess` (y los de `public/assets/`, `panel/public/` y `_next/static`, que genera `panel/scripts/csp.mjs`) configuran Hostinger:
 
 - **Una sola dirección:** `http://` y `www.` redirigen a `https://sarebidea.com` (301, un solo salto). Solo actúa sobre sarebidea.com, no sobre la dirección temporal de Hostinger.
 - **Compresión** de HTML, CSS, JS, JSON y SVG; **caché** de 1 año para los archivos con huella (`/assets/`, `/panel/_next/static/`), 30 días para imágenes y revalidación siempre para páginas, sitemap y robots.
@@ -187,8 +187,16 @@ El formulario de contacto lleva una verificación de Cloudflare Turnstile (casil
 - El script de Cloudflare solo se descarga cuando el formulario se acerca a la pantalla. La CSP de `public/.htaccess` permite `challenges.cloudflare.com` (script y marco).
 - El visitante anónimo ya no puede escribir directamente en `solicitudes` (paso 2 de la migración 020, aplicado): la única vía es la función con CAPTCHA.
 
+## Panel en su propio subdominio y sesiones (seguridad, 2026-11)
+- **Subdominio propio:** el panel está en https://panel.sarebidea.com. Al ser otro origen, ningún script de la web pública, de las demos ni de Google Analytics puede leer su sesión. La web borra, al cargar, cualquier sesión antigua que quedara guardada de cuando el panel vivía en `/panel/`.
+- **Sesión solo en la pestaña** (`sessionStorage`): al cerrar la pestaña hay que volver a entrar con contraseña y código.
+- **Cierre por inactividad:** a los 30 minutos sin actividad, y como máximo a las 12 horas.
+- **12 horas también en el servidor:** `panel_role()` solo reconoce sesiones de menos de 12 horas (tabla `auth.sessions`), igual que la función `manage-panel-users`. La tarea `cerrar-sesiones-caducadas` (pg_cron, cada hora) borra las sesiones caducadas y sus tokens de renovación. Migración `021_sesiones_panel.sql`.
+- **CSP sin `'unsafe-inline'` para scripts:** `panel/scripts/csp.mjs` calcula al compilar la huella SHA-256 de cada script en línea de Next.js y la escribe en `out/.htaccess`.
+
 ## Zips y ejecución en local
 
 - `sarebidea-codigo-completo.zip` incluye `LEEME.txt` (pasos) y los archivos `.env` / `panel/.env` con la conexión pública a Supabase (clave *publishable*, pública por diseño; no se suben a git). Sin ellos el formulario solo guardaría en el navegador y el panel entraría en «Modo demostración».
 - `scripts/prerender.mjs`: si no hay Chromium (otro equipo), copia la portada a `/aviso-legal/`, `/politica-de-privacidad/` y `/politica-de-cookies/` en vez de dejar esas rutas sin página.
-- `sarebidea-web-y-panel.zip` incluye `LEEME-SUBIR.txt` (borrar tras extraer).
+- `sarebidea-web.zip` (contenido de `dist/` + `LEEME-WEB.txt` y lanzadores locales) va a `public_html` de sarebidea.com.
+- `sarebidea-panel.zip` (contenido de `panel/out/` + `LEEME-PANEL.txt`) va a la carpeta del subdominio panel.sarebidea.com. Su `.htaccess` lleva las huellas CSP de esa compilación: súbelo siempre completo.

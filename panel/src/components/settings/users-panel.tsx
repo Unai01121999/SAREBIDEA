@@ -239,7 +239,7 @@ export function UsersPanel() {
             {[
               ['Correo', credentials?.email ?? ''],
               ['Contraseña temporal', credentials?.password ?? ''],
-              ['Dirección del panel', `${typeof window !== 'undefined' ? window.location.origin : ''}/panel/`],
+              ['Dirección del panel', `${typeof window !== 'undefined' ? window.location.origin : ''}/`],
             ].map(([k, v]) => (
               <div key={k} className="flex items-center justify-between gap-3 rounded-lg border bg-muted/40 px-3 py-2">
                 <div className="min-w-0">

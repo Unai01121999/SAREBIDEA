@@ -19,14 +19,15 @@ import { Faq } from './sections/Faq'
 import { FinalCta } from './sections/FinalCta'
 import { Footer } from './sections/Footer'
 
-/** El botón «Área privada» lleva al panel de administración (publicado en /panel junto a la web). */
+/** El botón «Área privada» lleva al panel de administración, en su propio subdominio (aislado de la web pública). */
+const PANEL_URL = 'https://panel.sarebidea.com/'
 const goToPanel = () => {
-  window.location.assign('/panel/')
+  window.location.assign(PANEL_URL)
 }
 
 // Enlaces antiguos con # (#area-privada y las páginas legales, que ahora tienen URL propia) se redirigen (al cargar y si cambia el hash).
 const LEGACY: Record<string, string> = {
-  '#area-privada': '/panel/',
+  '#area-privada': PANEL_URL,
   '#aviso-legal': '/aviso-legal/',
   '#politica-de-privacidad': '/politica-de-privacidad/',
   '#politica-de-cookies': '/politica-de-cookies/',
