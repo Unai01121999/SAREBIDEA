@@ -8,6 +8,10 @@ ErrorDocument 404 /404.html
 
 <IfModule mod_rewrite.c>
   RewriteEngine On
+  # Solo se sirve en panel.sarebidea.com. Si la carpeta del subdominio está dentro de public_html (public_html/panel),
+  # este .htaccess anula las reglas del de la web, así que aquí se redirige sarebidea.com/panel/… al subdominio.
+  RewriteCond %{HTTP_HOST} ^(www\.)?sarebidea\.com$ [NC]
+  RewriteRule ^(.*)$ https://panel.sarebidea.com/$1 [L,R=301]
   # Siempre por HTTPS
   RewriteCond %{HTTPS} !=on
   RewriteCond %{HTTP:X-Forwarded-Proto} !https
