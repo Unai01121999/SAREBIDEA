@@ -185,7 +185,7 @@ El formulario de contacto lleva una verificación de Cloudflare Turnstile (casil
 - Clave pública (Site Key): en `src/components/ui/Turnstile.tsx` (o `VITE_TURNSTILE_SITE_KEY`).
 - Clave secreta: secreto `TURNSTILE_SECRET_KEY` en Supabase → Edge Functions → Secrets. Sin ella, la función responde «config» y no guarda nada.
 - El script de Cloudflare solo se descarga cuando el formulario se acerca a la pantalla. La CSP de `public/.htaccess` permite `challenges.cloudflare.com` (script y marco).
-- Pendiente tras subir la web nueva: quitar el `INSERT` directo del visitante anónimo en `solicitudes` (paso 2 de la migración 020).
+- El visitante anónimo ya no puede escribir directamente en `solicitudes` (paso 2 de la migración 020, aplicado): la única vía es la función con CAPTCHA.
 
 ## Zips y ejecución en local
 

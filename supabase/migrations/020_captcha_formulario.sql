@@ -12,6 +12,6 @@ create index if not exists envios_formulario_ip on public.envios_formulario (ip_
 alter table public.envios_formulario enable row level security;
 revoke all on public.envios_formulario from anon, authenticated;
 
--- PASO 2 (cuando la web nueva esté subida a Hostinger): cerrar la vía directa, que se salta el CAPTCHA.
--- revoke insert on public.solicitudes from anon;
--- drop policy if exists "formulario publico inserta" on public.solicitudes;
+-- PASO 2 (aplicado el 02/11/2026, con la web nueva ya publicada): se cierra la vía directa, que se saltaba el CAPTCHA.
+revoke insert on public.solicitudes from anon;
+alter policy "formulario publico inserta" on public.solicitudes with check (false);

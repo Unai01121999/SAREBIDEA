@@ -218,8 +218,8 @@ create table if not exists public.solicitudes (
   constraint solicitudes_pack_interes_check CHECK (((pack_interes IS NULL) OR (pack_interes = ANY (ARRAY['STARTER'::text, 'PROFESSIONAL'::text, 'PREMIUM'::text, 'INDECISO'::text]))))
 );
 alter table public.solicitudes enable row level security;
+-- El visitante anónimo ya no escribe aquí: el formulario pasa por la Edge Function `enviar-solicitud` (CAPTCHA). Migración 020.
 revoke insert, update, delete, select on public.solicitudes from anon;
-grant insert (empresa, nombre, telefono, correo, tipo_negocio, pack_interes, descripcion) on public.solicitudes to anon;
 
 -- tabla tareas
 create table if not exists public.tareas (
@@ -775,7 +775,7 @@ create policy "admin borra" on public.solicitudes as permissive for delete to au
 create policy "admin edita" on public.solicitudes as permissive for update to authenticated using (false) with check (false);
 create policy "admin inserta" on public.solicitudes as permissive for insert to authenticated with check (false);
 create policy "admin lee" on public.solicitudes as permissive for select to authenticated using (false);
-create policy "formulario publico inserta" on public.solicitudes as permissive for insert to anon with check (true);
+create policy "formulario publico inserta" on public.solicitudes as permissive for insert to anon with check (false);
 create policy "leads borrar" on public.solicitudes as permissive for delete to authenticated using (panel_can('clients'::text, 'write'::text));
 create policy "leads crear" on public.solicitudes as permissive for insert to authenticated with check (panel_can('clients'::text, 'write'::text));
 create policy "leads editar" on public.solicitudes as permissive for update to authenticated using (panel_can('clients'::text, 'write'::text)) with check (panel_can('clients'::text, 'write'::text));
